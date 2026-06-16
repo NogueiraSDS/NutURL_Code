@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Login() {
-  const { user, signInWithGoogle, signInWithEmail, registerWithEmail, loading } = useAuth();
+  const { user, signInWithGoogle, signInWithEmail, registerWithEmail, resetPassword, loading } = useAuth();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -41,6 +41,24 @@ export default function Login() {
     }
   };
 
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError('Por favor, preencha o campo de e-mail para recuperar a senha.');
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      setError('');
+      await resetPassword(email);
+      alert('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Erro ao enviar e-mail de recuperação.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>Carregando...</div>;
 
   return (
@@ -62,15 +80,27 @@ export default function Login() {
             className="input"
             required
           />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Sua senha"
-            className="input"
-            required
-            minLength={6}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: '100%' }}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Sua senha"
+              className="input"
+              required
+              minLength={6}
+              style={{ width: '100%' }}
+            />
+            {!isRegistering && (
+              <button 
+                type="button" 
+                onClick={handleResetPassword}
+                style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.85rem', marginTop: '0.5rem', cursor: 'pointer' }}
+              >
+                Esqueci minha senha
+              </button>
+            )}
+          </div>
           {error && <p style={{ color: 'var(--error)', fontSize: '0.9rem', textAlign: 'left' }}>{error}</p>}
           <button type="submit" className="btn" disabled={isSubmitting}>
             {isSubmitting ? 'Processando...' : (isRegistering ? 'Cadastrar' : 'Entrar')}
