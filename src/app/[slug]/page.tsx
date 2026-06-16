@@ -15,6 +15,23 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
     notFound();
   }
 
+  if (link.expiresAt && link.expiresAt < new Date()) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '2rem', textAlign: 'center' }}>
+        <div className="glass" style={{ padding: '4rem', maxWidth: '500px', width: '100%', borderRadius: '16px' }}>
+          <h1 style={{ fontSize: '5rem', marginBottom: '1rem', color: 'var(--error)', lineHeight: 1 }}>:(</h1>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1rem', fontWeight: 800 }}>Ops! Este link expirou.</h2>
+          <p style={{ color: '#94a3b8', marginBottom: '2rem', fontSize: '1.1rem' }}>
+            O prazo de validade deste link se esgotou. Links criados no plano gratuito expiram após 6 meses.
+          </p>
+          <a href="/" className="btn" style={{ textDecoration: 'none', display: 'inline-block' }}>
+            Crie seu próprio link no NutURL
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const headersList = await headers();
   const userAgent = headersList.get('user-agent') || 'Unknown';
   const referer = headersList.get('referer') || 'Direct';

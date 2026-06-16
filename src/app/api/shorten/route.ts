@@ -3,11 +3,8 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    const { url, userId, hasAd } = await request.json();
+    const { url, userId, hasAd, customAlias } = await request.json();
     
-    // DEBUG LOG
-    console.log("DB URL DEBUG:", process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 20) + "..." : "EMPTY");
-
     if (!url) {
       return NextResponse.json({ error: 'URL é obrigatória' }, { status: 400 });
     }
@@ -18,23 +15,58 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'URL inválida' }, { status: 400 });
     }
 
-    let slug;
-    let isUnique = false;
-    
-    while (!isUnique) {
-      slug = Math.random().toString(36).substring(2, 8);
-      const existing = await prisma.link.findUnique({ where: { slug } });
-      if (!existing) {
-        isUnique = true;
+    let userTier = 'free';
+    if (userId) {
+      const userRecord = await prisma.user.findUnique({ where: { firebaseUid: userId } });
+      if (userRecord) {
+        userTier = userRecord.tier;
+      } else {
+        await prisma.user.create({ data: { firebaseUid: userId, tier: 'free' } });
+      }
+    }
+
+    let finalHasAd = !!hasAd;
+    let expiresAt: Date | null = null;
+    let finalSlug: string | null = null;
+
+    if (userTier === 'free') {
+      finalHasAd = true; 
+      expiresAt = new Date(Date.now() + 180 * 24 * 60 * 60 * 1000); 
+    } else if (userTier === 'pro') {
+      expiresAt = null;
+    } else if (userTier === 'premium') {
+      expiresAt = null;
+      if (customAlias) {
+        const aliasClean = customAlias.trim().replace(/[^a-zA-Z0-9_-]/g, '');
+        if (aliasClean.length < 3) {
+          return NextResponse.json({ error: 'Alias customizado deve ter pelo menos 3 caracteres permitidos (letras, números, hífens e underlines).' }, { status: 400 });
+        }
+        const existing = await prisma.link.findUnique({ where: { slug: aliasClean } });
+        if (existing) {
+          return NextResponse.json({ error: 'Este link customizado já está em uso.' }, { status: 400 });
+        }
+        finalSlug = aliasClean;
+      }
+    }
+
+    if (!finalSlug) {
+      let isUnique = false;
+      while (!isUnique) {
+        finalSlug = Math.random().toString(36).substring(2, 8);
+        const existing = await prisma.link.findUnique({ where: { slug: finalSlug } });
+        if (!existing) {
+          isUnique = true;
+        }
       }
     }
 
     const link = await prisma.link.create({
       data: {
         url,
-        slug: slug!,
+        slug: finalSlug as string,
         userId: userId || null,
-        hasAd: !!hasAd,
+        hasAd: finalHasAd,
+        expiresAt,
       },
     });
 

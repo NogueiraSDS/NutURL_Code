@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,26 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [shortUrl, setShortUrl] = useState('');
   const [error, setError] = useState('');
-  const [hasAd, setHasAd] = useState(false);
+  const [hasAd, setHasAd] = useState(true); // Default to true (Ad) for free users
+  const [customAlias, setCustomAlias] = useState('');
+  const [tier, setTier] = useState('free');
+
+  useEffect(() => {
+    if (user) {
+      fetch(`/api/me?userId=${user.uid}`)
+        .then(res => res.json())
+        .then(data => {
+          setTier(data.tier);
+          if (data.tier !== 'free') {
+            setHasAd(false); // Default to direct for pro/premium
+          }
+        })
+        .catch(console.error);
+    } else {
+      setTier('free');
+      setHasAd(true);
+    }
+  }, [user]);
 
   const handleShorten = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +45,7 @@ export default function Home() {
       const res = await fetch('/api/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, userId: user?.uid, hasAd }),
+        body: JSON.stringify({ url, userId: user?.uid, hasAd, customAlias }),
       });
 
       const data = await res.json();
@@ -83,18 +102,33 @@ export default function Home() {
           </button>
         </form>
 
+        {tier === 'premium' && (
+          <div style={{ marginTop: '1.25rem', width: '100%' }}>
+            <input 
+              type="text" 
+              value={customAlias} 
+              onChange={(e) => setCustomAlias(e.target.value)} 
+              placeholder="Alias customizado (Ex: minha-marca)" 
+              className="input" 
+              style={{ width: '100%' }} 
+            />
+          </div>
+        )}
+
         <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'flex-start' }}>
-          <label className="switch-container">
+          <label className="switch-container" style={{ opacity: tier === 'free' ? 0.5 : 1, cursor: tier === 'free' ? 'not-allowed' : 'pointer' }}>
             <span className="switch">
               <input 
                 type="checkbox" 
                 checked={hasAd} 
                 onChange={(e) => setHasAd(e.target.checked)} 
+                disabled={tier === 'free'}
               />
               <span className="slider"></span>
             </span>
             <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
               {hasAd ? 'Exibir Página de Espera (Ad ⏳)' : 'Redirecionamento Direto (⚡)'}
+              {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>Requer PRO</span>}
             </span>
           </label>
         </div>
