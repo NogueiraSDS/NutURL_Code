@@ -4,9 +4,14 @@ import pg from 'pg';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const databaseUrl = process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy";
+const rawUrl = process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy";
+const databaseUrl = rawUrl.trim().replace(/^"|"$/g, '');
 
-const pool = new pg.Pool({ connectionString: databaseUrl });
+const isProd = process.env.NODE_ENV === 'production';
+const pool = new pg.Pool({ 
+  connectionString: databaseUrl,
+  ...(isProd && { ssl: { rejectUnauthorized: false } })
+});
 const adapter = new PrismaPg(pool);
 
 export const prisma =

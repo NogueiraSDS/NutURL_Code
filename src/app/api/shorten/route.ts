@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
   try {
     const { url, userId, hasAd } = await request.json();
+    
+    // DEBUG LOG
+    console.log("DB URL DEBUG:", process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 20) + "..." : "EMPTY");
 
     if (!url) {
       return NextResponse.json({ error: 'URL é obrigatória' }, { status: 400 });
