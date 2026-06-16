@@ -125,7 +125,9 @@ export default function Dashboard() {
                       <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa' }}>{link.url}</a>
                     </td>
                     <td style={{ padding: '1rem' }}>
-                      <a href={`/${link.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--success)', fontWeight: 'bold' }}>/{link.slug}</a>
+                      <a href={`/${link.slug}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--success)', fontWeight: 'bold' }}>
+                        {typeof window !== 'undefined' ? `${window.location.host.replace('www.', '')}/${link.slug}` : `/${link.slug}`}
+                      </a>
                     </td>
                     <td style={{ padding: '1rem', fontWeight: 600 }}>{link.clicks}</td>
                     <td style={{ padding: '1rem' }}>
