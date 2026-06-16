@@ -49,15 +49,16 @@ export default function Home() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} style={{ position: 'relative', width: '100%' }}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
+        {user ? (
+          <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Meu Dashboard</button>
+        ) : (
+          <button onClick={() => router.push('/login')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Fazer Login</button>
+        )}
+      </div>
+
       <div className={`${styles.hero} animate-fade-in`}>
-        <div style={{ position: 'absolute', top: '1rem', right: '1rem' }}>
-          {user ? (
-            <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Meu Dashboard</button>
-          ) : (
-            <button onClick={() => router.push('/login')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Fazer Login</button>
-          )}
-        </div>
         <h1 className={styles.title}>
           Encurte. <span className="text-gradient">Compartilhe.</span>
         </h1>
