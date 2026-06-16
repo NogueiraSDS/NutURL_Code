@@ -7,9 +7,15 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 const rawUrl = process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy";
 const databaseUrl = rawUrl.trim().replace(/^"|"$/g, '');
 
+// Clean the URL of sslmode query parameter to prevent Node-postgres / pg-connection-string warnings,
+// since we configure SSL programmatically in production.
+const cleanedUrl = databaseUrl
+  .replace(/([?&])sslmode=[^&]*(&|$)/, '$1')
+  .replace(/[?&]$/, '');
+
 const isProd = process.env.NODE_ENV === 'production';
 const pool = new pg.Pool({ 
-  connectionString: databaseUrl,
+  connectionString: cleanedUrl,
   ...(isProd && { ssl: { rejectUnauthorized: false } })
 });
 const adapter = new PrismaPg(pool);
