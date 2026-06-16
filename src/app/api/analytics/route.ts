@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       clicksPerDay[dateStr] = 0;
     }
 
-    visits.forEach(v => {
+    visits.forEach((v: { createdAt: Date }) => {
       const dateStr = v.createdAt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
       if (clicksPerDay[dateStr] !== undefined) {
         clicksPerDay[dateStr]++;
