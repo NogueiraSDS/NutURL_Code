@@ -37,25 +37,43 @@ export default function ProfileClient({ profile }: { profile: any }) {
       case 'tiktok': return '🎵';
       case 'twitter': return '✖️';
       case 'linkedin': return '💼';
+      case 'telegram': return '✈️';
+      case 'whatsapp': return '💬';
+      case 'github': return '🐙';
       case 'onlyfans': return '🔒';
       case 'privacy': return '🔒';
+      case 'fansly': return '🔒';
       default: return '🌐';
     }
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '4rem 1rem', background: 'var(--bg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '0 0 4rem 0', background: 'var(--bg)' }}>
+      {/* Cover Banner */}
+      {profile.coverUrl ? (
+        <div style={{ width: '100%', height: '200px', background: `url(${profile.coverUrl}) center/cover`, borderBottom: '1px solid rgba(255,255,255,0.1)' }} />
+      ) : (
+        <div style={{ width: '100%', height: '100px' }} />
+      )}
+
       {/* Profile Header */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem', maxWidth: '600px', width: '100%' }}>
-        <div style={{ width: '96px', height: '96px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b5cf6)', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', color: 'white', border: '4px solid var(--card-bg)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
-          {profile.title ? profile.title.charAt(0).toUpperCase() : '@'}
+      <div style={{ textAlign: 'center', marginBottom: '2rem', maxWidth: '600px', width: '100%', marginTop: profile.coverUrl ? '-48px' : '0', padding: '0 1rem' }}>
+        <div style={{ 
+          width: '96px', height: '96px', borderRadius: '50%', 
+          background: profile.avatarUrl ? `url(${profile.avatarUrl}) center/cover` : 'linear-gradient(135deg, var(--primary), #8b5cf6)', 
+          margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          fontSize: '2.5rem', fontWeight: 'bold', color: 'white', 
+          border: '4px solid var(--bg)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          position: 'relative', zIndex: 10
+        }}>
+          {!profile.avatarUrl && (profile.title ? profile.title.charAt(0).toUpperCase() : '@')}
         </div>
         <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>{profile.title || `@${profile.username}`}</h1>
         {profile.bio && <p style={{ color: '#94a3b8', fontSize: '1.1rem', whiteSpace: 'pre-wrap' }}>{profile.bio}</p>}
       </div>
 
       {/* Links List */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '600px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '600px', padding: '0 1rem' }}>
         {profile.links?.filter((l: any) => l.isActive).map((link: any) => (
           <a
             key={link.id}

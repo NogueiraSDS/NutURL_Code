@@ -4,6 +4,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useI18n } from '@/context/I18nContext';
+import imageCompression from 'browser-image-compression';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '@/lib/firebase';
 
 export default function ProfileDashboard() {
   const { user, loading } = useAuth();
@@ -17,7 +20,12 @@ export default function ProfileDashboard() {
   const [username, setUsername] = useState('');
   const [title, setTitle] = useState('');
   const [bio, setBio] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [coverUrl, setCoverUrl] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
+  const [checkingUsername, setCheckingUsername] = useState(false);
 
   // Link Form State
   const [links, setLinks] = useState<any[]>([]);
@@ -43,6 +51,8 @@ export default function ProfileDashboard() {
             setUsername(data.profile.username || '');
             setTitle(data.profile.title || '');
             setBio(data.profile.bio || '');
+            setAvatarUrl(data.profile.avatarUrl || '');
+            setCoverUrl(data.profile.coverUrl || '');
             setLinks(data.profile.links || []);
           }
           setFetching(false);
@@ -50,6 +60,48 @@ export default function ProfileDashboard() {
         .catch(console.error);
     }
   }, [user]);
+
+  // Auto-detect link icon
+  useEffect(() => {
+    if (!newLinkUrl) return;
+    const urlLower = newLinkUrl.toLowerCase();
+    if (urlLower.includes('instagram.com')) setNewLinkIcon('instagram');
+    else if (urlLower.includes('facebook.com')) setNewLinkIcon('facebook');
+    else if (urlLower.includes('youtube.com') || urlLower.includes('youtu.be')) setNewLinkIcon('youtube');
+    else if (urlLower.includes('tiktok.com')) setNewLinkIcon('tiktok');
+    else if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) setNewLinkIcon('twitter');
+    else if (urlLower.includes('linkedin.com')) setNewLinkIcon('linkedin');
+    else if (urlLower.includes('onlyfans.com')) { setNewLinkIcon('onlyfans'); setNewLinkAge(true); }
+    else if (urlLower.includes('privacy.com.br')) { setNewLinkIcon('privacy'); setNewLinkAge(true); }
+    else if (urlLower.includes('fansly.com')) { setNewLinkIcon('fansly'); setNewLinkAge(true); }
+    else if (urlLower.includes('t.me') || urlLower.includes('telegram.org')) setNewLinkIcon('telegram');
+    else if (urlLower.includes('whatsapp.com') || urlLower.includes('wa.me')) setNewLinkIcon('whatsapp');
+    else if (urlLower.includes('github.com')) setNewLinkIcon('github');
+  }, [newLinkUrl]);
+
+  // Dynamic username check
+  useEffect(() => {
+    if (!username) {
+      setIsUsernameAvailable(null);
+      return;
+    }
+    const cleanUsername = username.replace('@', '').toLowerCase().trim();
+    if (profile && cleanUsername === profile.username) {
+      setIsUsernameAvailable(true);
+      return;
+    }
+    
+    setCheckingUsername(true);
+    const timeoutId = setTimeout(() => {
+      fetch(`/api/profile/check-username?username=${cleanUsername}&userId=${user?.uid}`)
+        .then(res => res.json())
+        .then(data => setIsUsernameAvailable(data.available))
+        .catch(() => setIsUsernameAvailable(null))
+        .finally(() => setCheckingUsername(false));
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [username, user, profile]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +115,7 @@ export default function ProfileDashboard() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio })
+        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar perfil');
@@ -77,12 +129,65 @@ export default function ProfileDashboard() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setIsUploading(true);
+    try {
+      const options = {
+        maxSizeMB: type === 'avatar' ? 0.2 : 0.5,
+        maxWidthOrHeight: type === 'avatar' ? 400 : 1200,
+        useWebWorker: true,
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      const storageRef = ref(storage, `profiles/${user.uid}/${type}-${Date.now()}.jpg`);
+      
+      await uploadBytes(storageRef, compressedFile);
+      const downloadUrl = await getDownloadURL(storageRef);
+
+      if (type === 'avatar') {
+        setAvatarUrl(downloadUrl);
+      } else {
+        setCoverUrl(downloadUrl);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Erro ao fazer upload da imagem.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleAddLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) {
       alert('Por favor, salve as configurações do seu perfil (username) primeiro.');
       return;
     }
+    
+    let finalTitle = newLinkTitle.trim();
+    if (!finalTitle) {
+      if (newLinkIcon === 'web') {
+        alert('Por favor, insira um Título para o botão.');
+        return;
+      }
+      // Pega apenas o nome da rede (sem o emoji)
+      const selectedIcon = iconsList.find(i => i.value === newLinkIcon);
+      if (selectedIcon) {
+        finalTitle = selectedIcon.label.split(' ')[1] || 'Link';
+      } else {
+        finalTitle = 'Link';
+      }
+    }
+
+    let finalAgeRestricted = newLinkAge;
+    const selectedIcon = iconsList.find(i => i.value === newLinkIcon);
+    if (selectedIcon?.age) {
+      finalAgeRestricted = true;
+    }
+
     setIsSavingLink(true);
     try {
       const res = await fetch('/api/profile/links', {
@@ -90,10 +195,10 @@ export default function ProfileDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           profileId: profile.id, 
-          title: newLinkTitle, 
+          title: finalTitle, 
           url: newLinkUrl, 
           icon: newLinkIcon, 
-          isAgeRestricted: newLinkAge 
+          isAgeRestricted: finalAgeRestricted 
         })
       });
       const data = await res.json();
@@ -130,8 +235,12 @@ export default function ProfileDashboard() {
     { value: 'tiktok', label: '🎵 TikTok' },
     { value: 'twitter', label: '✖️ X (Twitter)' },
     { value: 'linkedin', label: '💼 LinkedIn' },
+    { value: 'telegram', label: '✈️ Telegram' },
+    { value: 'whatsapp', label: '💬 WhatsApp' },
+    { value: 'github', label: '🐙 GitHub' },
     { value: 'onlyfans', label: '🔒 OnlyFans (+18)', age: true },
-    { value: 'privacy', label: '🔒 Privacy (+18)', age: true }
+    { value: 'privacy', label: '🔒 Privacy (+18)', age: true },
+    { value: 'fansly', label: '🔒 Fansly (+18)', age: true }
   ];
 
   const handleIconSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -159,7 +268,28 @@ export default function ProfileDashboard() {
         {/* Profile Settings */}
         <div className="glass" style={{ padding: '2rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Configurações do Perfil</h2>
-          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            {/* Imagens */}
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Avatar / Foto de Perfil</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: avatarUrl ? `url(${avatarUrl}) center/cover` : 'var(--card-bg)', border: '2px solid var(--primary)' }} />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'avatar')} disabled={isUploading} style={{ color: '#cbd5e1' }} />
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Banner de Capa (Opcional)</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: '120px', height: '40px', borderRadius: '4px', background: coverUrl ? `url(${coverUrl}) center/cover` : 'var(--card-bg)', border: '1px solid #334155' }} />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'cover')} disabled={isUploading} style={{ color: '#cbd5e1' }} />
+                </div>
+              </div>
+            </div>
+
+            {isUploading && <p style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>Comprimindo e fazendo upload... Aguarde.</p>}
+
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Seu Username único</label>
               <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid var(--card-border)', padding: '0 1rem' }}>
@@ -173,6 +303,11 @@ export default function ProfileDashboard() {
                   required
                 />
               </div>
+              {username && (
+                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem', color: checkingUsername ? '#94a3b8' : isUsernameAvailable ? 'var(--success)' : 'var(--error)' }}>
+                  {checkingUsername ? 'Verificando disponibilidade...' : isUsernameAvailable ? '✅ Nome de usuário disponível!' : '❌ Nome de usuário já em uso.'}
+                </p>
+              )}
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Título da Página</label>
@@ -200,11 +335,24 @@ export default function ProfileDashboard() {
           </form>
 
           {profile?.username && (
-             <div style={{ marginTop: '2rem', padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', borderRadius: '8px' }}>
-               <p style={{ color: 'var(--success)', marginBottom: '0.5rem', fontWeight: 'bold' }}>Sua página está no ar!</p>
-               <a href={`/@${profile.username}`} target="_blank" rel="noreferrer" style={{ color: 'white', wordBreak: 'break-all' }}>
-                  {typeof window !== 'undefined' ? window.location.host : 'nuturl.com'}/@{profile.username}
-               </a>
+             <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+               <div>
+                 <p style={{ color: 'var(--success)', marginBottom: '0.5rem', fontWeight: 'bold' }}>Sua página está no ar!</p>
+                 <a href={`/@${profile.username}`} target="_blank" rel="noreferrer" style={{ color: 'white', wordBreak: 'break-all', fontSize: '1.1rem' }}>
+                    {typeof window !== 'undefined' ? window.location.host : 'nuturl.com'}/@{profile.username}
+                 </a>
+               </div>
+               <button 
+                 onClick={() => {
+                   const url = `${typeof window !== 'undefined' ? window.location.origin : 'https://nuturl.com'}/@${profile.username}`;
+                   navigator.clipboard.writeText(url);
+                   alert('Link da página copiado!');
+                 }}
+                 className="btn"
+                 style={{ background: 'var(--success)', width: 'fit-content', fontSize: '0.9rem', padding: '8px 16px' }}
+               >
+                 Copiar Link da Página
+               </button>
              </div>
           )}
         </div>
@@ -224,9 +372,8 @@ export default function ProfileDashboard() {
               type="text"
               value={newLinkTitle}
               onChange={(e) => setNewLinkTitle(e.target.value)}
-              placeholder="Título do Botão (Ex: Meu Instagram)"
+              placeholder="Título do Botão (Opcional para redes conhecidas)"
               className="input"
-              required
             />
             
             <input
@@ -238,9 +385,17 @@ export default function ProfileDashboard() {
               required
             />
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.9rem' }}>
-              <input type="checkbox" checked={newLinkAge} onChange={(e) => setNewLinkAge(e.target.checked)} />
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.9rem', cursor: iconsList.find(i => i.value === newLinkIcon)?.age ? 'not-allowed' : 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={iconsList.find(i => i.value === newLinkIcon)?.age || newLinkAge} 
+                onChange={(e) => setNewLinkAge(e.target.checked)} 
+                disabled={iconsList.find(i => i.value === newLinkIcon)?.age}
+              />
               Exigir confirmação de +18 anos ao clicar
+              {iconsList.find(i => i.value === newLinkIcon)?.age && (
+                <span style={{ fontSize: '0.75rem', color: '#ef4444', marginLeft: '0.5rem' }}>(Obrigatório para esta rede)</span>
+              )}
             </label>
 
             <button type="submit" className="btn" disabled={isSavingLink || !profile}>

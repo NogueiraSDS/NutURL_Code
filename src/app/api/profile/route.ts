@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, username, title, bio } = body;
+    const { userId, username, title, bio, avatarUrl, coverUrl } = body;
 
     if (!userId || !username) {
       return NextResponse.json({ error: 'Missing userId or username' }, { status: 400 });
@@ -71,12 +71,16 @@ export async function POST(request: Request) {
         username,
         title,
         bio,
+        ...(avatarUrl !== undefined && { avatarUrl }),
+        ...(coverUrl !== undefined && { coverUrl }),
       },
       create: {
         userId: dbUser.id,
         username,
         title,
         bio,
+        avatarUrl,
+        coverUrl,
       },
       include: {
         links: {

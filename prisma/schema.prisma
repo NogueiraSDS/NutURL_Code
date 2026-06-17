@@ -48,6 +48,8 @@ model Profile {
   username  String        @unique // O nome de usuário na URL (ex: @joao)
   title     String?       // Nome que aparece no topo da página
   bio       String?       // Pequena descrição
+  avatarUrl String?
+  coverUrl  String?
   userId    String        @unique // Ligação com o User existente
   user      User          @relation(fields: [userId], references: [id])
   links     ProfileLink[]
