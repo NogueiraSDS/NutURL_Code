@@ -70,7 +70,8 @@ export default function Home() {
 
   return (
     <div className={styles.container} style={{ position: 'relative', width: '100%' }}>
-      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10 }}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10, display: 'flex', gap: '1rem' }}>
+        <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>Planos</button>
         {user ? (
           <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Meu Dashboard</button>
         ) : (

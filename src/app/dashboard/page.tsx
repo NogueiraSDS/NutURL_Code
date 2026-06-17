@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [links, setLinks] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
+  const [tier, setTier] = useState('free');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -22,11 +23,13 @@ export default function Dashboard() {
     if (user) {
       Promise.all([
         fetch(`/api/links?userId=${user.uid}`).then(res => res.json()),
-        fetch(`/api/analytics?userId=${user.uid}`).then(res => res.json())
+        fetch(`/api/analytics?userId=${user.uid}`).then(res => res.json()),
+        fetch(`/api/me?userId=${user.uid}`).then(res => res.json())
       ])
-        .then(([linksData, analyticsData]) => {
+        .then(([linksData, analyticsData, userData]) => {
           setLinks(linksData.links || []);
           setChartData(analyticsData.chartData || []);
+          setTier(userData.tier || 'free');
           setFetching(false);
         })
         .catch(err => {
@@ -62,7 +65,15 @@ export default function Dashboard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Seu <span className="text-gradient">Dashboard</span></h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <p style={{ color: '#94a3b8' }}>Olá, {user.displayName}</p>
+          <span style={{ padding: '4px 8px', borderRadius: '4px', background: tier === 'premium' ? '#f59e0b' : tier === 'pro' ? 'var(--primary)' : '#334155', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
+            {tier.toUpperCase()}
+          </span>
+          {tier !== 'premium' && (
+            <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>
+              Ver Planos
+            </button>
+          )}
+          <p style={{ color: '#94a3b8' }}>Olá, {user.displayName || user.email}</p>
           <button onClick={logout} className="btn" style={{ background: '#ef4444', padding: '8px 16px' }}>Sair</button>
         </div>
       </div>
@@ -131,12 +142,13 @@ export default function Dashboard() {
                     </td>
                     <td style={{ padding: '1rem', fontWeight: 600 }}>{link.clicks}</td>
                     <td style={{ padding: '1rem' }}>
-                      <label className="switch-container">
+                      <label className="switch-container" style={{ opacity: tier === 'free' ? 0.5 : 1 }}>
                         <span className="switch" style={{ transform: 'scale(0.85)', transformOrigin: 'left center' }}>
                           <input 
                             type="checkbox" 
                             checked={link.hasAd} 
                             onChange={(e) => handleToggleAd(link.id, e.target.checked)} 
+                            disabled={tier === 'free'}
                           />
                           <span className="slider"></span>
                         </span>
