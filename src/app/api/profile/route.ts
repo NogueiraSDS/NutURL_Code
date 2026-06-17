@@ -12,8 +12,16 @@ export async function GET(request: Request) {
   }
 
   try {
+    const user = await prisma.user.findUnique({
+      where: { firebaseUid: userId },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+    }
+
     const profile = await prisma.profile.findUnique({
-      where: { userId },
+      where: { userId: user.id },
       include: {
         links: {
           orderBy: { order: 'asc' },
@@ -39,24 +47,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing userId or username' }, { status: 400 });
     }
 
+    // Find the actual database user ID using firebaseUid
+    const dbUser = await prisma.user.findUnique({
+      where: { firebaseUid: userId },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+    }
+
     // Check if username is taken by someone else
     const existingUsername = await prisma.profile.findUnique({
       where: { username },
     });
 
-    if (existingUsername && existingUsername.userId !== userId) {
+    if (existingUsername && existingUsername.userId !== dbUser.id) {
       return NextResponse.json({ error: 'Username already taken' }, { status: 400 });
     }
 
     const profile = await prisma.profile.upsert({
-      where: { userId },
+      where: { userId: dbUser.id },
       update: {
         username,
         title,
         bio,
       },
       create: {
-        userId,
+        userId: dbUser.id,
         username,
         title,
         bio,
