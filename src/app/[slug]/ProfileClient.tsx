@@ -100,16 +100,16 @@ export default function ProfileClient({ profile }: { profile: any }) {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
           <div className="glass" style={{ padding: '3rem', maxWidth: '400px', width: '100%', textAlign: 'center', borderRadius: '16px', border: '1px solid var(--error)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔞</div>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 'bold' }}>{t('profile.ageTitle', 'Conteúdo para maiores')}</h2>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 'bold' }}>{t('profile.ageTitle')}</h2>
             <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
-              {t('profile.ageDesc', 'Este link pode conter conteúdo sensível. Você tem 18 anos ou mais?')}
+              {t('profile.ageDesc')}
             </p>
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
               <button onClick={cancelAge} className="btn" style={{ background: 'transparent', border: '1px solid #64748b', color: '#cbd5e1' }}>
-                {t('profile.ageNo', 'Não, sair')}
+                {t('profile.ageNo')}
               </button>
               <button onClick={confirmAge} className="btn" style={{ background: 'var(--error)' }}>
-                {t('profile.ageYes', 'Sim, eu tenho')}
+                {t('profile.ageYes')}
               </button>
             </div>
           </div>
