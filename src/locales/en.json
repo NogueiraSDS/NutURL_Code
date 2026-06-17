@@ -93,5 +93,11 @@
     "seconds": "seconds...",
     "continue": "Continue to link",
     "waitNotice": "You are being redirected to an external link created via NutURL."
+  },
+  "profile": {
+    "ageTitle": "18+ Content",
+    "ageDesc": "This link may contain sensitive content. Are you 18 years or older?",
+    "ageNo": "No, leave",
+    "ageYes": "Yes, I am"
   }
 }

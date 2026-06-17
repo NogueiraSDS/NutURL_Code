@@ -67,6 +67,9 @@ export default function Dashboard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>{t('dashboard.title').split(' ')[0]} <span className="text-gradient">{t('dashboard.title').split(' ')[1]}</span></h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button onClick={() => router.push('/dashboard/profile')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--success)', color: 'var(--success)' }}>
+            Editar Minha Página (@)
+          </button>
           <span style={{ padding: '4px 8px', borderRadius: '4px', background: tier === 'premium' ? '#f59e0b' : tier === 'pro' ? 'var(--primary)' : '#334155', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
             {tier.toUpperCase()}
           </span>

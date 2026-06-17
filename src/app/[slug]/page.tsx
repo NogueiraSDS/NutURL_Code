@@ -3,10 +3,30 @@ import { notFound, redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import RedirectClient from './RedirectClient';
 import ExpiredClient from './ExpiredClient';
+import ProfileClient from './ProfileClient';
 
 export default async function SlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const { slug } = resolvedParams;
+
+  // Intercept profile routing
+  if (slug.startsWith('%40') || slug.startsWith('@')) {
+    const username = slug.replace(/^%40|^@/, '');
+    const profile = await prisma.profile.findUnique({
+      where: { username },
+      include: {
+        links: {
+          orderBy: { order: 'asc' },
+        },
+      },
+    });
+
+    if (profile) {
+      return <ProfileClient profile={profile} />;
+    } else {
+      notFound();
+    }
+  }
 
   const link = await prisma.link.findUnique({
     where: { slug },

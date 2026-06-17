@@ -40,4 +40,31 @@ model User {
   tier               String   @default("free") // "free", "pro" ou "premium"
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  profile            Profile?
+}
+
+model Profile {
+  id        String        @id @default(cuid())
+  username  String        @unique // O nome de usuário na URL (ex: @joao)
+  title     String?       // Nome que aparece no topo da página
+  bio       String?       // Pequena descrição
+  userId    String        @unique // Ligação com o User existente
+  user      User          @relation(fields: [userId], references: [id])
+  links     ProfileLink[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model ProfileLink {
+  id              String   @id @default(cuid())
+  title           String
+  url             String
+  icon            String   // 'instagram', 'onlyfans', 'web', etc.
+  isAgeRestricted Boolean  @default(false)
+  order           Int      @default(0)
+  isActive        Boolean  @default(true)
+  profileId       String
+  profile         Profile  @relation(fields: [profileId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

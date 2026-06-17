@@ -1,0 +1,120 @@
+'use client';
+
+import { useState } from 'react';
+import { useI18n } from '@/context/I18nContext';
+
+export default function ProfileClient({ profile }: { profile: any }) {
+  const { t } = useI18n();
+  const [showAgeModal, setShowAgeModal] = useState(false);
+  const [pendingUrl, setPendingUrl] = useState('');
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: any) => {
+    if (link.isAgeRestricted) {
+      e.preventDefault();
+      setPendingUrl(link.url);
+      setShowAgeModal(true);
+    }
+  };
+
+  const confirmAge = () => {
+    setShowAgeModal(false);
+    if (pendingUrl) {
+      window.open(pendingUrl, '_blank');
+      setPendingUrl('');
+    }
+  };
+
+  const cancelAge = () => {
+    setShowAgeModal(false);
+    setPendingUrl('');
+  };
+
+  const getIconUrl = (icon: string) => {
+    switch(icon) {
+      case 'instagram': return '📸';
+      case 'facebook': return '📘';
+      case 'youtube': return '▶️';
+      case 'tiktok': return '🎵';
+      case 'twitter': return '✖️';
+      case 'linkedin': return '💼';
+      case 'onlyfans': return '🔒';
+      case 'privacy': return '🔒';
+      default: return '🌐';
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '4rem 1rem', background: 'var(--bg)' }}>
+      {/* Profile Header */}
+      <div style={{ textAlign: 'center', marginBottom: '2rem', maxWidth: '600px', width: '100%' }}>
+        <div style={{ width: '96px', height: '96px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), #8b5cf6)', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', color: 'white', border: '4px solid var(--card-bg)', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+          {profile.title ? profile.title.charAt(0).toUpperCase() : '@'}
+        </div>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>{profile.title || `@${profile.username}`}</h1>
+        {profile.bio && <p style={{ color: '#94a3b8', fontSize: '1.1rem', whiteSpace: 'pre-wrap' }}>{profile.bio}</p>}
+      </div>
+
+      {/* Links List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%', maxWidth: '600px' }}>
+        {profile.links?.filter((l: any) => l.isActive).map((link: any) => (
+          <a
+            key={link.id}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => handleLinkClick(e, link)}
+            className="btn"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              position: 'relative', 
+              padding: '1.2rem', 
+              background: 'rgba(255,255,255,0.05)', 
+              border: '1px solid rgba(255,255,255,0.1)', 
+              borderRadius: '12px',
+              transition: 'all 0.2s',
+              color: 'white',
+              textDecoration: 'none',
+              fontWeight: 600,
+              fontSize: '1.1rem'
+            }}
+          >
+            <span style={{ position: 'absolute', left: '1.5rem', fontSize: '1.5rem' }}>
+              {getIconUrl(link.icon)}
+            </span>
+            {link.title}
+          </a>
+        ))}
+      </div>
+
+      {/* Branding Footer */}
+      <div style={{ marginTop: '4rem', opacity: 0.5, textAlign: 'center' }}>
+        <a href="/" style={{ color: 'white', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' }}>
+          nut<span style={{ color: 'var(--primary)' }}>url</span>
+        </a>
+      </div>
+
+      {/* Age Restriction Modal */}
+      {showAgeModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1rem' }}>
+          <div className="glass" style={{ padding: '3rem', maxWidth: '400px', width: '100%', textAlign: 'center', borderRadius: '16px', border: '1px solid var(--error)' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔞</div>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', fontWeight: 'bold' }}>{t('profile.ageTitle', 'Conteúdo para maiores')}</h2>
+            <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
+              {t('profile.ageDesc', 'Este link pode conter conteúdo sensível. Você tem 18 anos ou mais?')}
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button onClick={cancelAge} className="btn" style={{ background: 'transparent', border: '1px solid #64748b', color: '#cbd5e1' }}>
+                {t('profile.ageNo', 'Não, sair')}
+              </button>
+              <button onClick={confirmAge} className="btn" style={{ background: 'var(--error)' }}>
+                {t('profile.ageYes', 'Sim, eu tenho')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
