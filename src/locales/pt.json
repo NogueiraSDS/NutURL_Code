@@ -1,0 +1,97 @@
+{
+  "home": {
+    "shortenShare": "Encurte. Compartilhe.",
+    "subtitle": "A plataforma premium para gestão de links do seu projeto.",
+    "placeholder": "Cole seu link longo aqui...",
+    "btnShorten": "Encurtar",
+    "btnShortening": "Encurtando...",
+    "aliasPlaceholder": "Alias customizado (Ex: minha-marca)",
+    "adWaitPage": "Exibir Página de Espera (Ad ⏳)",
+    "directRedirect": "Redirecionamento Direto (⚡)",
+    "requiresPro": "Requer PRO",
+    "ready": "Seu link curto está pronto:",
+    "copyLink": "Copiar Link",
+    "copied": "Link copiado!",
+    "myDashboard": "Meu Dashboard",
+    "login": "Fazer Login",
+    "plans": "Planos"
+  },
+  "login": {
+    "createAccount": "Crie sua Conta",
+    "accessAccount": "Acesse sua Conta",
+    "signupDesc": "Cadastre-se para gerenciar seus links curtos.",
+    "loginDesc": "Faça login para gerenciar seus links curtos e ver as métricas.",
+    "emailPlaceholder": "Seu e-mail",
+    "passwordPlaceholder": "Sua senha",
+    "forgotPassword": "Esqueci minha senha",
+    "processing": "Processando...",
+    "register": "Cadastrar",
+    "enter": "Entrar",
+    "or": "ou",
+    "googleBtn": "Google",
+    "alreadyHaveAccount": "Já tem uma conta?",
+    "noAccount": "Ainda não tem conta?",
+    "doLogin": "Faça login",
+    "doSignup": "Cadastre-se",
+    "recoverySent": "E-mail de recuperação enviado! Verifique sua caixa de entrada.",
+    "fillEmail": "Por favor, preencha o campo de e-mail para recuperar a senha."
+  },
+  "dashboard": {
+    "title": "Seu Dashboard",
+    "hello": "Olá, {name}",
+    "logout": "Sair",
+    "seePlans": "Ver Planos",
+    "overview": "Visão Geral (Últimos 7 dias)",
+    "loadingChart": "Carregando gráfico...",
+    "noData": "Sem dados suficientes para o gráfico.",
+    "myLinks": "Meus Links",
+    "shortenNew": "Encurtar Novo Link",
+    "loadingLinks": "Carregando links...",
+    "noLinks": "Você ainda não encurtou nenhum link.",
+    "colOriginal": "URL Original",
+    "colShort": "Link Curto",
+    "colClicks": "Cliques",
+    "colRedirect": "Redirecionamento",
+    "colDate": "Data",
+    "wait": "Espera ⏳",
+    "direct": "Direto ⚡"
+  },
+  "pricing": {
+    "title": "Escolha o plano ideal para seus Links",
+    "subtitle": "Planos acessíveis para quem quer compartilhar com estilo e inteligência.",
+    "month": "/mês",
+    "currentPlan": "Seu Plano Atual",
+    "basicPlan": "Plano Básico",
+    "subscribePro": "Assinar PRO",
+    "subscribePremium": "Assinar PREMIUM",
+    "pleaseWait": "Aguarde...",
+    "mostPopular": "MAIS POPULAR",
+    "freeFeatures": {
+      "dashboard": "Dashboard de Cliques",
+      "multipleLinks": "Múltiplos Links",
+      "ads": "Links com Anúncios (Obrigatório)",
+      "expires": "Links expiram em 6 meses",
+      "custom": "Sem Customização"
+    },
+    "proFeatures": {
+      "allFree": "Todos os recursos Free",
+      "direct": "Redirecionamento Direto (Sem Anúncios)",
+      "neverExpires": "Links NUNCA expiram",
+      "custom": "Sem Customização"
+    },
+    "premiumFeatures": {
+      "allPro": "Todos os recursos PRO",
+      "customAlias": "Link Customizado (Alias)",
+      "customEx": "Ex: nuturl.com/sua-marca"
+    }
+  },
+  "redirect": {
+    "expiredTitle": "Ops! Este link expirou.",
+    "expiredDesc": "O prazo de validade deste link se esgotou. Links criados no plano gratuito expiram após 6 meses.",
+    "createOwn": "Crie seu próprio link no NutURL",
+    "redirectingIn": "Redirecionando em",
+    "seconds": "segundos...",
+    "continue": "Continuar para o link",
+    "waitNotice": "Você está sendo redirecionado para um link externo criado via NutURL."
+  }
+}

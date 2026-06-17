@@ -3,10 +3,12 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/context/I18nContext';
 
 export default function Login() {
   const { user, signInWithGoogle, signInWithEmail, registerWithEmail, resetPassword, loading } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,14 +45,14 @@ export default function Login() {
 
   const handleResetPassword = async () => {
     if (!email) {
-      setError('Por favor, preencha o campo de e-mail para recuperar a senha.');
+      setError(t('login.fillEmail'));
       return;
     }
     try {
       setIsSubmitting(true);
       setError('');
       await resetPassword(email);
-      alert('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+      alert(t('login.recoverySent'));
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Erro ao enviar e-mail de recuperação.');
@@ -65,10 +67,10 @@ export default function Login() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '2rem' }}>
       <div className="glass" style={{ padding: '3rem', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
         <h1 style={{ fontSize: '2rem', marginBottom: '1rem', fontWeight: 800 }}>
-          {isRegistering ? 'Crie sua ' : 'Acesse sua '} <span className="text-gradient">Conta</span>
+          {isRegistering ? t('login.createAccount').split(' ')[0] + ' ' : t('login.accessAccount').split(' ')[0] + ' '} <span className="text-gradient">{t('login.createAccount').split(' ').slice(1).join(' ')}</span>
         </h1>
         <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
-          {isRegistering ? 'Cadastre-se para gerenciar seus links curtos.' : 'Faça login para gerenciar seus links curtos e ver as métricas.'}
+          {isRegistering ? t('login.signupDesc') : t('login.loginDesc')}
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -76,7 +78,7 @@ export default function Login() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Seu e-mail"
+            placeholder={t('login.emailPlaceholder')}
             className="input"
             required
           />
@@ -85,7 +87,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Sua senha"
+              placeholder={t('login.passwordPlaceholder')}
               className="input"
               required
               minLength={6}
@@ -97,19 +99,19 @@ export default function Login() {
                 onClick={handleResetPassword}
                 style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.85rem', marginTop: '0.5rem', cursor: 'pointer' }}
               >
-                Esqueci minha senha
+                {t('login.forgotPassword')}
               </button>
             )}
           </div>
           {error && <p style={{ color: 'var(--error)', fontSize: '0.9rem', textAlign: 'left' }}>{error}</p>}
           <button type="submit" className="btn" disabled={isSubmitting}>
-            {isSubmitting ? 'Processando...' : (isRegistering ? 'Cadastrar' : 'Entrar')}
+            {isSubmitting ? t('login.processing') : (isRegistering ? t('login.register') : t('login.enter'))}
           </button>
         </form>
 
         <div style={{ display: 'flex', alignItems: 'center', margin: '1rem 0', color: '#64748b' }}>
           <div style={{ flex: 1, height: '1px', background: '#334155' }}></div>
-          <span style={{ margin: '0 1rem', fontSize: '0.9rem' }}>ou</span>
+          <span style={{ margin: '0 1rem', fontSize: '0.9rem' }}>{t('login.or')}</span>
           <div style={{ flex: 1, height: '1px', background: '#334155' }}></div>
         </div>
 
@@ -122,17 +124,17 @@ export default function Login() {
               <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"/>
             </g>
           </svg>
-          Google
+          {t('login.googleBtn')}
         </button>
 
         <p style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-          {isRegistering ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+          {isRegistering ? t('login.alreadyHaveAccount') : t('login.noAccount')}
           {' '}
           <button 
             onClick={() => { setIsRegistering(!isRegistering); setError(''); }} 
             style={{ color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
           >
-            {isRegistering ? 'Faça login' : 'Cadastre-se'}
+            {isRegistering ? t('login.doLogin') : t('login.doSignup')}
           </button>
         </p>
       </div>

@@ -1,0 +1,97 @@
+{
+  "home": {
+    "shortenShare": "Shorten. Share.",
+    "subtitle": "The premium platform for managing your project's links.",
+    "placeholder": "Paste your long link here...",
+    "btnShorten": "Shorten",
+    "btnShortening": "Shortening...",
+    "aliasPlaceholder": "Custom alias (Ex: my-brand)",
+    "adWaitPage": "Show Wait Page (Ad ⏳)",
+    "directRedirect": "Direct Redirect (⚡)",
+    "requiresPro": "Requires PRO",
+    "ready": "Your short link is ready:",
+    "copyLink": "Copy Link",
+    "copied": "Link copied!",
+    "myDashboard": "My Dashboard",
+    "login": "Login",
+    "plans": "Plans"
+  },
+  "login": {
+    "createAccount": "Create your Account",
+    "accessAccount": "Access your Account",
+    "signupDesc": "Sign up to manage your short links.",
+    "loginDesc": "Login to manage your short links and see metrics.",
+    "emailPlaceholder": "Your email",
+    "passwordPlaceholder": "Your password",
+    "forgotPassword": "Forgot my password",
+    "processing": "Processing...",
+    "register": "Sign Up",
+    "enter": "Sign In",
+    "or": "or",
+    "googleBtn": "Google",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account yet?",
+    "doLogin": "Login",
+    "doSignup": "Sign up",
+    "recoverySent": "Recovery email sent! Check your inbox.",
+    "fillEmail": "Please fill in the email field to recover your password."
+  },
+  "dashboard": {
+    "title": "Your Dashboard",
+    "hello": "Hello, {name}",
+    "logout": "Logout",
+    "seePlans": "See Plans",
+    "overview": "Overview (Last 7 days)",
+    "loadingChart": "Loading chart...",
+    "noData": "Not enough data for the chart.",
+    "myLinks": "My Links",
+    "shortenNew": "Shorten New Link",
+    "loadingLinks": "Loading links...",
+    "noLinks": "You haven't shortened any links yet.",
+    "colOriginal": "Original URL",
+    "colShort": "Short Link",
+    "colClicks": "Clicks",
+    "colRedirect": "Redirect",
+    "colDate": "Date",
+    "wait": "Wait ⏳",
+    "direct": "Direct ⚡"
+  },
+  "pricing": {
+    "title": "Choose the perfect plan for your Links",
+    "subtitle": "Affordable plans for those who want to share with style and intelligence.",
+    "month": "/month",
+    "currentPlan": "Your Current Plan",
+    "basicPlan": "Basic Plan",
+    "subscribePro": "Subscribe PRO",
+    "subscribePremium": "Subscribe PREMIUM",
+    "pleaseWait": "Please wait...",
+    "mostPopular": "MOST POPULAR",
+    "freeFeatures": {
+      "dashboard": "Clicks Dashboard",
+      "multipleLinks": "Multiple Links",
+      "ads": "Links with Ads (Mandatory)",
+      "expires": "Links expire in 6 months",
+      "custom": "No Customization"
+    },
+    "proFeatures": {
+      "allFree": "All Free features",
+      "direct": "Direct Redirect (No Ads)",
+      "neverExpires": "Links NEVER expire",
+      "custom": "No Customization"
+    },
+    "premiumFeatures": {
+      "allPro": "All PRO features",
+      "customAlias": "Custom Link (Alias)",
+      "customEx": "Ex: nuturl.com/your-brand"
+    }
+  },
+  "redirect": {
+    "expiredTitle": "Oops! This link has expired.",
+    "expiredDesc": "The validity period for this link has ended. Links created on the free plan expire after 6 months.",
+    "createOwn": "Create your own link on NutURL",
+    "redirectingIn": "Redirecting in",
+    "seconds": "seconds...",
+    "continue": "Continue to link",
+    "waitNotice": "You are being redirected to an external link created via NutURL."
+  }
+}

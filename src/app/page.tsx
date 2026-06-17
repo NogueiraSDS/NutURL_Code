@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/context/I18nContext';
 
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
+  const { t, locale, setLocale } = useI18n();
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [shortUrl, setShortUrl] = useState('');
@@ -70,21 +72,24 @@ export default function Home() {
 
   return (
     <div className={styles.container} style={{ position: 'relative', width: '100%' }}>
-      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10, display: 'flex', gap: '1rem' }}>
-        <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>Planos</button>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 10, display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <button onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')} className="btn" style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', fontSize: '0.8rem' }}>
+          {locale === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
+        </button>
+        <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>{t('home.plans')}</button>
         {user ? (
-          <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Meu Dashboard</button>
+          <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.myDashboard')}</button>
         ) : (
-          <button onClick={() => router.push('/login')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>Fazer Login</button>
+          <button onClick={() => router.push('/login')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.login')}</button>
         )}
       </div>
 
       <div className={`${styles.hero} animate-fade-in`}>
         <h1 className={styles.title}>
-          Encurte. <span className="text-gradient">Compartilhe.</span>
+          {t('home.shortenShare').split('.')[0]}. <span className="text-gradient">{t('home.shortenShare').split('.')[1]}.</span>
         </h1>
         <p className={styles.subtitle}>
-          A plataforma premium para gestão de links do seu projeto.
+          {t('home.subtitle')}
         </p>
       </div>
 
@@ -94,12 +99,12 @@ export default function Home() {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Cole seu link longo aqui..."
+            placeholder={t('home.placeholder')}
             className="input"
             required
           />
           <button type="submit" className="btn" disabled={isLoading}>
-            {isLoading ? 'Encurtando...' : 'Encurtar'}
+            {isLoading ? t('home.btnShortening') : t('home.btnShorten')}
           </button>
         </form>
 
@@ -109,7 +114,7 @@ export default function Home() {
               type="text" 
               value={customAlias} 
               onChange={(e) => setCustomAlias(e.target.value)} 
-              placeholder="Alias customizado (Ex: minha-marca)" 
+              placeholder={t('home.aliasPlaceholder')}
               className="input" 
               style={{ width: '100%' }} 
             />
@@ -128,8 +133,8 @@ export default function Home() {
               <span className="slider"></span>
             </span>
             <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-              {hasAd ? 'Exibir Página de Espera (Ad ⏳)' : 'Redirecionamento Direto (⚡)'}
-              {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>Requer PRO</span>}
+              {hasAd ? t('home.adWaitPage') : t('home.directRedirect')}
+              {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{t('home.requiresPro')}</span>}
             </span>
           </label>
         </div>
@@ -138,12 +143,12 @@ export default function Home() {
 
         {shortUrl && (
           <div className={styles.resultBox}>
-            <p>Seu link curto está pronto:</p>
+            <p>{t('home.ready')}</p>
             <a href={shortUrl} target="_blank" rel="noopener noreferrer" className={styles.shortLink}>
               {shortUrl}
             </a>
             <button onClick={copyToClipboard} className="btn" style={{ background: '#475569' }}>
-              Copiar Link
+              {t('home.copyLink')}
             </button>
           </div>
         )}

@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useI18n } from '@/context/I18nContext';
 
 export default function Dashboard() {
   const { user, loading, logout } = useAuth();
@@ -12,6 +13,7 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState<any[]>([]);
   const [fetching, setFetching] = useState(true);
   const [tier, setTier] = useState('free');
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -63,26 +65,26 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', width: '100%', flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Seu <span className="text-gradient">Dashboard</span></h1>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>{t('dashboard.title').split(' ')[0]} <span className="text-gradient">{t('dashboard.title').split(' ')[1]}</span></h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <span style={{ padding: '4px 8px', borderRadius: '4px', background: tier === 'premium' ? '#f59e0b' : tier === 'pro' ? 'var(--primary)' : '#334155', color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>
             {tier.toUpperCase()}
           </span>
           {tier !== 'premium' && (
             <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>
-              Ver Planos
+              {t('dashboard.seePlans')}
             </button>
           )}
-          <p style={{ color: '#94a3b8' }}>Olá, {user.displayName || user.email}</p>
-          <button onClick={logout} className="btn" style={{ background: '#ef4444', padding: '8px 16px' }}>Sair</button>
+          <p style={{ color: '#94a3b8' }}>{t('dashboard.hello', { name: user.displayName || user.email || '' })}</p>
+          <button onClick={logout} className="btn" style={{ background: '#ef4444', padding: '8px 16px' }}>{t('dashboard.logout')}</button>
         </div>
       </div>
 
       <div className="glass" style={{ padding: '2rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Visão Geral (Últimos 7 dias)</h2>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>{t('dashboard.overview')}</h2>
         <div style={{ height: '300px', width: '100%' }}>
           {fetching ? (
-             <p>Carregando gráfico...</p>
+             <p>{t('dashboard.loadingChart')}</p>
           ) : chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={chartData}>
@@ -102,31 +104,31 @@ export default function Dashboard() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p style={{ color: '#94a3b8' }}>Sem dados suficientes para o gráfico.</p>
+            <p style={{ color: '#94a3b8' }}>{t('dashboard.noData')}</p>
           )}
         </div>
       </div>
 
       <div className="glass" style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.5rem' }}>Meus Links</h2>
-            <button onClick={() => router.push('/')} className="btn" style={{ padding: '8px 16px' }}>Encurtar Novo Link</button>
+            <h2 style={{ fontSize: '1.5rem' }}>{t('dashboard.myLinks')}</h2>
+            <button onClick={() => router.push('/')} className="btn" style={{ padding: '8px 16px' }}>{t('dashboard.shortenNew')}</button>
         </div>
         
         {fetching ? (
-          <p>Carregando links...</p>
+          <p>{t('dashboard.loadingLinks')}</p>
         ) : links.length === 0 ? (
-          <p style={{ color: '#94a3b8' }}>Você ainda não encurtou nenhum link.</p>
+          <p style={{ color: '#94a3b8' }}>{t('dashboard.noLinks')}</p>
         ) : (
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--card-border)' }}>
-                  <th style={{ padding: '1rem', color: '#94a3b8' }}>URL Original</th>
-                  <th style={{ padding: '1rem', color: '#94a3b8' }}>Link Curto</th>
-                  <th style={{ padding: '1rem', color: '#94a3b8' }}>Cliques</th>
-                  <th style={{ padding: '1rem', color: '#94a3b8' }}>Redirecionamento</th>
-                  <th style={{ padding: '1rem', color: '#94a3b8' }}>Data</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8' }}>{t('dashboard.colOriginal')}</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8' }}>{t('dashboard.colShort')}</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8' }}>{t('dashboard.colClicks')}</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8' }}>{t('dashboard.colRedirect')}</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8' }}>{t('dashboard.colDate')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -153,7 +155,7 @@ export default function Dashboard() {
                           <span className="slider"></span>
                         </span>
                         <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                          {link.hasAd ? 'Espera ⏳' : 'Direto ⚡'}
+                          {link.hasAd ? t('dashboard.wait') : t('dashboard.direct')}
                         </span>
                       </label>
                     </td>
