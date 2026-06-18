@@ -12,12 +12,14 @@ export async function GET(request: Request) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { firebaseUid: userId },
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+      user = await prisma.user.create({
+        data: { firebaseUid: userId, tier: 'free' }
+      });
     }
 
     const profile = await prisma.profile.findUnique({
@@ -47,13 +49,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing userId or username' }, { status: 400 });
     }
 
-    // Find the actual database user ID using firebaseUid
-    const dbUser = await prisma.user.findUnique({
+    // Find or create the actual database user ID using firebaseUid
+    let dbUser = await prisma.user.findUnique({
       where: { firebaseUid: userId },
     });
 
     if (!dbUser) {
-      return NextResponse.json({ error: 'User not found in database' }, { status: 404 });
+      dbUser = await prisma.user.create({
+        data: { firebaseUid: userId, tier: 'free' }
+      });
     }
 
     // Check if username is taken by someone else

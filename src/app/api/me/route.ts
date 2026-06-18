@@ -10,11 +10,17 @@ export async function GET(request: Request) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: { firebaseUid: userId }
     });
 
-    return NextResponse.json({ tier: user ? user.tier : 'free' });
+    if (!user) {
+      user = await prisma.user.create({
+        data: { firebaseUid: userId, tier: 'free' }
+      });
+    }
+
+    return NextResponse.json({ tier: user.tier });
   } catch (error) {
     console.error('Error fetching user tier:', error);
     return NextResponse.json({ tier: 'free' });
