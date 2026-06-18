@@ -48,7 +48,7 @@ export default function ProfileClient({ profile }: { profile: any }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '0 0 4rem 0', background: 'var(--bg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '0 0 4rem 0', background: profile.backgroundColor || 'var(--bg)' }}>
       {/* Cover Banner */}
       {profile.coverUrl ? (
         <div style={{ width: '100%', height: '200px', background: `url(${profile.coverUrl}) center/cover`, borderBottom: '1px solid rgba(255,255,255,0.1)' }} />

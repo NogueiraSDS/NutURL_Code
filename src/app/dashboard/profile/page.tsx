@@ -7,6 +7,7 @@ import { useI18n } from '@/context/I18nContext';
 import imageCompression from 'browser-image-compression';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
+import { HexColorPicker } from 'react-colorful';
 
 export default function ProfileDashboard() {
   const { user, loading } = useAuth();
@@ -22,6 +23,8 @@ export default function ProfileDashboard() {
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [coverUrl, setCoverUrl] = useState('');
+  const [backgroundColor, setBackgroundColor] = useState('#0f172a');
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
@@ -53,6 +56,7 @@ export default function ProfileDashboard() {
             setBio(data.profile.bio || '');
             setAvatarUrl(data.profile.avatarUrl || '');
             setCoverUrl(data.profile.coverUrl || '');
+            setBackgroundColor(data.profile.backgroundColor || '#0f172a');
             setLinks(data.profile.links || []);
           }
           setFetching(false);
@@ -115,7 +119,7 @@ export default function ProfileDashboard() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl })
+        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar perfil');
@@ -289,6 +293,32 @@ export default function ProfileDashboard() {
             </div>
 
             {isUploading && <p style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>Comprimindo e fazendo upload... Aguarde.</p>}
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Cor de Fundo da Página</label>
+              <div style={{ position: 'relative' }}>
+                <div 
+                  onClick={() => setShowColorPicker(!showColorPicker)}
+                  style={{ 
+                    width: '100%', height: '48px', borderRadius: '8px', 
+                    background: backgroundColor, border: '1px solid var(--card-border)',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0 1rem',
+                    color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+                  }}
+                >
+                  Clique para alterar: {backgroundColor}
+                </div>
+                {showColorPicker && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 50, marginTop: '0.5rem', background: 'var(--card-bg)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--card-border)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                      <span style={{ fontWeight: 'bold' }}>Selecione a Cor</span>
+                      <button type="button" onClick={() => setShowColorPicker(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>✕</button>
+                    </div>
+                    <HexColorPicker color={backgroundColor} onChange={setBackgroundColor} />
+                  </div>
+                )}
+              </div>
+            </div>
 
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Seu Username único</label>
