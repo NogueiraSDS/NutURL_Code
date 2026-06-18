@@ -9,8 +9,23 @@ import { AuthProvider } from "@/context/AuthContext";
 import { I18nProvider } from "@/context/I18nContext";
 
 export const metadata: Metadata = {
-  title: "NutURL - Premium URL Shortener",
-  description: "Encurte seus links e acompanhe as métricas de acesso.",
+  title: "NutURL - Premium Link-in-Bio & URL Shortener",
+  description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real e redirecionamentos inteligentes.",
+  keywords: ["encurtador de url", "link tree", "link na bio", "linktree gratis", "nuturl", "analytics links", "monetizacao de links"],
+  authors: [{ name: "NutURL Team" }],
+  openGraph: {
+    title: "NutURL - Premium Link-in-Bio & URL Shortener",
+    description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real.",
+    url: "https://nuturl.com",
+    siteName: "NutURL",
+    type: "website",
+    locale: "pt_BR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NutURL - Premium Link-in-Bio & URL Shortener",
+    description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real.",
+  },
 };
 
 export default function RootLayout({
