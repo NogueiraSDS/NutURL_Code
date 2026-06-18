@@ -56,8 +56,7 @@ export default function Home() {
         throw new Error(data.error || 'Erro ao encurtar a URL');
       }
 
-      const originWithoutWww = window.location.origin.replace('www.', '');
-      setShortUrl(`${originWithoutWww}/${data.slug}`);
+      setShortUrl(`https://wnut.me/${data.slug}`);
     } catch (err: any) {
       setError(err.message);
     } finally {

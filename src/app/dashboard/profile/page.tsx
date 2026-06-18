@@ -293,7 +293,7 @@ export default function ProfileDashboard() {
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Seu Username único</label>
               <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', border: '1px solid var(--card-border)', padding: '0 1rem' }}>
-                <span style={{ color: '#64748b' }}>nuturl.com/@</span>
+                <span style={{ color: '#64748b' }}>wnut.me/@</span>
                 <input
                   type="text"
                   value={username}
@@ -338,13 +338,13 @@ export default function ProfileDashboard() {
              <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                <div>
                  <p style={{ color: 'var(--success)', marginBottom: '0.5rem', fontWeight: 'bold' }}>Sua página está no ar!</p>
-                 <a href={`/@${profile.username}`} target="_blank" rel="noreferrer" style={{ color: 'white', wordBreak: 'break-all', fontSize: '1.1rem' }}>
-                    {typeof window !== 'undefined' ? window.location.host : 'nuturl.com'}/@{profile.username}
+                 <a href={`https://wnut.me/@${profile.username}`} target="_blank" rel="noreferrer" style={{ color: 'white', wordBreak: 'break-all', fontSize: '1.1rem' }}>
+                    wnut.me/@{profile.username}
                  </a>
                </div>
                <button 
                  onClick={() => {
-                   const url = `${typeof window !== 'undefined' ? window.location.origin : 'https://nuturl.com'}/@${profile.username}`;
+                   const url = `https://wnut.me/@${profile.username}`;
                    navigator.clipboard.writeText(url);
                    alert('Link da página copiado!');
                  }}
