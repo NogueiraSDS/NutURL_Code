@@ -40,6 +40,7 @@ export default function ProfileDashboard() {
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkIcon, setNewLinkIcon] = useState('web');
   const [newLinkAge, setNewLinkAge] = useState(false);
+  const [newLinkIsSocialIcon, setNewLinkIsSocialIcon] = useState(false);
   const [newLinkAnimation, setNewLinkAnimation] = useState('none');
   const [isSavingLink, setIsSavingLink] = useState(false);
 
@@ -219,6 +220,7 @@ export default function ProfileDashboard() {
           url: newLinkUrl, 
           icon: newLinkIcon, 
           isAgeRestricted: finalAgeRestricted,
+          isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
           animation: tier !== 'free' ? newLinkAnimation : 'none'
         })
       });
@@ -230,6 +232,7 @@ export default function ProfileDashboard() {
       setNewLinkUrl('');
       setNewLinkIcon('web');
       setNewLinkAge(false);
+      setNewLinkIsSocialIcon(false);
       setNewLinkAnimation('none');
     } catch (err: any) {
       alert(err.message);
@@ -480,6 +483,16 @@ export default function ProfileDashboard() {
               )}
             </label>
 
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.9rem', cursor: tier !== 'premium' ? 'not-allowed' : 'pointer', opacity: tier !== 'premium' ? 0.6 : 1 }}>
+              <input 
+                type="checkbox" 
+                checked={tier === 'premium' && newLinkIsSocialIcon} 
+                onChange={(e) => setNewLinkIsSocialIcon(e.target.checked)} 
+                disabled={tier !== 'premium'}
+              />
+              Exibir apenas como ícone no topo da página (Premium)
+            </label>
+
             <select value={newLinkAnimation} onChange={(e) => setNewLinkAnimation(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto', opacity: tier === 'free' ? 0.5 : 1 }} disabled={tier === 'free'}>
               <option value="none">Sem Animação no Botão</option>
               <option value="pulse">✨ Efeito Pulsar (Premium)</option>
@@ -504,6 +517,7 @@ export default function ProfileDashboard() {
                     <p style={{ fontWeight: 'bold', marginBottom: '0.2rem' }}>
                       {iconsList.find(i => i.value === link.icon)?.label.split(' ')[0]} {link.title}
                       {link.isAgeRestricted && <span style={{ marginLeft: '8px', background: '#ef4444', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>+18</span>}
+                      {link.isSocialIcon && <span style={{ marginLeft: '8px', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>Ícone</span>}
                     </p>
                     <p style={{ color: '#94a3b8', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.url}</p>
                   </div>

@@ -286,6 +286,15 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
 
   // Ad checking logic: if tier is premium, hasAds is false. (Otherwise true)
   const hasAds = profile.user ? profile.user.tier !== 'premium' : (profile.tier ? profile.tier !== 'premium' : true);
+  const isPremium = profile.user ? profile.user.tier === 'premium' : (profile.tier ? profile.tier === 'premium' : false);
+
+  const socialIcons = isPremium
+    ? (profile.links || []).filter((link: any) => link.isActive && link.isSocialIcon)
+    : [];
+
+  const standardLinks = (profile.links || []).filter(
+    (link: any) => link.isActive && (!isPremium || !link.isSocialIcon)
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: isPreview ? '100%' : '100vh', padding: hasAds ? '0 0 7rem 0' : '0 0 4rem 0', position: 'relative', width: '100%', minWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden', ...themeConfig.container }}>
@@ -368,11 +377,50 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
         </div>
         <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', ...themeConfig.title }}>{profile.title || `@${profile.username}`}</h1>
         {profile.bio && <p style={{ fontSize: '1.1rem', whiteSpace: 'pre-wrap', ...themeConfig.bio }}>{profile.bio}</p>}
+        
+        {/* Social Icons Row (Premium Only) */}
+        {socialIcons.length > 0 && (
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: '1rem',
+            marginTop: '1.5rem'
+          }}>
+            {socialIcons.map((link: any) => (
+              <a
+                key={link.id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => handleLinkClick(e, link)}
+                title={link.title}
+                className={hoverClass}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '50%',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  border: profile.theme === 'minimal' ? '1px solid #111111' : '1px solid rgba(255,255,255,0.15)',
+                  background: profile.theme === 'minimal' ? 'transparent' : 'rgba(255, 255, 255, 0.08)',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                  transition: 'all 0.2s ease-in-out'
+                }}
+              >
+                <SocialIcon name={link.icon} size={20} />
+              </a>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Links List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', width: '100%', maxWidth: '600px', padding: '0 1rem', position: 'relative', zIndex: 2 }}>
-        {profile.links?.filter((l: any) => l.isActive).map((link: any) => (
+        {standardLinks.map((link: any) => (
           <a
             key={link.id}
             href={link.url}

@@ -70,6 +70,7 @@ model ProfileLink {
   icon            String   @default("web") // Identificador do ícone (ex: instagram, web)
   isActive        Boolean  @default(true)
   isAgeRestricted Boolean  @default(false)
+  isSocialIcon    Boolean  @default(false)
   hasAd           Boolean  @default(true) // Controle de monetização individual
   clicks          Int      @default(0)
   order           Int      @default(0) // Ordem de exibição dos links
