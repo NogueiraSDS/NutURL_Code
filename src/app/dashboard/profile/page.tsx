@@ -92,6 +92,10 @@ export default function ProfileDashboard() {
     else if (urlLower.includes('tiktok.com')) setNewLinkIcon('tiktok');
     else if (urlLower.includes('twitter.com') || urlLower.includes('x.com')) setNewLinkIcon('twitter');
     else if (urlLower.includes('linkedin.com')) setNewLinkIcon('linkedin');
+    else if (urlLower.includes('spotify.com')) setNewLinkIcon('spotify');
+    else if (urlLower.includes('deezer.com')) setNewLinkIcon('deezer');
+    else if (urlLower.includes('music.apple.com')) setNewLinkIcon('applemusic');
+    else if (urlLower.includes('music.amazon.com') || urlLower.includes('amazon.com/music')) setNewLinkIcon('amazonmusic');
     else if (urlLower.includes('onlyfans.com')) { setNewLinkIcon('onlyfans'); setNewLinkAge(true); }
     else if (urlLower.includes('privacy.com.br')) { setNewLinkIcon('privacy'); setNewLinkAge(true); }
     else if (urlLower.includes('fansly.com')) { setNewLinkIcon('fansly'); setNewLinkAge(true); }
@@ -263,6 +267,10 @@ export default function ProfileDashboard() {
     { value: 'telegram', label: '✈️ Telegram' },
     { value: 'whatsapp', label: '💬 WhatsApp' },
     { value: 'github', label: '🐙 GitHub' },
+    { value: 'spotify', label: '🎵 Spotify' },
+    { value: 'deezer', label: '🎵 Deezer' },
+    { value: 'applemusic', label: '🎵 Apple Music' },
+    { value: 'amazonmusic', label: '🎵 Amazon Music' },
     { value: 'onlyfans', label: '🔒 OnlyFans (+18)', age: true },
     { value: 'privacy', label: '🔒 Privacy (+18)', age: true },
     { value: 'fansly', label: '🔒 Fansly (+18)', age: true }

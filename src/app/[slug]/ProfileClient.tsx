@@ -76,6 +76,30 @@ const SocialIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
         <path d="M12 12L2.5 12A10 10 0 0 0 12 22V12z"></path>
       </svg>
     ),
+    spotify: (
+      <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.892-.982-.336.076-.67-.135-.746-.47-.077-.337.135-.67.47-.747 3.856-.882 7.15-.502 9.822 1.135.296.18.387.563.206.857zm1.225-2.72c-.227.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.08-1.182-.413.125-.847-.107-.972-.52-.125-.413.108-.847.52-.972 3.67-1.114 8.24-.57 11.348 1.34.367.226.488.707.26 1.074zm.106-2.833C14.385 8.7 8.547 8.5 5.163 9.526c-.517.157-1.066-.137-1.224-.654-.158-.517.136-1.066.653-1.224 3.882-1.18 10.334-.95 14.42 1.48.465.276.615.875.34 1.34-.277.466-.876.616-1.34.34z" />
+      </svg>
+    ),
+    deezer: (
+      <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor">
+        <path d="M16 17.5h6v1.5h-6zM8 17.5h6v1.5H8zM0 17.5h6v1.5H0zM16 13.5h6v1.5h-6zM8 13.5h6v1.5H8zM8 9.5h6v1.5H8zM16 9.5h6v1.5h-6zM16 5.5h6v1.5h-6zM16 1.5h6v1.5h-6z" />
+      </svg>
+    ),
+    applemusic: (
+      <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+      </svg>
+    ),
+    amazonmusic: (
+      <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 18c6 0 10-3.5 13-8 .5-.8 1-2 1.5-3"></path>
+        <path d="M12 6c1.5 2 3.5 4 6.5 4a6.5 6.5 0 0 0 0-13c-3 0-5 2-6.5 4z"></path>
+        <circle cx="18.5" cy="7" r="1.5" fill="currentColor"></circle>
+      </svg>
+    ),
     web: (
       <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
