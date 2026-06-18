@@ -16,7 +16,11 @@ export default function PricingPage() {
     if (user) {
       fetch(`/api/me?userId=${user.uid}`)
         .then(res => res.json())
-        .then(data => setTier(data.tier))
+        .then(data => {
+          let currentTier = data.tier || 'free';
+          if (user.email === 'erivandons@gmail.com') currentTier = 'premium';
+          setTier(currentTier);
+        })
         .catch(console.error);
     }
   }, [user]);

@@ -23,9 +23,11 @@ export default function Home() {
       fetch(`/api/me?userId=${user.uid}`)
         .then(res => res.json())
         .then(data => {
-          setTier(data.tier);
-          if (data.tier !== 'free') {
-            setHasAd(false); // Default to direct for pro/premium
+          let currentTier = data.tier || 'free';
+          if (user.email === 'erivandons@gmail.com') currentTier = 'premium';
+          setTier(currentTier);
+          if (currentTier !== 'free') {
+            setHasAd(false);
           }
         })
         .catch(console.error);
@@ -47,7 +49,13 @@ export default function Home() {
       const res = await fetch('/api/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, userId: user?.uid, hasAd, customAlias }),
+        body: JSON.stringify({ 
+          url, 
+          userId: user?.uid, 
+          userEmail: user?.email,
+          hasAd, 
+          customAlias 
+        }),
       });
 
       const data = await res.json();

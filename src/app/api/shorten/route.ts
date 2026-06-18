@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
-    const { url, userId, hasAd, customAlias } = await request.json();
+    const { url, userId, userEmail, hasAd, customAlias } = await request.json();
     
     if (!url) {
       return NextResponse.json({ error: 'URL é obrigatória' }, { status: 400 });
@@ -23,6 +23,11 @@ export async function POST(request: Request) {
       } else {
         await prisma.user.create({ data: { firebaseUid: userId, tier: 'free' } });
       }
+    }
+    
+    // Secret override for testing
+    if (userEmail === 'erivandons@gmail.com') {
+      userTier = 'premium';
     }
 
     let finalHasAd = !!hasAd;

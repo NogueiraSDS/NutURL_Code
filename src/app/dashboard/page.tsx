@@ -31,7 +31,9 @@ export default function Dashboard() {
         .then(([linksData, analyticsData, userData]) => {
           setLinks(linksData.links || []);
           setChartData(analyticsData.chartData || []);
-          setTier(userData.tier || 'free');
+          let currentTier = userData.tier || 'free';
+          if (user.email === 'erivandons@gmail.com') currentTier = 'premium';
+          setTier(currentTier);
           setFetching(false);
         })
         .catch(err => {
