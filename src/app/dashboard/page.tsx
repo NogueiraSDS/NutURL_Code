@@ -11,6 +11,8 @@ export default function Dashboard() {
   const router = useRouter();
   const [links, setLinks] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [profileChartData, setProfileChartData] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'links' | 'profile'>('links');
   const [fetching, setFetching] = useState(true);
   const [tier, setTier] = useState('free');
   const { t } = useI18n();
@@ -31,6 +33,7 @@ export default function Dashboard() {
         .then(([linksData, analyticsData, userData]) => {
           setLinks(linksData.links || []);
           setChartData(analyticsData.chartData || []);
+          setProfileChartData(analyticsData.profileChartData || []);
           let currentTier = userData.tier || 'free';
           if (user.email === 'erivandons@gmail.com') currentTier = 'premium';
           setTier(currentTier);
@@ -86,26 +89,70 @@ export default function Dashboard() {
       </div>
 
       <div className="glass" style={{ padding: '2rem', marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>{t('dashboard.overview')}</h2>
+        <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{t('dashboard.overview')}</h2>
+          
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '4px', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
+            <button 
+              onClick={() => setActiveTab('links')}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'links' ? 'var(--primary)' : 'transparent',
+                color: activeTab === 'links' ? 'white' : '#94a3b8',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              🔗 {t('dashboard.tabLinks') || 'Cliques em Links'}
+            </button>
+            <button 
+              onClick={() => setActiveTab('profile')}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'profile' ? 'var(--accent)' : 'transparent',
+                color: activeTab === 'profile' ? 'white' : '#94a3b8',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              👤 {t('dashboard.tabProfile') || 'Visitas da Página (@)'}
+            </button>
+          </div>
+        </div>
+
         <div style={{ height: '300px', width: '100%' }}>
           {fetching ? (
              <p>{t('dashboard.loadingChart')}</p>
-          ) : chartData.length > 0 ? (
+          ) : (activeTab === 'links' ? chartData : profileChartData).length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
+              <AreaChart data={activeTab === 'links' ? chartData : profileChartData}>
                 <defs>
                   <linearGradient id="colorCliques" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                    <stop offset="5%" stopColor={activeTab === 'links' ? 'var(--primary)' : 'var(--accent)'} stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor={activeTab === 'links' ? 'var(--primary)' : 'var(--accent)'} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="date" stroke="#94a3b8" />
                 <YAxis stroke="#94a3b8" />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--card-border)', borderRadius: '8px' }}
-                  itemStyle={{ color: 'var(--primary)', fontWeight: 'bold' }}
+                  itemStyle={{ color: activeTab === 'links' ? 'var(--primary)' : 'var(--accent)', fontWeight: 'bold' }}
                 />
-                <Area type="monotone" dataKey="cliques" stroke="var(--primary)" fillOpacity={1} fill="url(#colorCliques)" />
+                <Area 
+                  type="monotone" 
+                  dataKey={activeTab === 'links' ? 'cliques' : 'visitas'} 
+                  stroke={activeTab === 'links' ? 'var(--primary)' : 'var(--accent)'} 
+                  fillOpacity={1} 
+                  fill="url(#colorCliques)" 
+                />
               </AreaChart>
             </ResponsiveContainer>
           ) : (

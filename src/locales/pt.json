@@ -54,7 +54,9 @@
     "colRedirect": "Redirecionamento",
     "colDate": "Data",
     "wait": "Espera ⏳",
-    "direct": "Direto ⚡"
+    "direct": "Direto ⚡",
+    "tabLinks": "Cliques em Links",
+    "tabProfile": "Visitas da Página (@)"
   },
   "pricing": {
     "title": "Escolha o plano ideal para seus Links",
@@ -98,6 +100,8 @@
     "ageTitle": "Conteúdo para maiores",
     "ageDesc": "Este link pode conter conteúdo sensível. Você tem 18 anos ou mais?",
     "ageNo": "Não, sair",
-    "ageYes": "Sim, eu tenho"
+    "ageYes": "Sim, eu tenho",
+    "adText": "Quer divulgar sua marca com estilo? Encurte links e crie sua própria página personalizável!",
+    "createFree": "Começar Grátis"
   }
 }

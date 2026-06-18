@@ -54,7 +54,9 @@
     "colRedirect": "Redirect",
     "colDate": "Date",
     "wait": "Wait ⏳",
-    "direct": "Direct ⚡"
+    "direct": "Direct ⚡",
+    "tabLinks": "Link Clicks",
+    "tabProfile": "Page Views (@)"
   },
   "pricing": {
     "title": "Choose the perfect plan for your Links",
@@ -98,6 +100,8 @@
     "ageTitle": "18+ Content",
     "ageDesc": "This link may contain sensitive content. Are you 18 years or older?",
     "ageNo": "No, leave",
-    "ageYes": "Yes, I am"
+    "ageYes": "Yes, I am",
+    "adText": "Want to showcase your brand in style? Shorten links and create your own customizable page!",
+    "createFree": "Get Started Free"
   }
 }

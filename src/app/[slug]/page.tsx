@@ -9,12 +9,17 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   const resolvedParams = await params;
   const { slug } = resolvedParams;
 
+  const headersList = await headers();
+  const userAgent = headersList.get('user-agent') || 'Unknown';
+  const referer = headersList.get('referer') || 'Direct';
+
   // Intercept profile routing
   if (slug.startsWith('%40') || slug.startsWith('@')) {
     const username = slug.replace(/^%40|^@/, '');
     const profile = await prisma.profile.findUnique({
       where: { username },
       include: {
+        user: true,
         links: {
           orderBy: { order: 'asc' },
         },
@@ -22,6 +27,15 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
     });
 
     if (profile) {
+      // Record profile visit
+      await prisma.profileVisit.create({
+        data: {
+          profileId: profile.id,
+          userAgent,
+          referer,
+        },
+      }).catch(err => console.error("Error recording profile visit:", err));
+
       return <ProfileClient profile={profile} />;
     } else {
       notFound();
@@ -39,10 +53,6 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
   if (link.expiresAt && link.expiresAt < new Date()) {
     return <ExpiredClient />;
   }
-
-  const headersList = await headers();
-  const userAgent = headersList.get('user-agent') || 'Unknown';
-  const referer = headersList.get('referer') || 'Direct';
 
   await Promise.all([
     prisma.link.update({

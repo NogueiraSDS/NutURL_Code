@@ -8,6 +8,7 @@ import imageCompression from 'browser-image-compression';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
 import { HexColorPicker } from 'react-colorful';
+import ProfileClient from '@/app/[slug]/ProfileClient';
 
 export default function ProfileDashboard() {
   const { user, loading } = useAuth();
@@ -276,7 +277,7 @@ export default function ProfileDashboard() {
   if (loading || fetching) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>Carregando...</div>;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', width: '100%', flex: 1 }}>
+    <div style={{ padding: '2rem', maxWidth: '1300px', margin: '0 auto', width: '100%', flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Sua <span className="text-gradient">Página</span></h1>
         <button onClick={() => router.push('/dashboard')} className="btn" style={{ background: 'transparent', border: '1px solid #94a3b8' }}>
@@ -284,7 +285,7 @@ export default function ProfileDashboard() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', alignItems: 'start' }}>
         
         {/* Profile Settings */}
         <div className="glass" style={{ padding: '2rem' }}>
@@ -388,9 +389,14 @@ export default function ProfileDashboard() {
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Tema de Fundo</label>
                   <select value={theme} onChange={(e) => setTheme(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
                     <option value="solid">Cor Sólida (Padrão)</option>
-                    <option value="gradient_1">Gradiente Aurora (Azul/Roxo)</option>
-                    <option value="gradient_2">Gradiente Neon (Rosa/Laranja)</option>
-                    <option value="matrix">Matrix (Verde Hacker)</option>
+                    <option value="gradient_1">Gradiente Aurora (Legado)</option>
+                    <option value="gradient_2">Gradiente Neon (Legado)</option>
+                    <option value="matrix">Matrix (Hacker Legado)</option>
+                    <option value="glassmorphism">✨ Glassmorphism Mesh (Premium)</option>
+                    <option value="aurora">✨ Aurora Glow (Premium)</option>
+                    <option value="cyberpunk">✨ Cyberpunk Neon (Premium)</option>
+                    <option value="minimal">✨ Minimalista Stark (Premium)</option>
+                    <option value="claymorphism">✨ Claymorphism Soft (Premium)</option>
                   </select>
                 </div>
 
@@ -508,6 +514,72 @@ export default function ProfileDashboard() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Live Preview (Mobile Emulator) */}
+        <div style={{
+          position: 'sticky',
+          top: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '1.5rem',
+          background: 'rgba(255, 255, 255, 0.02)',
+          border: '1px solid var(--card-border)',
+          borderRadius: '16px',
+        }}>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', fontWeight: 600, color: '#94a3b8' }}>
+            📱 Pré-visualização Mobile
+          </h3>
+          
+          <div style={{
+            width: '280px',
+            height: '520px',
+            borderRadius: '32px',
+            border: '8px solid #1e293b',
+            background: '#0f172a',
+            boxShadow: '0 15px 30px rgba(0,0,0,0.5)',
+            overflow: 'hidden',
+            position: 'relative'
+          }}>
+            {/* Notch */}
+            <div style={{
+              position: 'absolute',
+              top: '0',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '80px',
+              height: '14px',
+              background: '#1e293b',
+              borderBottomLeftRadius: '8px',
+              borderBottomRightRadius: '8px',
+              zIndex: 100
+            }} />
+            
+            {/* Embedded Profile Client Mock */}
+            <div style={{
+              width: '100%',
+              height: '100%',
+              overflowY: 'auto',
+              overflowX: 'hidden'
+            }}>
+              <ProfileClient 
+                profile={{
+                  username: username || 'username',
+                  title: title || 'Seu Nome',
+                  bio: bio || 'Sua bio aparecerá aqui...',
+                  avatarUrl,
+                  coverUrl,
+                  backgroundColor,
+                  theme,
+                  hideWatermark,
+                  tier,
+                  links: links.map(l => ({ ...l, isActive: true }))
+                }} 
+                isPreview={true}
+              />
+            </div>
+          </div>
         </div>
 
       </div>

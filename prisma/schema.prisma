@@ -56,6 +56,7 @@ model Profile {
   userId          String        @unique // Ligação com o User existente
   user            User          @relation(fields: [userId], references: [id])
   links           ProfileLink[]
+  visits          ProfileVisit[]
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 }
@@ -76,3 +77,13 @@ model ProfileLink {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
+
+model ProfileVisit {
+  id        String   @id @default(cuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  userAgent String?
+  referer   String?
+  createdAt DateTime @default(now())
+}
+
