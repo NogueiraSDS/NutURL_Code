@@ -678,7 +678,9 @@ export default function Home() {
 
           <div className={styles.footerLinks}>
             <Link href="/pricing">{t('home.plans')}</Link>
-            <Link href="/login">{t('home.login')}</Link>
+            <Link href="/about">{t('footer.about') || 'Quem Somos'}</Link>
+            <Link href="/contact">{t('footer.contact') || 'Contato'}</Link>
+            <Link href="/blog">{t('footer.blog') || 'Blog'}</Link>
             <Link href="/privacy">{t('footer.privacy') || 'Política de Privacidade'}</Link>
             <Link href="/terms">{t('footer.terms') || 'Termos de Uso'}</Link>
             <a href="https://github.com/NogueiraSDS/NutURL_Code" target="_blank" rel="noopener noreferrer">GitHub</a>

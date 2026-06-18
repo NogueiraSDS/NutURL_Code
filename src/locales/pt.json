@@ -132,6 +132,31 @@
   },
   "footer": {
     "privacy": "Política de Privacidade & Cookies",
-    "terms": "Termos de Uso"
+    "terms": "Termos de Uso",
+    "about": "Quem Somos",
+    "contact": "Contato",
+    "blog": "Blog"
+  },
+  "about": {
+    "title": "Sobre o NutURL",
+    "subtitle": "A evolução da gestão de links rápidos e páginas profissionais na bio."
+  },
+  "contact": {
+    "title": "Fale Conosco",
+    "subtitle": "Tem alguma dúvida, feedback ou proposta? Preencha o formulário abaixo e entraremos em contato.",
+    "name": "Seu Nome",
+    "email": "Seu E-mail",
+    "subject": "Assunto",
+    "message": "Mensagem",
+    "send": "Enviar Mensagem",
+    "sending": "Enviando...",
+    "success": "Mensagem enviada com sucesso! Responderemos o mais breve possível."
+  },
+  "blog": {
+    "title": "Blog NutURL",
+    "subtitle": "Artigos sobre marketing digital, branding, links na bio e otimização de tráfego.",
+    "readTime": "{time} min de leitura",
+    "back": "← Voltar para o Blog",
+    "searchPlaceholder": "Buscar artigos..."
   }
 }
