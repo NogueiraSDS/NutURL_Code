@@ -51,6 +51,8 @@ model Profile {
   avatarUrl       String?
   coverUrl        String?
   backgroundColor String?       @default("#0f172a") // Cor de fundo do perfil
+  theme           String?       @default("solid") // Temas premium: solid, gradient_1, gradient_2, matrix
+  hideWatermark   Boolean       @default(false)
   userId          String        @unique // Ligação com o User existente
   user            User          @relation(fields: [userId], references: [id])
   links           ProfileLink[]
@@ -70,6 +72,7 @@ model ProfileLink {
   hasAd           Boolean  @default(true) // Controle de monetização individual
   clicks          Int      @default(0)
   order           Int      @default(0) // Ordem de exibição dos links
+  animation       String?  @default("none") // Animação premium: none, pulse, bounce, wiggle
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

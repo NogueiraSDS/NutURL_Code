@@ -24,11 +24,14 @@ export default function ProfileDashboard() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [coverUrl, setCoverUrl] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#0f172a');
+  const [theme, setTheme] = useState('solid');
+  const [hideWatermark, setHideWatermark] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
   const [checkingUsername, setCheckingUsername] = useState(false);
+  const [tier, setTier] = useState('free');
 
   // Link Form State
   const [links, setLinks] = useState<any[]>([]);
@@ -36,6 +39,7 @@ export default function ProfileDashboard() {
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkIcon, setNewLinkIcon] = useState('web');
   const [newLinkAge, setNewLinkAge] = useState(false);
+  const [newLinkAnimation, setNewLinkAnimation] = useState('none');
   const [isSavingLink, setIsSavingLink] = useState(false);
 
   useEffect(() => {
@@ -57,9 +61,20 @@ export default function ProfileDashboard() {
             setAvatarUrl(data.profile.avatarUrl || '');
             setCoverUrl(data.profile.coverUrl || '');
             setBackgroundColor(data.profile.backgroundColor || '#0f172a');
+            setTheme(data.profile.theme || 'solid');
+            setHideWatermark(data.profile.hideWatermark || false);
             setLinks(data.profile.links || []);
           }
           setFetching(false);
+        })
+        .catch(console.error);
+        
+      fetch(`/api/me?userId=${user.uid}`)
+        .then(res => res.json())
+        .then(data => {
+          let currentTier = data.tier || 'free';
+          if (user.email === 'erivandons@gmail.com') currentTier = 'premium';
+          setTier(currentTier);
         })
         .catch(console.error);
     }
@@ -119,7 +134,7 @@ export default function ProfileDashboard() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor })
+        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, hideWatermark })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar perfil');
@@ -202,7 +217,8 @@ export default function ProfileDashboard() {
           title: finalTitle, 
           url: newLinkUrl, 
           icon: newLinkIcon, 
-          isAgeRestricted: finalAgeRestricted 
+          isAgeRestricted: finalAgeRestricted,
+          animation: tier !== 'free' ? newLinkAnimation : 'none'
         })
       });
       const data = await res.json();
@@ -213,6 +229,7 @@ export default function ProfileDashboard() {
       setNewLinkUrl('');
       setNewLinkIcon('web');
       setNewLinkAge(false);
+      setNewLinkAnimation('none');
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -359,6 +376,35 @@ export default function ProfileDashboard() {
                 style={{ resize: 'vertical', minHeight: '80px' }}
               />
             </div>
+
+            {/* Premium Section */}
+            <div style={{ marginTop: '1rem', padding: '1.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid #f59e0b', borderRadius: '8px' }}>
+              <h3 style={{ color: '#f59e0b', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                ✨ Opções Avançadas (Premium)
+              </h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', opacity: tier === 'free' ? 0.5 : 1, pointerEvents: tier === 'free' ? 'none' : 'auto' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Tema de Fundo</label>
+                  <select value={theme} onChange={(e) => setTheme(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
+                    <option value="solid">Cor Sólida (Padrão)</option>
+                    <option value="gradient_1">Gradiente Aurora (Azul/Roxo)</option>
+                    <option value="gradient_2">Gradiente Neon (Rosa/Laranja)</option>
+                    <option value="matrix">Matrix (Verde Hacker)</option>
+                  </select>
+                </div>
+
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={hideWatermark} onChange={(e) => setHideWatermark(e.target.checked)} />
+                  Ocultar marca d'água "nuturl" no final da página
+                </label>
+              </div>
+              
+              {tier === 'free' && (
+                <p style={{ color: '#f59e0b', fontSize: '0.85rem', marginTop: '1rem' }}>Faça upgrade para acessar estas opções.</p>
+              )}
+            </div>
+
             <button type="submit" className="btn" disabled={isSavingProfile}>
               {isSavingProfile ? 'Salvando...' : 'Salvar Perfil'}
             </button>
@@ -427,6 +473,13 @@ export default function ProfileDashboard() {
                 <span style={{ fontSize: '0.75rem', color: '#ef4444', marginLeft: '0.5rem' }}>(Obrigatório para esta rede)</span>
               )}
             </label>
+
+            <select value={newLinkAnimation} onChange={(e) => setNewLinkAnimation(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto', opacity: tier === 'free' ? 0.5 : 1 }} disabled={tier === 'free'}>
+              <option value="none">Sem Animação no Botão</option>
+              <option value="pulse">✨ Efeito Pulsar (Premium)</option>
+              <option value="bounce">✨ Efeito Pular (Premium)</option>
+              <option value="wiggle">✨ Efeito Balançar (Premium)</option>
+            </select>
 
             <button type="submit" className="btn" disabled={isSavingLink || !profile}>
               {isSavingLink ? 'Adicionando...' : 'Adicionar Link'}

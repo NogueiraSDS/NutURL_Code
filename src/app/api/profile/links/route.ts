@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { profileId, title, url, icon, isAgeRestricted } = body;
+    const { profileId, title, url, icon, isAgeRestricted, animation } = body;
 
     if (!profileId || !title || !url) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
         url,
         icon: icon || 'web',
         isAgeRestricted: isAgeRestricted || false,
+        animation: animation || 'none',
         order: nextOrder,
       },
     });
@@ -43,7 +44,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { id, title, url, icon, isAgeRestricted, isActive, order } = body;
+    const { id, title, url, icon, isAgeRestricted, isActive, order, animation } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing link id' }, { status: 400 });
@@ -58,6 +59,7 @@ export async function PATCH(request: Request) {
         ...(isAgeRestricted !== undefined && { isAgeRestricted }),
         ...(isActive !== undefined && { isActive }),
         ...(order !== undefined && { order }),
+        ...(animation !== undefined && { animation }),
       },
     });
 

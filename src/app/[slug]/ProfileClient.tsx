@@ -47,8 +47,36 @@ export default function ProfileClient({ profile }: { profile: any }) {
     }
   };
 
+  const bgStyle = (() => {
+    if (profile.theme === 'gradient_1') return { background: 'linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%)' };
+    if (profile.theme === 'gradient_2') return { background: 'linear-gradient(135deg, #be185d 0%, #ea580c 100%)' };
+    if (profile.theme === 'matrix') return { background: '#000', backgroundImage: 'radial-gradient(#0f0 1px, transparent 1px)', backgroundSize: '20px 20px' };
+    return { background: profile.backgroundColor || 'var(--bg)' };
+  })();
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '0 0 4rem 0', background: profile.backgroundColor || 'var(--bg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', padding: '0 0 4rem 0', ...bgStyle }}>
+      {/* CSS Animado */}
+      <style>{`
+        @keyframes pulse-anim {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+          100% { transform: scale(1); }
+        }
+        @keyframes bounce-anim {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        @keyframes wiggle-anim {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-3deg); }
+          75% { transform: rotate(3deg); }
+        }
+        .anim-pulse { animation: pulse-anim 2s infinite; }
+        .anim-bounce { animation: bounce-anim 2s infinite; }
+        .anim-wiggle { animation: wiggle-anim 2s infinite; }
+      `}</style>
+
       {/* Cover Banner */}
       {profile.coverUrl ? (
         <div style={{ width: '100%', height: '200px', background: `url(${profile.coverUrl}) center/cover`, borderBottom: '1px solid rgba(255,255,255,0.1)' }} />
@@ -81,7 +109,7 @@ export default function ProfileClient({ profile }: { profile: any }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => handleLinkClick(e, link)}
-            className="btn"
+            className={link.animation !== 'none' ? `anim-${link.animation}` : ''}
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -107,11 +135,14 @@ export default function ProfileClient({ profile }: { profile: any }) {
       </div>
 
       {/* Branding Footer */}
-      <div style={{ marginTop: '4rem', opacity: 0.5, textAlign: 'center' }}>
-        <a href="/" style={{ color: 'white', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 'bold', letterSpacing: '1px' }}>
-          nut<span style={{ color: 'var(--primary)' }}>url</span>
-        </a>
-      </div>
+      {!profile.hideWatermark && (
+        <div style={{ marginTop: 'auto', paddingTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8' }}>
+          <Zap size={16} />
+          <a href="/" style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'bold' }}>
+            Powered by nuturl
+          </a>
+        </div>
+      )}
 
       {/* Age Restriction Modal */}
       {showAgeModal && (
