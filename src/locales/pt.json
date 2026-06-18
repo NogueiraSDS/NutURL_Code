@@ -1,7 +1,7 @@
 {
   "home": {
-    "shortenShare": "Encurte. Compartilhe.",
-    "subtitle": "A plataforma premium para gestão de links do seu projeto.",
+    "shortenShare": "Encurte. Reúna. Compartilhe.",
+    "subtitle": "Crie sua página de link na bio personalizada e gerencie todos os seus links em um único lugar.",
     "placeholder": "Cole seu link longo aqui...",
     "btnShorten": "Encurtar",
     "btnShortening": "Encurtando...",
@@ -120,6 +120,18 @@
     "ageNo": "Não, sair",
     "ageYes": "Sim, eu tenho",
     "adText": "Quer divulgar sua marca com estilo? Encurte links e crie sua própria página personalizável!",
-    "createFree": "Começar Grátis"
+    "createFree": "Começar Grátis",
+    "share": "Compartilhar Página",
+    "linkCopied": "Link da página copiado!"
+  },
+  "cookie": {
+    "text": "Nós usamos cookies e tecnologias semelhantes para otimizar sua experiência, analisar o tráfego do site e personalizar anúncios (Google AdSense) em conformidade com a LGPD e GDPR. Ao continuar navegando, você concorda com nossas políticas.",
+    "accept": "Aceitar Todos",
+    "decline": "Recusar",
+    "learnMore": "Políticas de Privacidade"
+  },
+  "footer": {
+    "privacy": "Política de Privacidade & Cookies",
+    "terms": "Termos de Uso"
   }
 }

@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 import { AuthProvider } from "@/context/AuthContext";
 
 import { I18nProvider } from "@/context/I18nContext";
+import CookieConsent from "@/components/CookieConsent";
 
 export const metadata: Metadata = {
   title: "NutURL - Premium Link-in-Bio & URL Shortener",
@@ -41,6 +42,7 @@ export default function RootLayout({
             <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
               {children}
             </main>
+            <CookieConsent />
           </AuthProvider>
         </I18nProvider>
       </body>

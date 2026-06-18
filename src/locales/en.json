@@ -1,7 +1,7 @@
 {
   "home": {
-    "shortenShare": "Shorten. Share.",
-    "subtitle": "The premium platform for managing your project's links.",
+    "shortenShare": "Shorten. Connect. Share.",
+    "subtitle": "Create your customized link-in-bio page and manage all your links in one single place.",
     "placeholder": "Paste your long link here...",
     "btnShorten": "Shorten",
     "btnShortening": "Shortening...",
@@ -120,6 +120,18 @@
     "ageNo": "No, leave",
     "ageYes": "Yes, I am",
     "adText": "Want to showcase your brand in style? Shorten links and create your own customizable page!",
-    "createFree": "Get Started Free"
+    "createFree": "Get Started Free",
+    "share": "Share Page",
+    "linkCopied": "Page link copied!"
+  },
+  "cookie": {
+    "text": "We use cookies and similar technologies to optimize your experience, analyze site traffic, and personalize ads (Google AdSense) in compliance with LGPD and GDPR. By continuing to browse, you agree to our policies.",
+    "accept": "Accept All",
+    "decline": "Decline",
+    "learnMore": "Privacy Policies"
+  },
+  "footer": {
+    "privacy": "Privacy & Cookie Policy",
+    "terms": "Terms of Use"
   }
 }

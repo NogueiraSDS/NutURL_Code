@@ -5,6 +5,7 @@ import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/context/I18nContext';
+import Link from 'next/link';
 
 // Simple Vector SVG Icons for Features
 const FeatureIcons = {
@@ -273,7 +274,11 @@ export default function Home() {
       <header className={`${styles.section} ${styles.heroSection}`}>
         <div className={`${styles.hero} animate-fade-in`}>
           <h1 className={styles.title}>
-            {t('home.shortenShare').split('.')[0]}. <span className="text-gradient">{t('home.shortenShare').split('.')[1]}.</span>
+            {t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean)[0]}.{' '}
+            {t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean)[1]}.{' '}
+            <span className="text-gradient">
+              {t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean)[2]}.
+            </span>
           </h1>
           <p className={styles.subtitle}>
             {t('home.subtitle')}
@@ -672,8 +677,10 @@ export default function Home() {
           </div>
 
           <div className={styles.footerLinks}>
-            <a href="/pricing">{t('home.plans')}</a>
-            <a href="/login">{t('home.login')}</a>
+            <Link href="/pricing">{t('home.plans')}</Link>
+            <Link href="/login">{t('home.login')}</Link>
+            <Link href="/privacy">{t('footer.privacy') || 'Política de Privacidade'}</Link>
+            <Link href="/terms">{t('footer.terms') || 'Termos de Uso'}</Link>
             <a href="https://github.com/NogueiraSDS/NutURL_Code" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
