@@ -531,11 +531,41 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
 
       {/* Branding Footer */}
       {!profile.hideWatermark && (
-        <div style={{ marginTop: 'auto', paddingTop: '2.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: profile.theme === 'minimal' ? '#555555' : '#94a3b8', position: 'relative', zIndex: 2 }}>
-          <Zap size={16} />
-          <a href="/" style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'bold' }}>
-            Powered by nuturl
-          </a>
+        <div style={{ 
+          marginTop: 'auto', 
+          paddingTop: '2.5rem', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center', 
+          gap: '0.75rem', 
+          color: profile.theme === 'minimal' ? '#555555' : '#94a3b8', 
+          position: 'relative', 
+          zIndex: 2,
+          paddingLeft: '1rem',
+          paddingRight: '1rem',
+          textAlign: 'center'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Zap size={16} />
+            <a href="/" style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'bold' }}>
+              Powered by nuturl
+            </a>
+          </div>
+          <div style={{ 
+            display: 'flex', 
+            gap: '0.75rem', 
+            fontSize: '0.75rem', 
+            opacity: 0.7, 
+            flexWrap: 'wrap', 
+            justifyContent: 'center',
+            lineHeight: '1.4'
+          }}>
+            <a href="/about" style={{ textDecoration: 'underline' }}>{t('footer.about') || 'Quem Somos'}</a>
+            <a href="/contact" style={{ textDecoration: 'underline' }}>{t('footer.contact') || 'Contato'}</a>
+            <a href="/blog" style={{ textDecoration: 'underline' }}>{t('footer.blog') || 'Blog'}</a>
+            <a href="/privacy" style={{ textDecoration: 'underline' }}>{t('footer.privacy') || 'Privacidade'}</a>
+            <a href="/terms" style={{ textDecoration: 'underline' }}>{t('footer.terms') || 'Termos'}</a>
+          </div>
         </div>
       )}
 

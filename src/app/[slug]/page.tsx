@@ -4,6 +4,54 @@ import { headers } from 'next/headers';
 import RedirectClient from './RedirectClient';
 import ExpiredClient from './ExpiredClient';
 import ProfileClient from './ProfileClient';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
+
+  if (slug.startsWith('%40') || slug.startsWith('@')) {
+    const username = slug.replace(/^%40|^@/, '');
+    const profile = await prisma.profile.findUnique({
+      where: { username },
+      select: {
+        title: true,
+        bio: true,
+        avatarUrl: true,
+        username: true
+      }
+    });
+
+    if (profile) {
+      const title = profile.title || `@${profile.username}`;
+      const description = profile.bio || `Confira a página de links de ${title} no NutURL.`;
+      const images = profile.avatarUrl ? [profile.avatarUrl] : [];
+
+      return {
+        title: `${title} | NutURL`,
+        description,
+        openGraph: {
+          title,
+          description,
+          type: 'profile',
+          username: profile.username,
+          images,
+        },
+        twitter: {
+          card: 'summary',
+          title,
+          description,
+          images,
+        }
+      };
+    }
+  }
+
+  return {
+    title: 'NutURL - Premium Link-in-Bio & URL Shortener',
+    description: 'Crie páginas de links personalizadas e encurte URLs com métricas em tempo real.',
+  };
+}
 
 export default async function SlugPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
