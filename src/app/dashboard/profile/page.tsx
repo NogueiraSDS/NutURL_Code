@@ -37,6 +37,7 @@ export default function ProfileDashboard() {
   // Link Form State
   const [links, setLinks] = useState<any[]>([]);
   const [newLinkTitle, setNewLinkTitle] = useState('');
+  const [newLinkGroup, setNewLinkGroup] = useState('');
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [newLinkIcon, setNewLinkIcon] = useState('web');
   const [newLinkAge, setNewLinkAge] = useState(false);
@@ -225,7 +226,8 @@ export default function ProfileDashboard() {
           icon: newLinkIcon, 
           isAgeRestricted: finalAgeRestricted,
           isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
-          animation: tier !== 'free' ? newLinkAnimation : 'none'
+          animation: tier !== 'free' ? newLinkAnimation : 'none',
+          groupName: newLinkGroup.trim() || null
         })
       });
       const data = await res.json();
@@ -238,6 +240,7 @@ export default function ProfileDashboard() {
       setNewLinkAge(false);
       setNewLinkIsSocialIcon(false);
       setNewLinkAnimation('none');
+      setNewLinkGroup('');
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -468,6 +471,14 @@ export default function ProfileDashboard() {
               placeholder="Título do Botão (Opcional para redes conhecidas)"
               className="input"
             />
+
+            <input
+              type="text"
+              value={newLinkGroup}
+              onChange={(e) => setNewLinkGroup(e.target.value)}
+              placeholder="Nome do Grupo/Pasta (Opcional - Ex: Músicas)"
+              className="input"
+            />
             
             <input
               type="url"
@@ -526,6 +537,7 @@ export default function ProfileDashboard() {
                       {iconsList.find(i => i.value === link.icon)?.label.split(' ')[0]} {link.title}
                       {link.isAgeRestricted && <span style={{ marginLeft: '8px', background: '#ef4444', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>+18</span>}
                       {link.isSocialIcon && <span style={{ marginLeft: '8px', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>Ícone</span>}
+                      {link.groupName && <span style={{ marginLeft: '8px', background: '#334155', color: '#cbd5e1', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>📁 {link.groupName}</span>}
                     </p>
                     <p style={{ color: '#94a3b8', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.url}</p>
                   </div>

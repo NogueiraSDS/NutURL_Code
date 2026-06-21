@@ -341,6 +341,33 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
     (link: any) => link.isActive && (!isPremium || !link.isSocialIcon)
   );
 
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (groupName: string) => {
+    setCollapsedGroups(prev => ({
+      ...prev,
+      [groupName]: !prev[groupName]
+    }));
+  };
+
+  const groupedItems: any[] = [];
+  const groupIndexMap: Record<string, number> = {};
+
+  standardLinks.forEach((link: any) => {
+    if (!link.groupName) {
+      groupedItems.push({ type: 'link', link });
+    } else {
+      const gName = link.groupName.trim();
+      if (groupIndexMap[gName] === undefined) {
+        groupedItems.push({ type: 'group', name: gName, links: [link] });
+        groupIndexMap[gName] = groupedItems.length - 1;
+      } else {
+        const idx = groupIndexMap[gName];
+        groupedItems[idx].links.push(link);
+      }
+    }
+  });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: isPreview ? '100%' : '100vh', padding: hasAds ? '0 0 7rem 0' : '0 0 4rem 0', position: 'relative', width: '100%', minWidth: '100%', boxSizing: 'border-box', overflowX: 'hidden', ...themeConfig.container }}>
       
@@ -501,32 +528,108 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
 
       {/* Links List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', width: '100%', maxWidth: '600px', padding: '0 1rem', position: 'relative', zIndex: 2 }}>
-        {standardLinks.map((link: any) => (
-          <a
-            key={link.id}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => handleLinkClick(e, link)}
-            className={`${hoverClass} ${link.animation !== 'none' ? `anim-${link.animation}` : ''}`}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              position: 'relative', 
-              padding: '1.2rem', 
-              textDecoration: 'none',
-              fontWeight: 600,
-              fontSize: '1.1rem',
-              ...themeConfig.button
-            }}
-          >
-            <span style={{ position: 'absolute', left: '1.5rem', display: 'flex', alignItems: 'center' }}>
-              <SocialIcon name={link.icon} size={20} />
-            </span>
-            {link.title}
-          </a>
-        ))}
+        {groupedItems.map((item, idx) => {
+          if (item.type === 'link') {
+            const link = item.link;
+            return (
+              <a
+                key={link.id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => handleLinkClick(e, link)}
+                className={`${hoverClass} ${link.animation !== 'none' ? `anim-${link.animation}` : ''}`}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  position: 'relative', 
+                  padding: '1.2rem', 
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  ...themeConfig.button
+                }}
+              >
+                <span style={{ position: 'absolute', left: '1.5rem', display: 'flex', alignItems: 'center' }}>
+                  <SocialIcon name={link.icon} size={20} />
+                </span>
+                {link.title}
+              </a>
+            );
+          } else {
+            const isCollapsed = !!collapsedGroups[item.name];
+            return (
+              <div key={`group-${item.name}-${idx}`} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', width: '100%' }}>
+                {/* Group Header Button */}
+                <button
+                  onClick={() => toggleGroup(item.name)}
+                  className={hoverClass}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '1.2rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    cursor: 'pointer',
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    textAlign: 'center',
+                    ...themeConfig.button
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    📁 {item.name}
+                  </span>
+                  <span style={{ transition: 'transform 0.2s', transform: isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)' }}>
+                    ▼
+                  </span>
+                </button>
+
+                {/* Grouped Links Container */}
+                {!isCollapsed && (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.8rem',
+                    paddingLeft: '1rem',
+                    borderLeft: profile.theme === 'minimal' ? '2px solid #111111' : '2px solid rgba(255,255,255,0.1)',
+                    marginLeft: '1.5rem',
+                    boxSizing: 'border-box'
+                  }}>
+                    {item.links.map((link: any) => (
+                      <a
+                        key={link.id}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => handleLinkClick(e, link)}
+                        className={`${hoverClass} ${link.animation !== 'none' ? `anim-${link.animation}` : ''}`}
+                        style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          position: 'relative', 
+                          padding: '1rem', 
+                          textDecoration: 'none',
+                          fontWeight: 600,
+                          fontSize: '1rem',
+                          ...themeConfig.button
+                        }}
+                      >
+                        <span style={{ position: 'absolute', left: '1.2rem', display: 'flex', alignItems: 'center' }}>
+                          <SocialIcon name={link.icon} size={18} />
+                        </span>
+                        {link.title}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+        })}
       </div>
 
       {/* Branding Footer */}

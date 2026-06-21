@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { profileId, title, url, icon, isAgeRestricted, animation, isSocialIcon } = body;
+    const { profileId, title, url, icon, isAgeRestricted, animation, isSocialIcon, groupName } = body;
 
     if (!profileId || !title || !url) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         isSocialIcon: isSocialIcon || false,
         animation: animation || 'none',
         order: nextOrder,
+        groupName: groupName ? groupName.trim() : null,
       },
     });
 
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { id, title, url, icon, isAgeRestricted, isActive, order, animation, isSocialIcon } = body;
+    const { id, title, url, icon, isAgeRestricted, isActive, order, animation, isSocialIcon, groupName } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing link id' }, { status: 400 });
@@ -62,6 +63,7 @@ export async function PATCH(request: Request) {
         ...(isActive !== undefined && { isActive }),
         ...(order !== undefined && { order }),
         ...(animation !== undefined && { animation }),
+        ...(groupName !== undefined && { groupName: groupName ? groupName.trim() : null }),
       },
     });
 
