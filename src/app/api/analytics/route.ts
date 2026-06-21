@@ -57,7 +57,53 @@ export async function GET(request: Request) {
       }
     });
 
-    // 6. Map to Recharts structure
+    // 6. Popular Bio Links
+    const popularBioLinks = dbUser?.profile ? await prisma.profileLink.findMany({
+      where: { profileId: dbUser.profile.id },
+      orderBy: { clicks: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        url: true,
+        clicks: true,
+        icon: true
+      },
+      take: 5
+    }) : [];
+
+    // 7. Distribution by Hour (0-23)
+    const hoursMap: Record<number, number> = {};
+    for (let i = 0; i < 24; i++) {
+      hoursMap[i] = 0;
+    }
+    profileVisits.forEach((v: { createdAt: Date }) => {
+      const hour = new Date(v.createdAt).getHours();
+      hoursMap[hour]++;
+    });
+    const visitsByHour = Object.keys(hoursMap).map((h) => {
+      const hourNum = parseInt(h);
+      return {
+        hour: `${hourNum.toString().padStart(2, '0')}:00`,
+        visitas: hoursMap[hourNum]
+      };
+    });
+
+    // 8. Distribution by Day of Week (0-6)
+    const daysMap: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    profileVisits.forEach((v: { createdAt: Date }) => {
+      const day = new Date(v.createdAt).getDay();
+      daysMap[day]++;
+    });
+    const weekdaysPt = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+    const visitsByDayOfWeek = Object.keys(daysMap).map((d) => {
+      const dayNum = parseInt(d);
+      return {
+        day: weekdaysPt[dayNum],
+        visitas: daysMap[dayNum]
+      };
+    });
+
+    // 9. Map to Recharts structure
     const chartData = Object.keys(clicksPerDay).map(date => ({
       date,
       cliques: clicksPerDay[date]
@@ -68,7 +114,13 @@ export async function GET(request: Request) {
       visitas: profileVisitsPerDay[date]
     }));
 
-    return NextResponse.json({ chartData, profileChartData });
+    return NextResponse.json({ 
+      chartData, 
+      profileChartData,
+      popularBioLinks,
+      visitsByHour,
+      visitsByDayOfWeek
+    });
   } catch (error) {
     console.error('Error fetching analytics:', error);
     return NextResponse.json({ error: 'Erro interno' }, { status: 500 });

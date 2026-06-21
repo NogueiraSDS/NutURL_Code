@@ -362,11 +362,11 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
             height: '40px',
             borderRadius: '50%',
             cursor: 'pointer',
-            color: 'inherit',
-            border: profile.theme === 'minimal' ? '1px solid #111111' : '1px solid rgba(255,255,255,0.15)',
-            background: profile.theme === 'minimal' ? 'transparent' : 'rgba(255, 255, 255, 0.08)',
+            color: themeConfig.button.color || 'inherit',
+            border: themeConfig.button.border || (profile.theme === 'minimal' ? '1px solid #111111' : '1px solid rgba(255,255,255,0.15)'),
+            background: themeConfig.button.background || (profile.theme === 'minimal' ? 'transparent' : 'rgba(255, 255, 255, 0.08)'),
             backdropFilter: 'blur(8px)',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            boxShadow: themeConfig.button.boxShadow || '0 4px 10px rgba(0,0,0,0.15)',
             transition: 'all 0.2s ease-in-out'
           }}
         >
@@ -484,11 +484,11 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
                   width: '42px',
                   height: '42px',
                   borderRadius: '50%',
-                  color: 'inherit',
+                  color: themeConfig.button.color || 'inherit',
+                  border: themeConfig.button.border || (profile.theme === 'minimal' ? '1px solid #111111' : '1px solid rgba(255,255,255,0.15)'),
+                  background: themeConfig.button.background || (profile.theme === 'minimal' ? 'transparent' : 'rgba(255, 255, 255, 0.08)'),
+                  boxShadow: themeConfig.button.boxShadow || '0 4px 10px rgba(0,0,0,0.15)',
                   textDecoration: 'none',
-                  border: profile.theme === 'minimal' ? '1px solid #111111' : '1px solid rgba(255,255,255,0.15)',
-                  background: profile.theme === 'minimal' ? 'transparent' : 'rgba(255, 255, 255, 0.08)',
-                  boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
                   transition: 'all 0.2s ease-in-out'
                 }}
               >

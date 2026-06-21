@@ -74,7 +74,12 @@
     "wait": "Espera ⏳",
     "direct": "Direto ⚡",
     "tabLinks": "Cliques em Links",
-    "tabProfile": "Visitas da Página (@)"
+    "tabProfile": "Visitas da Página (@)",
+    "hourlyVisits": "Distribuição por Horário",
+    "weeklyVisits": "Visitas por Dia da Semana",
+    "popularBioLinks": "Links Mais Clicados no Perfil",
+    "clicks": "Cliques",
+    "noClicksRegistered": "Nenhum clique registrado nos links do perfil ainda."
   },
   "pricing": {
     "title": "Escolha o plano ideal para seus Links",

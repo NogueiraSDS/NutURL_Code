@@ -74,7 +74,12 @@
     "wait": "Wait ⏳",
     "direct": "Direct ⚡",
     "tabLinks": "Link Clicks",
-    "tabProfile": "Page Views (@)"
+    "tabProfile": "Page Views (@)",
+    "hourlyVisits": "Hourly Distribution",
+    "weeklyVisits": "Visits by Day of the Week",
+    "popularBioLinks": "Most Clicked Bio Links",
+    "clicks": "Clicks",
+    "noClicksRegistered": "No clicks registered on bio links yet."
   },
   "pricing": {
     "title": "Choose the perfect plan for your Links",

@@ -3,7 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useI18n } from '@/context/I18nContext';
 
 export default function Dashboard() {
@@ -12,6 +12,9 @@ export default function Dashboard() {
   const [links, setLinks] = useState<any[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [profileChartData, setProfileChartData] = useState<any[]>([]);
+  const [popularBioLinks, setPopularBioLinks] = useState<any[]>([]);
+  const [visitsByHour, setVisitsByHour] = useState<any[]>([]);
+  const [visitsByDayOfWeek, setVisitsByDayOfWeek] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'links' | 'profile'>('links');
   const [fetching, setFetching] = useState(true);
   const [tier, setTier] = useState('free');
@@ -34,6 +37,9 @@ export default function Dashboard() {
           setLinks(linksData.links || []);
           setChartData(analyticsData.chartData || []);
           setProfileChartData(analyticsData.profileChartData || []);
+          setPopularBioLinks(analyticsData.popularBioLinks || []);
+          setVisitsByHour(analyticsData.visitsByHour || []);
+          setVisitsByDayOfWeek(analyticsData.visitsByDayOfWeek || []);
           let currentTier = userData.tier || 'free';
           if (user.email === 'erivandons@gmail.com') currentTier = 'premium';
           setTier(currentTier);
@@ -160,6 +166,108 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {activeTab === 'profile' && !fetching && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+          {/* Horários */}
+          <div className="glass" style={{ padding: '2rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              ⏰ {t('dashboard.hourlyVisits') || 'Distribuição por Horário'}
+            </h3>
+            <div style={{ height: '200px', width: '100%' }}>
+              {visitsByHour.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={visitsByHour}>
+                    <XAxis dataKey="hour" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--card-border)', borderRadius: '8px' }}
+                      itemStyle={{ color: 'var(--accent)', fontWeight: 'bold' }}
+                    />
+                    <Bar dataKey="visitas" fill="var(--accent)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>{t('dashboard.noData')}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Dias da Semana */}
+          <div className="glass" style={{ padding: '2rem' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              📅 {t('dashboard.weeklyVisits') || 'Visitas por Dia da Semana'}
+            </h3>
+            <div style={{ height: '200px', width: '100%' }}>
+              {visitsByDayOfWeek.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={visitsByDayOfWeek}>
+                    <XAxis dataKey="day" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid var(--card-border)', borderRadius: '8px' }}
+                      itemStyle={{ color: 'var(--success)', fontWeight: 'bold' }}
+                    />
+                    <Bar dataKey="visitas" fill="var(--success)" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>{t('dashboard.noData')}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Links Mais Clicados */}
+          <div className="glass" style={{ padding: '2rem', gridColumn: '1 / -1' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              ⭐ {t('dashboard.popularBioLinks') || 'Links Mais Clicados no Perfil'}
+            </h3>
+            {popularBioLinks.length > 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {popularBioLinks.map((link, idx) => (
+                  <div 
+                    key={link.id} 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      padding: '1rem', 
+                      background: 'rgba(255,255,255,0.03)', 
+                      borderRadius: '8px', 
+                      border: '1px solid rgba(255,255,255,0.05)' 
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'black', color: 'rgba(255,255,255,0.15)', minWidth: '24px' }}>
+                        {idx + 1}
+                      </span>
+                      <div>
+                        <p style={{ fontWeight: 'bold', color: '#f1f5f9' }}>{link.title}</p>
+                        <a 
+                          href={link.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ fontSize: '0.75rem', color: '#60a5fa', textDecoration: 'none', wordBreak: 'break-all' }}
+                        >
+                          {link.url}
+                        </a>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                      <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--accent)' }}>
+                        {link.clicks}
+                      </span>
+                      <span style={{ fontSize: '0.65rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        {t('dashboard.clicks') || 'Cliques'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>{t('dashboard.noClicksRegistered') || 'Nenhum clique registrado nos links do perfil ainda.'}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="glass" style={{ padding: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
