@@ -28,7 +28,7 @@ export default function Dashboard() {
       Promise.all([
         fetch(`/api/links?userId=${user.uid}`).then(res => res.json()),
         fetch(`/api/analytics?userId=${user.uid}`).then(res => res.json()),
-        fetch(`/api/me?userId=${user.uid}`).then(res => res.json())
+        fetch(`/api/me?userId=${user.uid}&email=${encodeURIComponent(user.email || '')}`).then(res => res.json())
       ])
         .then(([linksData, analyticsData, userData]) => {
           setLinks(linksData.links || []);

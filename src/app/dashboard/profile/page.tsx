@@ -52,7 +52,7 @@ export default function ProfileDashboard() {
 
   useEffect(() => {
     if (user) {
-      fetch(`/api/profile?userId=${user.uid}`)
+      fetch(`/api/profile?userId=${user.uid}&email=${encodeURIComponent(user.email || '')}`)
         .then(res => res.json())
         .then(data => {
           if (data.profile) {
@@ -71,7 +71,7 @@ export default function ProfileDashboard() {
         })
         .catch(console.error);
         
-      fetch(`/api/me?userId=${user.uid}`)
+      fetch(`/api/me?userId=${user.uid}&email=${encodeURIComponent(user.email || '')}`)
         .then(res => res.json())
         .then(data => {
           let currentTier = data.tier || 'free';
@@ -140,7 +140,7 @@ export default function ProfileDashboard() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, hideWatermark })
+        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, hideWatermark, email: user.email })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar perfil');

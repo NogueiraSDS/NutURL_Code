@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
+  const email = searchParams.get('email');
 
   if (!userId) {
     return NextResponse.json({ tier: 'free' });
@@ -16,7 +17,12 @@ export async function GET(request: Request) {
 
     if (!user) {
       user = await prisma.user.create({
-        data: { firebaseUid: userId, tier: 'free' }
+        data: { firebaseUid: userId, tier: 'free', email }
+      });
+    } else if (email && user.email !== email) {
+      user = await prisma.user.update({
+        where: { firebaseUid: userId },
+        data: { email }
       });
     }
 

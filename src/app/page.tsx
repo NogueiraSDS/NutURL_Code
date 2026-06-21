@@ -192,7 +192,7 @@ export default function Home() {
 
   useEffect(() => {
     if (user) {
-      fetch(`/api/me?userId=${user.uid}`)
+      fetch(`/api/me?userId=${user.uid}&email=${encodeURIComponent(user.email || '')}`)
         .then(res => res.json())
         .then(data => {
           let currentTier = data.tier || 'free';

@@ -20,8 +20,14 @@ export async function POST(request: Request) {
       const userRecord = await prisma.user.findUnique({ where: { firebaseUid: userId } });
       if (userRecord) {
         userTier = userRecord.tier;
+        if (userEmail && userRecord.email !== userEmail) {
+          await prisma.user.update({
+            where: { firebaseUid: userId },
+            data: { email: userEmail }
+          });
+        }
       } else {
-        await prisma.user.create({ data: { firebaseUid: userId, tier: 'free' } });
+        await prisma.user.create({ data: { firebaseUid: userId, tier: 'free', email: userEmail } });
       }
     }
     
