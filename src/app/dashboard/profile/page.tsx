@@ -44,6 +44,34 @@ export default function ProfileDashboard() {
   const [newLinkIsSocialIcon, setNewLinkIsSocialIcon] = useState(false);
   const [newLinkAnimation, setNewLinkAnimation] = useState('none');
   const [isSavingLink, setIsSavingLink] = useState(false);
+  const [editingLinkId, setEditingLinkId] = useState<string | null>(null);
+
+  const handleStartEditLink = (link: any) => {
+    setEditingLinkId(link.id);
+    setNewLinkTitle(link.title || '');
+    setNewLinkGroup(link.groupName || '');
+    setNewLinkUrl(link.url || '');
+    setNewLinkIcon(link.icon || 'web');
+    setNewLinkAge(link.isAgeRestricted || false);
+    setNewLinkIsSocialIcon(link.isSocialIcon || false);
+    setNewLinkAnimation(link.animation || 'none');
+    
+    const formElement = document.getElementById('link-form');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleCancelEditLink = () => {
+    setEditingLinkId(null);
+    setNewLinkTitle('');
+    setNewLinkGroup('');
+    setNewLinkUrl('');
+    setNewLinkIcon('web');
+    setNewLinkAge(false);
+    setNewLinkIsSocialIcon(false);
+    setNewLinkAnimation('none');
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -186,7 +214,7 @@ export default function ProfileDashboard() {
     }
   };
 
-  const handleAddLink = async (e: React.FormEvent) => {
+  const handleSaveLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) {
       alert('Por favor, salve as configurações do seu perfil (username) primeiro.');
@@ -216,24 +244,49 @@ export default function ProfileDashboard() {
 
     setIsSavingLink(true);
     try {
-      const res = await fetch('/api/profile/links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          profileId: profile.id, 
-          title: finalTitle, 
-          url: newLinkUrl, 
-          icon: newLinkIcon, 
-          isAgeRestricted: finalAgeRestricted,
-          isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
-          animation: tier !== 'free' ? newLinkAnimation : 'none',
-          groupName: newLinkGroup.trim() || null
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao adicionar link');
+      if (editingLinkId) {
+        // PATCH (Edit Mode)
+        const res = await fetch('/api/profile/links', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            id: editingLinkId,
+            title: finalTitle, 
+            url: newLinkUrl, 
+            icon: newLinkIcon, 
+            isAgeRestricted: finalAgeRestricted,
+            isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
+            animation: tier !== 'free' ? newLinkAnimation : 'none',
+            groupName: newLinkGroup.trim() || null
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro ao editar link');
+        
+        setLinks(links.map(l => l.id === editingLinkId ? data.link : l));
+        setEditingLinkId(null);
+      } else {
+        // POST (Create Mode)
+        const res = await fetch('/api/profile/links', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            profileId: profile.id, 
+            title: finalTitle, 
+            url: newLinkUrl, 
+            icon: newLinkIcon, 
+            isAgeRestricted: finalAgeRestricted,
+            isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
+            animation: tier !== 'free' ? newLinkAnimation : 'none',
+            groupName: newLinkGroup.trim() || null
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erro ao adicionar link');
+        
+        setLinks([...links, data.link]);
+      }
       
-      setLinks([...links, data.link]);
       setNewLinkTitle('');
       setNewLinkUrl('');
       setNewLinkIcon('web');
@@ -455,9 +508,11 @@ export default function ProfileDashboard() {
 
         {/* Links Management */}
         <div className="glass" style={{ padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>Adicionar Link</h2>
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>
+            {editingLinkId ? 'Editar Link' : 'Adicionar Link'}
+          </h2>
           
-          <form onSubmit={handleAddLink} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+          <form id="link-form" onSubmit={handleSaveLink} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
             <select value={newLinkIcon} onChange={handleIconSelect} className="input" style={{ appearance: 'auto' }}>
               {iconsList.map(icon => (
                 <option key={icon.value} value={icon.value}>{icon.label}</option>
@@ -519,9 +574,21 @@ export default function ProfileDashboard() {
               <option value="wiggle">✨ Efeito Balançar (Premium)</option>
             </select>
 
-            <button type="submit" className="btn" disabled={isSavingLink || !profile}>
-              {isSavingLink ? 'Adicionando...' : 'Adicionar Link'}
-            </button>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button type="submit" className="btn" style={{ flex: 1 }} disabled={isSavingLink || !profile}>
+                {isSavingLink ? (editingLinkId ? 'Salvando...' : 'Adicionando...') : (editingLinkId ? 'Salvar Alterações' : 'Adicionar Link')}
+              </button>
+              {editingLinkId && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelEditLink} 
+                  className="btn" 
+                  style={{ background: 'transparent', border: '1px solid #64748b', color: '#cbd5e1', flex: 1 }}
+                >
+                  Cancelar Edição
+                </button>
+              )}
+            </div>
             {!profile && <p style={{ color: '#ef4444', fontSize: '0.8rem' }}>Você precisa salvar seu perfil primeiro.</p>}
           </form>
 
@@ -532,7 +599,7 @@ export default function ProfileDashboard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {links.map(link => (
                 <div key={link.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px', border: '1px solid #334155' }}>
-                  <div style={{ overflow: 'hidden' }}>
+                  <div style={{ overflow: 'hidden', marginRight: '1rem' }}>
                     <p style={{ fontWeight: 'bold', marginBottom: '0.2rem' }}>
                       {iconsList.find(i => i.value === link.icon)?.label.split(' ')[0]} {link.title}
                       {link.isAgeRestricted && <span style={{ marginLeft: '8px', background: '#ef4444', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>+18</span>}
@@ -541,9 +608,22 @@ export default function ProfileDashboard() {
                     </p>
                     <p style={{ color: '#94a3b8', fontSize: '0.8rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.url}</p>
                   </div>
-                  <button onClick={() => handleDeleteLink(link.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem' }}>
-                    Remover
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                    <button 
+                      type="button"
+                      onClick={() => handleStartEditLink(link)} 
+                      style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', padding: '0.5rem', fontWeight: 'bold', fontSize: '0.9rem' }}
+                    >
+                      Editar
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => handleDeleteLink(link.id)} 
+                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', fontSize: '0.9rem' }}
+                    >
+                      Remover
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
