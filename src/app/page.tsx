@@ -274,11 +274,19 @@ export default function Home() {
       <header className={`${styles.section} ${styles.heroSection}`}>
         <div className={`${styles.hero} animate-fade-in`}>
           <h1 className={styles.title}>
-            {t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean)[0]}.{' '}
-            {t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean)[1]}.{' '}
-            <span className="text-gradient">
-              {t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean)[2]}.
-            </span>
+            {(() => {
+              const parts = t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean);
+              return (
+                <>
+                  {parts.slice(0, -1).map((part, idx) => (
+                    <span key={idx}>{part}.{' '}</span>
+                  ))}
+                  <span className="text-gradient">
+                    {parts[parts.length - 1]}.
+                  </span>
+                </>
+              );
+            })()}
           </h1>
           <p className={styles.subtitle}>
             {t('home.subtitle')}
@@ -573,7 +581,7 @@ export default function Home() {
             <span className={styles.popularBadge}>{t('pricing.mostPopular') || 'MAIS POPULAR'}</span>
             <span className={styles.planName}>PRO</span>
             <div className={styles.planPrice}>
-              $2<span className={styles.planPeriod}>{t('pricing.month')}</span>
+              $1<span className={styles.planPeriod}>{t('pricing.month')}</span>
             </div>
             <p className={styles.planDesc}>
               {locale === 'pt' ? 'Ideal para profissionais que querem estatísticas completas e links diretos.' : 'Best for professionals wanting full analytics and direct redirects.'}
