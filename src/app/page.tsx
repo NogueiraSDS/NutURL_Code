@@ -570,6 +570,9 @@ export default function Home() {
               <li>
                 <span className={styles.featureCross}>✗</span> {t('pricing.freeFeatures.custom')}
               </li>
+              <li>
+                <span className={styles.featureCross}>✗</span> {locale === 'pt' ? 'Autoridade SEO (Dofollow)' : 'SEO Authority (Dofollow)'}
+              </li>
             </ul>
             <button onClick={() => router.push('/login')} className="btn" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', width: '100%' }}>
               {locale === 'pt' ? 'Começar Grátis' : 'Start for Free'}
@@ -602,6 +605,9 @@ export default function Home() {
               <li>
                 <span className={styles.featureCross}>✗</span> {locale === 'pt' ? 'Alias Customizado' : 'Custom Alias'}
               </li>
+              <li>
+                <span className={styles.featureCheck}>✓</span> {locale === 'pt' ? 'Links SEO Dofollow (Booster)' : 'SEO Dofollow Links (Booster)'}
+              </li>
             </ul>
             <button onClick={() => router.push('/pricing')} className="btn" style={{ width: '100%' }}>
               {t('pricing.subscribePro') || 'Assinar PRO'}
@@ -632,6 +638,9 @@ export default function Home() {
               </li>
               <li>
                 <span className={styles.featureCheck}>✓</span> {locale === 'pt' ? 'Redes Sociais como ícones abaixo da foto' : 'Social networks horizontal icons row'}
+              </li>
+              <li>
+                <span className={styles.featureCheck}>✓</span> {locale === 'pt' ? 'Links SEO Dofollow (Booster)' : 'SEO Dofollow Links (Booster)'}
               </li>
             </ul>
             <button onClick={() => router.push('/pricing')} className="btn" style={{ background: 'transparent', border: '1px solid var(--accent)', color: 'white', width: '100%' }}>
