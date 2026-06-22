@@ -332,6 +332,7 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
   // Ad checking logic: if tier is premium, hasAds is false. (Otherwise true)
   const hasAds = profile.user ? profile.user.tier !== 'premium' : (profile.tier ? profile.tier !== 'premium' : true);
   const isPremium = profile.user ? profile.user.tier === 'premium' : (profile.tier ? profile.tier === 'premium' : false);
+  const isPaid = profile.user ? profile.user.tier !== 'free' : (profile.tier ? profile.tier !== 'free' : false);
 
   const socialIcons = isPremium
     ? (profile.links || []).filter((link: any) => link.isActive && link.isSocialIcon)
@@ -474,14 +475,23 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
       <div style={{ textAlign: 'center', marginBottom: '2rem', maxWidth: '600px', width: '100%', marginTop: profile.coverUrl ? '-48px' : '0', padding: '0 1rem', position: 'relative', zIndex: 2 }}>
         <div style={{ 
           width: '96px', height: '96px', borderRadius: '50%', 
-          background: profile.avatarUrl ? `url(${profile.avatarUrl}) center/cover` : 'linear-gradient(135deg, var(--primary), #8b5cf6)', 
+          background: profile.avatarUrl ? 'transparent' : 'linear-gradient(135deg, var(--primary), #8b5cf6)', 
           margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', 
           fontSize: '2.5rem', fontWeight: 'bold', color: 'white', 
           border: profile.theme === 'minimal' ? '4px solid #faf9f6' : '4px solid var(--bg)', 
           boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-          position: 'relative', zIndex: 10
+          position: 'relative', zIndex: 10,
+          overflow: 'hidden'
         }}>
-          {!profile.avatarUrl && (profile.title ? profile.title.charAt(0).toUpperCase() : '@')}
+          {profile.avatarUrl ? (
+            <img 
+              src={profile.avatarUrl} 
+              alt={`Foto de perfil de ${profile.title || profile.username}`} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            profile.title ? profile.title.charAt(0).toUpperCase() : '@'
+          )}
         </div>
         <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', ...themeConfig.title }}>{profile.title || `@${profile.username}`}</h1>
         {profile.bio && <p style={{ fontSize: '1.1rem', whiteSpace: 'pre-wrap', ...themeConfig.bio }}>{profile.bio}</p>}
@@ -500,7 +510,7 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
                 key={link.id}
                 href={link.url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel={isPaid ? "noopener noreferrer" : "nofollow noopener noreferrer"}
                 onClick={(e) => handleLinkClick(e, link)}
                 title={link.title}
                 className={hoverClass}
@@ -536,7 +546,7 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
                 key={link.id}
                 href={link.url}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel={isPaid ? "noopener noreferrer" : "nofollow noopener noreferrer"}
                 onClick={(e) => handleLinkClick(e, link)}
                 className={`${hoverClass} ${link.animation !== 'none' ? `anim-${link.animation}` : ''}`}
                 style={{ 
@@ -603,7 +613,7 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
                         key={link.id}
                         href={link.url}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel={isPaid ? "noopener noreferrer" : "nofollow noopener noreferrer"}
                         onClick={(e) => handleLinkClick(e, link)}
                         className={`${hoverClass} ${link.animation !== 'none' ? `anim-${link.animation}` : ''}`}
                         style={{ 

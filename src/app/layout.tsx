@@ -11,10 +11,14 @@ import { I18nProvider } from "@/context/I18nContext";
 import CookieConsent from "@/components/CookieConsent";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://nuturl.com"),
   title: "NutURL - Premium Link-in-Bio & URL Shortener",
   description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real e redirecionamentos inteligentes.",
   keywords: ["encurtador de url", "link tree", "link na bio", "linktree gratis", "nuturl", "analytics links", "monetizacao de links"],
   authors: [{ name: "NutURL Team" }],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "NutURL - Premium Link-in-Bio & URL Shortener",
     description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real.",

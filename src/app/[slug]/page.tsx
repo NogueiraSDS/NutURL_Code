@@ -30,6 +30,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       return {
         title: `${title} | NutURL`,
         description,
+        alternates: {
+          canonical: `/@${profile.username}`,
+        },
         openGraph: {
           title,
           description,
@@ -84,7 +87,30 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
         },
       }).catch(err => console.error("Error recording profile visit:", err));
 
-      return <ProfileClient profile={profile} />;
+      const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ProfilePage",
+        "dateCreated": profile.createdAt.toISOString(),
+        "dateModified": profile.updatedAt.toISOString(),
+        "mainEntity": {
+          "@type": "Person",
+          "name": profile.title || `@${profile.username}`,
+          "alternateName": profile.username,
+          "description": profile.bio || "",
+          "image": profile.avatarUrl || "",
+          "url": `${process.env.NEXT_PUBLIC_APP_URL || 'https://nuturl.com'}/@${profile.username}`
+        }
+      };
+
+      return (
+        <>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          <ProfileClient profile={profile} />
+        </>
+      );
     } else {
       notFound();
     }
