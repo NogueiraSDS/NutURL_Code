@@ -300,6 +300,7 @@ export const blogArticles: BlogArticle[] = [
         <h2>4. Elevate Authority with Custom Domain Names</h2>
         <p>Your short URLs are part of your digital branding. Using a link shortener under your own customized brand name shows attention to detail and elevates your brand authority in all your online correspondence.</p>
       `
+    }
   },
   {
     slug: "evolucao-link-na-bio-qg-digital",
@@ -494,6 +495,7 @@ export const blogArticles: BlogArticle[] = [
         <h2>Aesthetics Matter</h2>
         <p>The psychology extends past the URL. Upon clicking and landing on a premium-designed bio page (like NutURL's Aurora Glow or Glassmorphism themes), users perceive high value and professionalism. This aesthetic first impression dictates whether they will trust your brand enough to make a purchase or submit their contact info.</p>
       `
+    }
   },
   {
     slug: "como-direcionar-trafego-stories-para-bio",
@@ -736,6 +738,7 @@ export const blogArticles: BlogArticle[] = [
         <h2>The Golden Rule: One Test at a Time</h2>
         <p>The biggest mistake creators make is changing the title, color, profile picture, and bio all on the same day. If sales go up, you will never know which tweak was responsible. For your NutURL data to be useful, make only one alteration at a time and wait at least 3 to 7 days to gather a statistically significant sample.</p>
       `
+    }
   },
   {
     slug: "algoritmo-instagram-2026",
