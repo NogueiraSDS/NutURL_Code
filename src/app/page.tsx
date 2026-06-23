@@ -262,6 +262,7 @@ export default function Home() {
         <button onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')} className="btn" style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', fontSize: '0.8rem' }}>
           {locale === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
         </button>
+        <button onClick={() => router.push('/blog')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8' }}>{t('footer.blog') || 'Blog'}</button>
         <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>{t('home.plans')}</button>
         {user ? (
           <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.myDashboard')}</button>
@@ -700,7 +701,6 @@ export default function Home() {
             <Link href="/blog">{t('footer.blog') || 'Blog'}</Link>
             <Link href="/privacy">{t('footer.privacy') || 'Política de Privacidade'}</Link>
             <Link href="/terms">{t('footer.terms') || 'Termos de Uso'}</Link>
-            <a href="https://github.com/NogueiraSDS/NutURL_Code" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>
         </div>
 
