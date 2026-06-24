@@ -274,87 +274,109 @@ export default function Home() {
 
       {/* Hero Section */}
       <header className={`${styles.section} ${styles.heroSection}`}>
-        <div className={`${styles.hero} animate-fade-in`}>
-          <h1 className={styles.title}>
-            {(() => {
-              const parts = t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean);
-              return (
-                <>
-                  {parts.slice(0, -1).map((part, idx) => (
-                    <span key={idx}>{part}.{' '}</span>
-                  ))}
-                  <span className="text-gradient">
-                    {parts[parts.length - 1]}.
-                  </span>
-                </>
-              );
-            })()}
-          </h1>
-          <p className={styles.subtitle}>
-            {t('home.subtitle')}
-          </p>
-        </div>
-
-        {/* URL Shortener Widget */}
-        <div className={`glass ${styles.shortenerBox} animate-fade-in`} style={{ animationDelay: '0.2s' }}>
-          <form onSubmit={handleShorten} className={styles.inputGroup}>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder={t('home.placeholder')}
-              className="input"
-              required
-            />
-            <button type="submit" className="btn" disabled={isLoading}>
-              {isLoading ? t('home.btnShortening') : t('home.btnShorten')}
-            </button>
-          </form>
-
-          {tier === 'premium' && (
-            <div style={{ marginTop: '0.5rem', width: '100%' }}>
-              <input 
-                type="text" 
-                value={customAlias} 
-                onChange={(e) => setCustomAlias(e.target.value)} 
-                placeholder={t('home.aliasPlaceholder')}
-                className="input" 
-                style={{ width: '100%' }} 
-              />
+        <div className={styles.heroLayout}>
+          {/* Left Column (2/3) */}
+          <div className={styles.heroLeft}>
+            <div className={`${styles.hero} animate-fade-in`}>
+              <h1 className={styles.title}>
+                {(() => {
+                  const parts = t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean);
+                  return (
+                    <>
+                      {parts.slice(0, -1).map((part, idx) => (
+                        <span key={idx}>{part}.{' '}</span>
+                      ))}
+                      <span className="text-gradient">
+                        {parts[parts.length - 1]}.
+                      </span>
+                    </>
+                  );
+                })()}
+              </h1>
+              <p className={styles.subtitle}>
+                {t('home.subtitle')}
+              </p>
             </div>
-          )}
 
-          <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-start' }}>
-            <label className="switch-container" style={{ opacity: tier === 'free' ? 0.5 : 1, cursor: tier === 'free' ? 'not-allowed' : 'pointer' }}>
-              <span className="switch">
-                <input 
-                  type="checkbox" 
-                  checked={hasAd} 
-                  onChange={(e) => setHasAd(e.target.checked)} 
-                  disabled={tier === 'free'}
+            {/* URL Shortener Widget */}
+            <div className={`glass ${styles.shortenerBox} animate-fade-in`} style={{ animationDelay: '0.2s' }}>
+              <form onSubmit={handleShorten} className={styles.inputGroup}>
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder={t('home.placeholder')}
+                  className="input"
+                  required
                 />
-                <span className="slider"></span>
-              </span>
-              <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-                {hasAd ? t('home.adWaitPage') : t('home.directRedirect')}
-                {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{t('home.requiresPro')}</span>}
-              </span>
-            </label>
+                <button type="submit" className="btn" disabled={isLoading}>
+                  {isLoading ? t('home.btnShortening') : t('home.btnShorten')}
+                </button>
+              </form>
+
+              {tier === 'premium' && (
+                <div style={{ marginTop: '0.5rem', width: '100%' }}>
+                  <input 
+                    type="text" 
+                    value={customAlias} 
+                    onChange={(e) => setCustomAlias(e.target.value)} 
+                    placeholder={t('home.aliasPlaceholder')}
+                    className="input" 
+                    style={{ width: '100%' }} 
+                  />
+                </div>
+              )}
+
+              <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-start' }}>
+                <label className="switch-container" style={{ opacity: tier === 'free' ? 0.5 : 1, cursor: tier === 'free' ? 'not-allowed' : 'pointer' }}>
+                  <span className="switch">
+                    <input 
+                      type="checkbox" 
+                      checked={hasAd} 
+                      onChange={(e) => setHasAd(e.target.checked)} 
+                      disabled={tier === 'free'}
+                    />
+                    <span className="slider"></span>
+                  </span>
+                  <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
+                    {hasAd ? t('home.adWaitPage') : t('home.directRedirect')}
+                    {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{t('home.requiresPro')}</span>}
+                  </span>
+                </label>
+              </div>
+
+              {error && <p style={{ color: 'var(--error)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}
+
+              {shortUrl && (
+                <div className={styles.resultBox}>
+                  <p style={{ fontWeight: '600' }}>{t('home.ready')}</p>
+                  <a href={shortUrl} target="_blank" rel="noopener noreferrer" className={styles.shortLink}>
+                    {shortUrl}
+                  </a>
+                  <button onClick={copyToClipboard} className="btn" style={{ background: '#475569', fontSize: '0.9rem', padding: '8px 16px' }}>
+                    {t('home.copyLink')}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {error && <p style={{ color: 'var(--error)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}
-
-          {shortUrl && (
-            <div className={styles.resultBox}>
-              <p style={{ fontWeight: '600' }}>{t('home.ready')}</p>
-              <a href={shortUrl} target="_blank" rel="noopener noreferrer" className={styles.shortLink}>
-                {shortUrl}
-              </a>
-              <button onClick={copyToClipboard} className="btn" style={{ background: '#475569', fontSize: '0.9rem', padding: '8px 16px' }}>
-                {t('home.copyLink')}
-              </button>
+          {/* Right Column (1/3) - Vertical Carousel */}
+          <div className={`${styles.heroRight} animate-fade-in`} style={{ animationDelay: '0.4s' }}>
+            <div className={styles.verticalCarouselWrapper}>
+              <div className={styles.verticalCarouselTrack}>
+                {[...blogArticles.slice(0, 5), ...blogArticles.slice(0, 5)].map((article, idx) => (
+                  <Link href={`/blog/${article.slug}`} key={`${article.slug}-${idx}`} className={styles.blogCardSmall}>
+                    <div className={styles.blogCardCategory}>{article.category[locale as 'pt'|'en'] || article.category.pt}</div>
+                    <h3 className={styles.blogCardTitleSmall}>{article.title[locale as 'pt'|'en'] || article.title.pt}</h3>
+                    <div className={styles.blogCardMeta}>
+                      <span>{article.readTime} min</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       </header>
 
@@ -652,26 +674,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Blog Carousel Section */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>{t('home.blogSection') || 'Nosso Blog'}</h2>
-        <p className={styles.sectionSubtitle}>
-          {locale === 'pt' ? 'Dicas e novidades para decolar sua presença online.' : 'Tips and news to boost your online presence.'}
-        </p>
 
-        <div className={styles.blogCarousel}>
-          {blogArticles.slice(0, 8).map((article) => (
-            <Link href={`/blog/${article.slug}`} key={article.slug} className={styles.blogCard}>
-              <div className={styles.blogCardCategory}>{article.category[locale as 'pt'|'en'] || article.category.pt}</div>
-              <h3 className={styles.blogCardTitle}>{article.title[locale as 'pt'|'en'] || article.title.pt}</h3>
-              <p className={styles.blogCardDesc}>{article.subtitle[locale as 'pt'|'en'] || article.subtitle.pt}</p>
-              <div className={styles.blogCardMeta}>
-                <span>{article.readTime} min</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
 
       {/* FAQ Accordion Section */}
       <section className={styles.section}>
