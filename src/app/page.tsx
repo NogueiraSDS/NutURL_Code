@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/context/I18nContext';
 import Link from 'next/link';
+import { blogArticles } from '@/data/blogArticles';
 
 // Simple Vector SVG Icons for Features
 const FeatureIcons = {
@@ -648,6 +649,27 @@ export default function Home() {
               {t('pricing.subscribePremium') || 'Assinar PREMIUM'}
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Blog Carousel Section */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>{t('home.blogSection') || 'Nosso Blog'}</h2>
+        <p className={styles.sectionSubtitle}>
+          {locale === 'pt' ? 'Dicas e novidades para decolar sua presença online.' : 'Tips and news to boost your online presence.'}
+        </p>
+
+        <div className={styles.blogCarousel}>
+          {blogArticles.slice(0, 8).map((article) => (
+            <Link href={`/blog/${article.slug}`} key={article.slug} className={styles.blogCard}>
+              <div className={styles.blogCardCategory}>{article.category[locale as 'pt'|'en'] || article.category.pt}</div>
+              <h3 className={styles.blogCardTitle}>{article.title[locale as 'pt'|'en'] || article.title.pt}</h3>
+              <p className={styles.blogCardDesc}>{article.subtitle[locale as 'pt'|'en'] || article.subtitle.pt}</p>
+              <div className={styles.blogCardMeta}>
+                <span>{article.readTime} min</span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
