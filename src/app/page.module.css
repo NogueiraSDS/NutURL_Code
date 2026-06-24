@@ -7,19 +7,30 @@
   padding: 1rem 1.5rem;
   z-index: 100;
   display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
+  justify-content: space-between;
   align-items: center;
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.navActions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 @media (max-width: 640px) {
   .topNav {
     padding: 1rem;
+    flex-direction: column;
     justify-content: center;
+    gap: 1rem;
+  }
+  .navActions {
     gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
 

@@ -260,16 +260,33 @@ export default function Home() {
     <div className={styles.container}>
       {/* Top Navbar Buttons */}
       <div className={styles.topNav}>
-        <button onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')} className="btn" style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', fontSize: '0.8rem' }}>
-          {locale === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
-        </button>
-        <button onClick={() => router.push('/blog')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8' }}>{t('footer.blog') || 'Blog'}</button>
-        <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>{t('home.plans')}</button>
-        {user ? (
-          <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.myDashboard')}</button>
-        ) : (
-          <button onClick={() => router.push('/login')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.login')}</button>
-        )}
+        <div 
+          onClick={() => router.push('/')} 
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          {/* Simple Abstract Nut Logo SVG */}
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+          <span style={{ fontWeight: 800, fontSize: '1.4rem', letterSpacing: '-0.03em', color: '#f8fafc' }}>
+            Nut<span style={{ color: 'var(--primary)' }}>URL</span>
+          </span>
+        </div>
+
+        <div className={styles.navActions}>
+          <button onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')} className="btn" style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', fontSize: '0.8rem' }}>
+            {locale === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
+          </button>
+          <button onClick={() => router.push('/blog')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8' }}>{t('footer.blog') || 'Blog'}</button>
+          <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>{t('home.plans')}</button>
+          {user ? (
+            <button onClick={() => router.push('/dashboard')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.myDashboard')}</button>
+          ) : (
+            <button onClick={() => router.push('/login')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--primary)' }}>{t('home.login')}</button>
+          )}
+        </div>
       </div>
 
       {/* Hero Section */}
