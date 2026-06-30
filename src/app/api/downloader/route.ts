@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       });
 
       // Se for playlist, teremos entries, senão é um objeto direto
-      const infoList = ytdlInfo.entries || [ytdlInfo];
+      const infoList = (ytdlInfo as any).entries || [ytdlInfo];
 
       for (const info of infoList) {
         if (!info) continue;
