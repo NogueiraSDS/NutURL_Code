@@ -9,7 +9,14 @@ interface MediaInfo {
   title?: string;
   ext?: string;
   quality?: string;
+  size?: number;
 }
+
+const formatSize = (bytes?: number) => {
+    if (!bytes) return '';
+    const mb = bytes / 1024 / 1024;
+    return mb > 1 ? `${mb.toFixed(2)} MB` : `${(bytes / 1024).toFixed(0)} KB`;
+};
 
 export default function DownloaderPage() {
   const [url, setUrl] = useState('');
@@ -40,7 +47,8 @@ export default function DownloaderPage() {
         throw new Error(data.error || 'Failed to fetch media');
       }
 
-      setMedias(data.medias || []);
+      const sortedMedias = (data.medias || []).sort((a: MediaInfo, b: MediaInfo) => (b.size || 0) - (a.size || 0));
+      setMedias(sortedMedias);
       
       if (data.medias?.length === 0) {
           setError('Nenhuma mídia encontrada nessa URL.');
@@ -83,8 +91,8 @@ export default function DownloaderPage() {
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-          <form onSubmit={handleFetch} className="flex gap-4">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-8 max-w-2xl mx-auto border border-gray-100 dark:border-gray-700">
+          <form onSubmit={handleFetch} className="flex flex-col sm:flex-row gap-4">
             <input
               type="url"
               required
@@ -114,7 +122,7 @@ export default function DownloaderPage() {
         {medias.length > 0 && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Mídias Encontradas ({medias.length})</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {medias.map((media, idx) => (
                 <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden flex flex-col">
                   <div className="relative">
@@ -134,7 +142,7 @@ export default function DownloaderPage() {
                         {media.title}
                       </h3>
                       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 capitalize">
-                        {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} {media.quality && `• ${media.quality}`}
+                        {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} {media.quality && `• ${media.quality}`} {media.size ? `• ${formatSize(media.size)}` : ''}
                       </p>
                     </div>
                     <div className="mt-4 flex flex-col gap-2">

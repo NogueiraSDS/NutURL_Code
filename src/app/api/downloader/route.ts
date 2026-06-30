@@ -9,6 +9,7 @@ interface MediaInfo {
   title?: string;
   ext?: string;
   quality?: string;
+  size?: number;
 }
 
 export async function POST(req: Request) {
@@ -53,7 +54,8 @@ export async function POST(req: Request) {
                thumbnail: info.thumbnail,
                title: info.title || 'Video',
                ext: bestFormat?.ext || info.ext,
-               quality: bestFormat?.format_note || 'Auto'
+               quality: bestFormat?.format_note || 'Auto',
+               size: bestFormat?.filesize || bestFormat?.filesize_approx || info.filesize || info.filesize_approx || 0
              });
            }
         } else if (info.url) {
@@ -63,6 +65,7 @@ export async function POST(req: Request) {
                thumbnail: info.thumbnail,
                title: info.title || 'Media',
                ext: info.ext,
+               size: info.filesize || info.filesize_approx || 0
            });
         }
       }
@@ -101,7 +104,8 @@ export async function POST(req: Request) {
                 type: 'image',
                 url: src,
                 title: $(el).attr('alt') || 'Imagem Extraída',
-                ext: src.split('.').pop()?.split('?')[0] || 'jpg'
+                ext: src.split('.').pop()?.split('?')[0] || 'jpg',
+                size: 0
             });
           }
         }
@@ -116,7 +120,8 @@ export async function POST(req: Request) {
                       type: 'video',
                       url: src,
                       title: 'HTML5 Video',
-                      ext: src.split('.').pop()?.split('?')[0] || 'mp4'
+                      ext: src.split('.').pop()?.split('?')[0] || 'mp4',
+                      size: 0
                   });
               }
           }
@@ -131,7 +136,8 @@ export async function POST(req: Request) {
                     type: 'video',
                     url: src,
                     title: 'HTML5 Video',
-                    ext: src.split('.').pop()?.split('?')[0] || 'mp4'
+                    ext: src.split('.').pop()?.split('?')[0] || 'mp4',
+                    size: 0
                 });
             }
         }
