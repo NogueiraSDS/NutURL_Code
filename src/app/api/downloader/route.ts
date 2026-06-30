@@ -28,11 +28,7 @@ export async function POST(req: Request) {
         dumpSingleJson: true,
         noCheckCertificates: true,
         noWarnings: true,
-        preferFreeFormats: true,
-        addHeader: [
-            'referer:youtube.com',
-            'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        ]
+        preferFreeFormats: true
       });
 
       // Se for playlist, teremos entries, senão é um objeto direto
@@ -69,8 +65,8 @@ export async function POST(req: Request) {
            });
         }
       }
-    } catch (ytError) {
-      console.warn("youtube-dl-exec não conseguiu extrair a mídia (pode não ser suportado, tentando cheerio fallback).");
+    } catch (ytError: any) {
+      console.warn("youtube-dl-exec falhou. Detalhes:", ytError.message || ytError);
     }
 
     // 2. Fallback / Complemento: Fazer fetch simples e usar Cheerio
@@ -136,6 +132,22 @@ export async function POST(req: Request) {
       // 3. Pegar OpenGraph e Twitter cards (geralmente fotos em boa qualidade)
       $('meta[property="og:image"], meta[name="twitter:image"], meta[itemprop="image"]').each((_, el) => {
         addImage($(el).attr('content'));
+      });
+
+      // 4. Pegar Vídeos escondidos em metadados (Comum no Twitter/X e outras redes)
+      $('meta[property="og:video"], meta[property="og:video:secure_url"], meta[name="twitter:player:stream"]').each((_, el) => {
+        const src = resolveUrl($(el).attr('content'));
+        if (src) {
+           if (!medias.some(m => m.url === src)) {
+              medias.push({
+                  type: 'video',
+                  url: src,
+                  title: 'Social Media Video',
+                  ext: src.split('.').pop()?.split('?')[0] || 'mp4',
+                  size: 0
+              });
+           }
+        }
       });
 
       // Pegar tags de vídeo HTML5 (source)
