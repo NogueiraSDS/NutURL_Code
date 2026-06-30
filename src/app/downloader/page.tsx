@@ -63,21 +63,10 @@ export default function DownloaderPage() {
     }
   };
 
-  const handleDownload = async (mediaUrl: string, title: string, ext: string) => {
-      try {
-          const res = await fetch(mediaUrl);
-          const blob = await res.blob();
-          const downloadUrl = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${ext}`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(downloadUrl);
-      } catch (e) {
-          window.open(mediaUrl, '_blank');
-      }
+  const handleDownload = (mediaUrl: string, title: string, ext: string) => {
+      const filename = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${ext}`;
+      const proxyUrl = `/api/proxy?url=${encodeURIComponent(mediaUrl)}&filename=${encodeURIComponent(filename)}`;
+      window.location.href = proxyUrl;
   };
 
   const displayedMedias = [...medias]
