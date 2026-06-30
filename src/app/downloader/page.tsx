@@ -112,6 +112,24 @@ export default function DownloaderPage() {
             >
               {loading ? 'Buscando...' : 'Extrair Mídia'}
             </button>
+            <button
+              type="button"
+              onClick={() => {
+                setUrl('');
+                setMedias([]);
+                setError('');
+              }}
+              className="btn"
+              style={{ 
+                flex: '0 1 auto', 
+                whiteSpace: 'nowrap', 
+                background: 'rgba(255,255,255,0.1)', 
+                backgroundImage: 'none',
+                boxShadow: 'none'
+              }}
+            >
+              Limpar
+            </button>
           </form>
 
           {error && (
