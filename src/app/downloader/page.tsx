@@ -23,14 +23,14 @@ export default function DownloaderPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [medias, setMedias] = useState<MediaInfo[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   
   // Controls
   const [sortType, setSortType] = useState<'size' | 'default'>('size');
   const [typeFilter, setTypeFilter] = useState<'all' | 'image' | 'video' | 'audio'>('all');
 
-  const handleFetch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!url) return;
+  const executeFetch = async (targetUrl: string) => {
+    if (!targetUrl) return;
 
     setLoading(true);
     setError('');
@@ -42,7 +42,7 @@ export default function DownloaderPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url: targetUrl }),
       });
 
       const data = await response.json();
@@ -63,10 +63,45 @@ export default function DownloaderPage() {
     }
   };
 
+  const handleFetch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    executeFetch(url);
+  };
+
   const handleDownload = (mediaUrl: string, title: string, ext: string) => {
-      const filename = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${ext}`;
+      // Regex para substituir caracteres inválidos no Windows, Mac e Linux, mantendo acentos e espaços
+      const safeTitle = title.replace(/[\/\\?%*:|"<>]/g, '-').trim() || 'media';
+      const filename = `${safeTitle}.${ext}`;
       const proxyUrl = `/api/proxy?url=${encodeURIComponent(mediaUrl)}&filename=${encodeURIComponent(filename)}`;
       window.location.href = proxyUrl;
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedText = e.dataTransfer.getData('text');
+    if (droppedText && droppedText.startsWith('http')) {
+        setUrl(droppedText);
+        executeFetch(droppedText);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const pastedText = e.clipboardData.getData('text');
+    if (pastedText && pastedText.startsWith('http')) {
+        // Usa um timeout curto para permitir que o input atualize o value, e já dispara a busca
+        setTimeout(() => executeFetch(pastedText), 50);
+    }
   };
 
   const displayedMedias = [...medias]
@@ -79,9 +114,31 @@ export default function DownloaderPage() {
     });
 
   return (
-    <div style={{ minHeight: '100vh', padding: '3rem 1rem' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+    <div 
+      style={{ minHeight: '100vh', padding: '3rem 1rem' }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '3rem', position: 'relative' }}>
         
+        {isDragging && (
+          <div style={{ 
+            position: 'absolute', 
+            top: -20, left: -20, right: -20, bottom: -20, 
+            backgroundColor: 'rgba(59, 130, 246, 0.2)', 
+            border: '4px dashed #3b82f6', 
+            borderRadius: '24px', 
+            zIndex: 50, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            pointerEvents: 'none'
+          }}>
+            <h2 className="text-4xl font-bold text-white drop-shadow-lg">Solte o link aqui!</h2>
+          </div>
+        )}
+
         {/* Header Section */}
         <div style={{ textAlign: 'center' }} className="animate-fade-in">
           <h1 className="text-gradient" style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
@@ -93,13 +150,14 @@ export default function DownloaderPage() {
         </div>
 
         {/* Search Box */}
-        <div className="glass animate-fade-in" style={{ padding: '2rem', maxWidth: '48rem', margin: '0 auto', width: '100%' }}>
+        <div className="glass animate-fade-in" style={{ padding: '2rem', maxWidth: '48rem', margin: '0 auto', width: '100%', position: 'relative', zIndex: 10 }}>
           <form onSubmit={handleFetch} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <input
               type="url"
               required
               value={url}
               onChange={(e) => setUrl(e.target.value)}
+              onPaste={handlePaste}
               placeholder="https://exemplo.com/video"
               className="input"
               style={{ flex: '1 1 250px' }}
@@ -141,7 +199,7 @@ export default function DownloaderPage() {
 
         {/* Gallery */}
         {medias.length > 0 && (
-          <div className="animate-fade-in" style={{ marginTop: '2rem' }}>
+          <div className="animate-fade-in" style={{ marginTop: '2rem', position: 'relative', zIndex: 10 }}>
             
             {/* Controls */}
             <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
