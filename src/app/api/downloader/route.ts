@@ -95,20 +95,47 @@ export async function POST(req: Request) {
         }
       };
 
-      // Pegar imagens
-      $('img').each((_, el) => {
-        const src = resolveUrl($(el).attr('src'));
-        if (src && (src.includes('.jpg') || src.includes('.png') || src.includes('.webp') || src.includes('.jpeg'))) {
-          if (!medias.some(m => m.url === src)) {
+      // Função para extrair imagens com segurança
+      const addImage = (src?: string, alt?: string) => {
+          const resolvedUrl = resolveUrl(src);
+          if (!resolvedUrl) return;
+          
+          // ignorar svgs e avatares muito pequenos (opcional)
+          if (resolvedUrl.endsWith('.svg')) return;
+
+          if (!medias.some(m => m.url === resolvedUrl)) {
+            let ext = resolvedUrl.split('.').pop()?.split('?')[0] || 'jpg';
+            if (ext.length > 5) ext = 'jpg'; // se não tem extensão óbvia
+
             medias.push({
                 type: 'image',
-                url: src,
-                title: $(el).attr('alt') || 'Imagem Extraída',
-                ext: src.split('.').pop()?.split('?')[0] || 'jpg',
+                url: resolvedUrl,
+                title: alt || 'Imagem Extraída',
+                ext,
                 size: 0
             });
           }
+      };
+
+      // 1. Pegar imagens (considerando lazy loading comum)
+      $('img').each((_, el) => {
+        const src = $(el).attr('data-src') || $(el).attr('data-lazy-src') || $(el).attr('data-original') || $(el).attr('src');
+        addImage(src, $(el).attr('alt'));
+      });
+
+      // 2. Pegar de <picture> <source>
+      $('picture source').each((_, el) => {
+        const srcset = $(el).attr('srcset');
+        if (srcset) {
+            // srcset pode ter multiplas urls "url 1x, url 2x" - vamos pegar a primeira
+            const src = srcset.split(',')[0].trim().split(' ')[0];
+            addImage(src);
         }
+      });
+
+      // 3. Pegar OpenGraph e Twitter cards (geralmente fotos em boa qualidade)
+      $('meta[property="og:image"], meta[name="twitter:image"], meta[itemprop="image"]').each((_, el) => {
+        addImage($(el).attr('content'));
       });
 
       // Pegar tags de vídeo HTML5 (source)
