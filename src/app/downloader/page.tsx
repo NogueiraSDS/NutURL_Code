@@ -61,7 +61,6 @@ export default function DownloaderPage() {
   };
 
   const handleDownload = async (mediaUrl: string, title: string, ext: string) => {
-      // Cria uma tag invisível para forçar download caso o browser tente reproduzir a mídia no lugar
       try {
           const res = await fetch(mediaUrl);
           const blob = await res.blob();
@@ -74,81 +73,99 @@ export default function DownloaderPage() {
           a.remove();
           window.URL.revokeObjectURL(downloadUrl);
       } catch (e) {
-          // Fallback se CORS bloquear o fetch
           window.open(mediaUrl, '_blank');
       }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white sm:text-5xl">
+    <div style={{ minHeight: '100vh', padding: '3rem 1rem' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+        
+        {/* Header Section */}
+        <div style={{ textAlign: 'center' }} className="animate-fade-in">
+          <h1 className="text-gradient" style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
             Downloader de Mídia
           </h1>
-          <p className="mt-3 text-xl text-gray-500 dark:text-gray-400">
+          <p style={{ fontSize: '1.25rem', color: 'rgba(255, 255, 255, 0.7)' }}>
             Cole a URL de qualquer site para extrair vídeos e imagens.
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-8 max-w-2xl mx-auto border border-gray-100 dark:border-gray-700">
-          <form onSubmit={handleFetch} className="flex flex-col sm:flex-row gap-4">
+        {/* Search Box */}
+        <div className="glass animate-fade-in" style={{ padding: '2rem', maxWidth: '48rem', margin: '0 auto', width: '100%' }}>
+          <form onSubmit={handleFetch} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <input
               type="url"
               required
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://exemplo.com/video"
-              className="flex-1 min-w-0 block w-full px-4 py-3 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 sm:text-lg"
+              className="input"
+              style={{ flex: '1 1 250px' }}
             />
             <button
               type="submit"
               disabled={loading}
-              className={`inline-flex items-center px-6 py-3 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                loading ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
+              className="btn"
+              style={{ flex: '0 1 auto', whiteSpace: 'nowrap' }}
             >
-              {loading ? 'Buscando...' : 'Extrair'}
+              {loading ? 'Buscando...' : 'Extrair Mídia'}
             </button>
           </form>
 
           {error && (
-            <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/50 text-red-700 dark:text-red-200 rounded-md">
+            <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#fca5a5', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
               {error}
             </div>
           )}
         </div>
 
+        {/* Gallery */}
         {medias.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Mídias Encontradas ({medias.length})</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="animate-fade-in" style={{ marginTop: '2rem' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#fff' }}>
+              Mídias Encontradas ({medias.length})
+            </h2>
+            
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
+              gap: '1.5rem' 
+            }}>
               {medias.map((media, idx) => (
-                <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden flex flex-col">
-                  <div className="relative">
+                <div key={idx} className="glass" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
+                  
+                  {/* Thumbnail Area */}
+                  <div style={{ position: 'relative', height: '180px', backgroundColor: 'rgba(0,0,0,0.3)' }}>
                     {media.type === 'image' ? (
-                      <img src={media.url} alt={media.title} className="object-cover w-full h-48" />
+                      <img src={media.url} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                     ) : media.thumbnail ? (
-                      <img src={media.thumbnail} alt={media.title} className="object-cover w-full h-48" />
+                      <img src={media.thumbnail} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                     ) : (
-                      <div className="flex items-center justify-center w-full h-48 bg-gray-800 text-white">
-                        {media.type === 'audio' ? '🎵 Áudio' : '🎥 Vídeo'}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'rgba(255,255,255,0.5)', fontSize: '2rem' }}>
+                        {media.type === 'audio' ? '🎵' : '🎥'}
                       </div>
                     )}
                   </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate" title={media.title}>
-                        {media.title}
+
+                  {/* Info Area */}
+                  <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+                    <div style={{ marginBottom: '1rem' }}>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={media.title}>
+                        {media.title || 'Mídia'}
                       </h3>
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 capitalize">
-                        {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} {media.quality && `• ${media.quality}`} {media.size ? `• ${formatSize(media.size)}` : ''}
+                      <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', textTransform: 'capitalize' }}>
+                        {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} 
+                        {media.quality && ` • ${media.quality}`} 
+                        {media.size ? ` • ${formatSize(media.size)}` : ''}
                       </p>
                     </div>
-                    <div className="mt-4 flex flex-col gap-2">
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <button
                           onClick={() => handleDownload(media.url, media.title || 'media', media.ext || 'bin')}
-                          className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                          className="btn"
+                          style={{ width: '100%', padding: '0.5rem', fontSize: '0.875rem' }}
                         >
                           Baixar
                         </button>
@@ -156,9 +173,20 @@ export default function DownloaderPage() {
                           href={media.url} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          style={{ 
+                            width: '100%', 
+                            textAlign: 'center',
+                            padding: '0.5rem', 
+                            fontSize: '0.875rem',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '8px',
+                            color: '#fff',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         >
-                          Abrir Link Direto
+                          Link Direto
                         </a>
                     </div>
                   </div>
