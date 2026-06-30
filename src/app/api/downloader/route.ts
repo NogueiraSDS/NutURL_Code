@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         if (info.formats && info.formats.length > 0) {
            // O youtube-dl-exec retorna info de formatos do pior pro melhor na maioria dos casos, vamos pegar um dos melhores.
            // Tentamos fugir de manifestos m3u8 nativos quando há URL direta se possível, mas dependendo da plataforma, m3u8 é necessário.
-           const bestFormat = info.formats.reverse().find(f => f.url && f.protocol !== 'm3u8_native') || info.formats[0];
+           const bestFormat = info.formats.reverse().find((f: any) => f.url && f.protocol !== 'm3u8_native') || info.formats[0];
            
            if (bestFormat || info.url) {
              medias.push({
