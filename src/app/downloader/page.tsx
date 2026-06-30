@@ -23,6 +23,10 @@ export default function DownloaderPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [medias, setMedias] = useState<MediaInfo[]>([]);
+  
+  // Controls
+  const [sortType, setSortType] = useState<'size' | 'default'>('size');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'image' | 'video' | 'audio'>('all');
 
   const handleFetch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +51,7 @@ export default function DownloaderPage() {
         throw new Error(data.error || 'Failed to fetch media');
       }
 
-      const sortedMedias = (data.medias || []).sort((a: MediaInfo, b: MediaInfo) => (b.size || 0) - (a.size || 0));
-      setMedias(sortedMedias);
+      setMedias(data.medias || []);
       
       if (data.medias?.length === 0) {
           setError('Nenhuma mídia encontrada nessa URL.');
@@ -76,6 +79,15 @@ export default function DownloaderPage() {
           window.open(mediaUrl, '_blank');
       }
   };
+
+  const displayedMedias = [...medias]
+    .filter(m => typeFilter === 'all' ? true : m.type === typeFilter)
+    .sort((a, b) => {
+        if (sortType === 'size') {
+            return (b.size || 0) - (a.size || 0);
+        }
+        return 0; // Mantém ordem original (Padrão/Data)
+    });
 
   return (
     <div style={{ minHeight: '100vh', padding: '3rem 1rem' }}>
@@ -123,16 +135,50 @@ export default function DownloaderPage() {
         {/* Gallery */}
         {medias.length > 0 && (
           <div className="animate-fade-in" style={{ marginTop: '2rem' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#fff' }}>
-              Mídias Encontradas ({medias.length})
-            </h2>
             
+            {/* Controls */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', gap: '1rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fff', margin: 0 }}>
+                Mídias Encontradas ({displayedMedias.length})
+              </h2>
+
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <select 
+                  className="input"
+                  style={{ width: 'auto', padding: '0.5rem 1rem' }}
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value as any)}
+                >
+                  <option value="all">Filtro: Todos</option>
+                  <option value="image">Somente Imagens</option>
+                  <option value="video">Somente Vídeos</option>
+                  <option value="audio">Somente Áudios</option>
+                </select>
+
+                <select 
+                  className="input"
+                  style={{ width: 'auto', padding: '0.5rem 1rem' }}
+                  value={sortType}
+                  onChange={(e) => setSortType(e.target.value as any)}
+                >
+                  <option value="size">Ordem: Maior Tamanho</option>
+                  <option value="default">Ordem: Padrão / Data</option>
+                </select>
+              </div>
+            </div>
+            
+            {displayedMedias.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.5)' }}>
+                    Nenhuma mídia corresponde a esse filtro.
+                </div>
+            )}
+
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
               gap: '1.5rem' 
             }}>
-              {medias.map((media, idx) => (
+              {displayedMedias.map((media, idx) => (
                 <div key={idx} className="glass" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
                   
                   {/* Thumbnail Area */}
@@ -157,7 +203,9 @@ export default function DownloaderPage() {
                       <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', textTransform: 'capitalize' }}>
                         {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} 
                         {media.quality && ` • ${media.quality}`} 
-                        {media.size ? ` • ${formatSize(media.size)}` : ''}
+                      </p>
+                      <p style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: 'rgba(167, 139, 250, 0.9)', fontWeight: 'bold' }}>
+                        Tamanho: {media.size ? formatSize(media.size) : 'Desconhecido'}
                       </p>
                     </div>
                     
