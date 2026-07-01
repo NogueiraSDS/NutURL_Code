@@ -75,6 +75,73 @@ export async function POST(req: Request) {
       }
     }
 
+    // 1.5 Interceptar TikTok para usar API tikwm (evita erro de python3/yt-dlp no Vercel e baixa sem marca d'água)
+    if (!isExtracted && url.includes('tiktok.com')) {
+        try {
+            const tkUrl = `https://www.tikwm.com/api/?url=${url}`;
+            const tkRes = await fetch(tkUrl);
+            const tkJson = await tkRes.json();
+            
+            if (tkJson?.data) {
+                const data = tkJson.data;
+                // Vídeo Sem Marca d'Água
+                if (data.play) {
+                    medias.push({
+                        type: 'video',
+                        url: data.play,
+                        thumbnail: data.cover,
+                        title: data.title || 'TikTok Video',
+                        ext: 'mp4',
+                        quality: 'Sem Marca d\'Água',
+                        size: data.size || 0
+                    });
+                }
+                // Vídeo Com Marca d'Água
+                if (data.wmplay) {
+                    medias.push({
+                        type: 'video',
+                        url: data.wmplay,
+                        thumbnail: data.cover,
+                        title: data.title || 'TikTok Video',
+                        ext: 'mp4',
+                        quality: 'Com Marca d\'Água',
+                        size: data.wm_size || 0
+                    });
+                }
+                // Áudio
+                if (data.music) {
+                    medias.push({
+                        type: 'audio',
+                        url: data.music,
+                        thumbnail: data.cover,
+                        title: data.music_info?.title || 'TikTok Audio',
+                        ext: 'mp3',
+                        quality: 'Áudio Original',
+                        size: 0
+                    });
+                }
+                // Se for um carrossel de imagens
+                if (data.images && data.images.length > 0) {
+                    data.images.forEach((imgUrl: string, idx: number) => {
+                        medias.push({
+                            type: 'image',
+                            url: imgUrl,
+                            title: `${data.title || 'TikTok Imagem'} - Parte ${idx + 1}`,
+                            ext: 'jpg',
+                            size: 0
+                        });
+                    });
+                }
+
+                if (medias.length > 0) {
+                    isExtracted = true;
+                }
+            }
+        } catch (err) {
+            console.warn("Falha ao usar tikwm, caindo para youtube-dl-exec...");
+        }
+    }
+
     // 2. Tentar usar o youtube-dl-exec (perfeito para YouTube, Vimeo, TikTok, etc)
     if (!isExtracted) {
         try {
