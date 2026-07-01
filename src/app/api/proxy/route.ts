@@ -10,14 +10,22 @@ export async function GET(req: Request) {
   }
 
   try {
+    const fetchHeaders: any = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': new URL(url).origin
+    };
+
+    // Repassar o cabeçalho Range para suportar downloads grandes e vídeos longos
+    const rangeHeader = req.headers.get('range');
+    if (rangeHeader) {
+        fetchHeaders['Range'] = rangeHeader;
+    }
+
     const response = await fetch(url, {
-        headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Referer': new URL(url).origin
-        }
+        headers: fetchHeaders
     });
 
-    if (!response.ok) {
+    if (!response.ok && response.status !== 206) {
       throw new Error(`Failed to fetch media: ${response.status} ${response.statusText}`);
     }
 
@@ -41,8 +49,18 @@ export async function GET(req: Request) {
         headers.set('Content-Length', contentLength);
     }
 
+    const contentRange = response.headers.get('content-range');
+    if (contentRange) {
+        headers.set('Content-Range', contentRange);
+    }
+    
+    const acceptRanges = response.headers.get('accept-ranges');
+    if (acceptRanges) {
+        headers.set('Accept-Ranges', acceptRanges);
+    }
+
     return new NextResponse(response.body, {
-      status: 200,
+      status: response.status === 206 ? 206 : 200,
       headers
     });
   } catch (error: any) {
