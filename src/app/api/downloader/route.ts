@@ -158,7 +158,8 @@ export async function POST(req: Request) {
             }
           }
         } catch (ytError: any) {
-          console.warn("youtube-dl-exec falhou. Detalhes:", ytError.message || ytError);
+          console.error("youtube-dl-exec falhou. Detalhes:", ytError.message || ytError);
+          return NextResponse.json({ error: `YTDL Error: ${ytError.message}` }, { status: 500 });
         }
     }
 
