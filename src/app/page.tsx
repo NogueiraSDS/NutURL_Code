@@ -279,6 +279,7 @@ export default function Home() {
           <button onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')} className="btn" style={{ padding: '6px 12px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', fontSize: '0.8rem' }}>
             {locale === 'pt' ? '🇺🇸 EN' : '🇧🇷 PT'}
           </button>
+          <button onClick={() => router.push('/downloader')} className="btn" style={{ padding: '8px 16px', background: 'var(--primary)', border: 'none', color: '#fff', fontWeight: 'bold' }}>Downloader</button>
           <button onClick={() => router.push('/blog')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8' }}>{t('footer.blog') || 'Blog'}</button>
           <button onClick={() => router.push('/pricing')} className="btn" style={{ padding: '8px 16px', background: 'transparent', border: '1px solid #f59e0b', color: '#f59e0b' }}>{t('home.plans')}</button>
           {user ? (
