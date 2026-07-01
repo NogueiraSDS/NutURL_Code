@@ -152,6 +152,14 @@ export async function POST(req: Request) {
           }
         } catch (ytError: any) {
           console.warn("youtube-dl-exec falhou. Detalhes:", ytError.message || ytError);
+          // Adicionar o erro como uma mídia fake apenas para debug visual temporário na UI
+          medias.push({
+              type: 'image',
+              url: 'https://via.placeholder.com/400x200.png?text=Error',
+              title: 'DEBUG ERRO YTDL: ' + (ytError.message || String(ytError)),
+              ext: 'txt',
+              size: 0
+          });
         }
     }
 
