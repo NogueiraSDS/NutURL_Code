@@ -86,21 +86,57 @@ export async function POST(req: Request) {
             
             // Pega os formatos (se existirem)
             if (info.formats && info.formats.length > 0) {
-               // O youtube-dl-exec retorna info de formatos do pior pro melhor na maioria dos casos, vamos pegar um dos melhores.
-               // Tentamos fugir de manifestos m3u8 nativos quando há URL direta se possível, mas dependendo da plataforma, m3u8 é necessário.
-               const bestFormat = info.formats.reverse().find((f: any) => f.url && f.protocol !== 'm3u8_native') || info.formats[0];
-               
-               if (bestFormat || info.url) {
-                 medias.push({
-                   type: 'video',
-                   url: (bestFormat?.url || info.url) as string,
-                   thumbnail: info.thumbnail,
-                   title: info.title || 'Video',
-                   ext: bestFormat?.ext || info.ext,
-                   quality: bestFormat?.format_note || 'Auto',
-                   size: bestFormat?.filesize || bestFormat?.filesize_approx || info.filesize || info.filesize_approx || 0
-                 });
-                 isExtracted = true;
+               // Filtrar Vídeo+Áudio nativos (ex: 360p) OU Apenas Áudio
+               const playableFormats = info.formats.filter((f: any) => 
+                   (f.vcodec !== 'none' && f.acodec !== 'none') || 
+                   (f.vcodec === 'none' && f.acodec !== 'none')
+               );
+
+               // Filtrar Vídeos de alta qualidade que o YouTube separou do áudio (ex: 1080p, 4K DASH)
+               const videoOnlyFormats = info.formats.filter((f: any) => 
+                   (f.vcodec !== 'none' && f.acodec === 'none') &&
+                   // Pegar só os grandes pra não encher de lixo
+                   (f.height && f.height >= 720)
+               );
+
+               const allOptions = [...playableFormats, ...videoOnlyFormats];
+
+               if (allOptions.length > 0) {
+                   allOptions.forEach((f: any) => {
+                       const isVideoOnly = f.vcodec !== 'none' && f.acodec === 'none';
+                       const isAudioOnly = f.vcodec === 'none' && f.acodec !== 'none';
+                       
+                       let label = f.format_note || 'Auto';
+                       if (isAudioOnly) label = 'Áudio';
+                       if (isVideoOnly) label = `${label} (Sem Áudio)`;
+
+                       medias.push({
+                           type: isAudioOnly ? 'audio' : 'video',
+                           url: f.url,
+                           thumbnail: info.thumbnail,
+                           title: info.title || 'Video',
+                           ext: f.ext,
+                           quality: label,
+                           size: f.filesize || f.filesize_approx || info.filesize || info.filesize_approx || 0
+                       });
+                   });
+                   isExtracted = true;
+               } else {
+                   // Fallback se a plataforma não separar canais (pegar o melhor)
+                   const bestFormat = info.formats.reverse().find((f: any) => f.url && f.protocol !== 'm3u8_native') || info.formats[0];
+                   
+                   if (bestFormat || info.url) {
+                     medias.push({
+                       type: 'video',
+                       url: (bestFormat?.url || info.url) as string,
+                       thumbnail: info.thumbnail,
+                       title: info.title || 'Video',
+                       ext: bestFormat?.ext || info.ext,
+                       quality: bestFormat?.format_note || 'Auto',
+                       size: bestFormat?.filesize || bestFormat?.filesize_approx || info.filesize || info.filesize_approx || 0
+                     });
+                     isExtracted = true;
+                   }
                }
             } else if (info.url) {
                medias.push({

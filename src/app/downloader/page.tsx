@@ -247,14 +247,27 @@ export default function DownloaderPage() {
                 <div key={idx} className="glass" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
                   
                   {/* Thumbnail Area */}
-                  <div style={{ position: 'relative', height: '180px', backgroundColor: 'rgba(0,0,0,0.3)' }}>
-                    {media.type === 'image' ? (
+                  <div style={{ position: 'relative', height: '180px', backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {media.type === 'video' ? (
+                      <video 
+                        src={media.url} 
+                        poster={media.thumbnail} 
+                        controls 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      />
+                    ) : media.type === 'audio' ? (
+                      <audio 
+                        src={media.url} 
+                        controls 
+                        style={{ width: '90%' }} 
+                      />
+                    ) : media.type === 'image' ? (
                       <img src={media.url} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                     ) : media.thumbnail ? (
                       <img src={media.thumbnail} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: 'rgba(255,255,255,0.5)', fontSize: '2rem' }}>
-                        {media.type === 'audio' ? '🎵' : '🎥'}
+                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '2rem' }}>
+                        🎥
                       </div>
                     )}
                   </div>
