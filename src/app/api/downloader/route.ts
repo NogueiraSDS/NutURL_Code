@@ -1,18 +1,6 @@
 import { NextResponse } from 'next/server';
 import { load } from 'cheerio';
-import { create } from 'youtube-dl-exec';
-import path from 'path';
-import fs from 'fs';
 
-// Workaround para o Next.js achar o binário em produção
-let binName = 'yt-dlp';
-const exePath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', 'yt-dlp.exe');
-if (fs.existsSync(exePath)) {
-  binName = 'yt-dlp.exe';
-}
-
-const binPath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', binName);
-const youtubedl = create(binPath);
 
 interface MediaInfo {
   type: 'image' | 'video' | 'audio';
@@ -147,91 +135,52 @@ export async function POST(req: Request) {
         }
     }
 
-    // 2. Tentar usar o youtube-dl-exec (perfeito para YouTube, Vimeo, TikTok, etc)
+    // 2. Tentar usar a API do Cobalt (funciona no Vercel sem precisar de Python)
     if (!isExtracted) {
         try {
-          const ytdlInfo = await youtubedl(url, {
-            dumpSingleJson: true,
-            noCheckCertificates: true,
-            noWarnings: true,
-            preferFreeFormats: true
-          });
-    
-          // Se for playlist, teremos entries, senão é um objeto direto
-          const infoList = (ytdlInfo as any).entries || [ytdlInfo];
-    
-          for (const info of infoList) {
-            if (!info) continue;
-            
-            // Pega os formatos (se existirem)
-            if (info.formats && info.formats.length > 0) {
-               // Filtrar Vídeo+Áudio nativos (ex: 360p) OU Apenas Áudio
-               const playableFormats = info.formats.filter((f: any) => 
-                   (f.vcodec !== 'none' && f.acodec !== 'none') || 
-                   (f.vcodec === 'none' && f.acodec !== 'none')
-               );
+            const cobaltRes = await fetch('https://api.cobalt.tools/api/json', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                },
+                body: JSON.stringify({
+                    url: url,
+                    isAudioOnly: false
+                })
+            });
 
-               // Filtrar Vídeos de alta qualidade que o YouTube separou do áudio (ex: 1080p, 4K DASH)
-               const videoOnlyFormats = info.formats.filter((f: any) => 
-                   (f.vcodec !== 'none' && f.acodec === 'none') &&
-                   // Pegar só os grandes pra não encher de lixo
-                   (f.height && f.height >= 720)
-               );
-
-               const allOptions = [...playableFormats, ...videoOnlyFormats];
-
-               if (allOptions.length > 0) {
-                   allOptions.forEach((f: any) => {
-                       const isVideoOnly = f.vcodec !== 'none' && f.acodec === 'none';
-                       const isAudioOnly = f.vcodec === 'none' && f.acodec !== 'none';
-                       
-                       let label = f.format_note || 'Auto';
-                       if (isAudioOnly) label = 'Áudio';
-                       if (isVideoOnly) label = `${label} (Sem Áudio)`;
-
-                       medias.push({
-                           type: isAudioOnly ? 'audio' : 'video',
-                           url: f.url,
-                           thumbnail: info.thumbnail,
-                           title: info.title || 'Video',
-                           ext: f.ext,
-                           quality: label,
-                           size: f.filesize || f.filesize_approx || info.filesize || info.filesize_approx || 0
-                       });
-                   });
-                   isExtracted = true;
-               } else {
-                   // Fallback se a plataforma não separar canais (pegar o melhor)
-                   const bestFormat = info.formats.reverse().find((f: any) => f.url && f.protocol !== 'm3u8_native') || info.formats[0];
-                   
-                   if (bestFormat || info.url) {
-                     medias.push({
-                       type: 'video',
-                       url: (bestFormat?.url || info.url) as string,
-                       thumbnail: info.thumbnail,
-                       title: info.title || 'Video',
-                       ext: bestFormat?.ext || info.ext,
-                       quality: bestFormat?.format_note || 'Auto',
-                       size: bestFormat?.filesize || bestFormat?.filesize_approx || info.filesize || info.filesize_approx || 0
-                     });
-                     isExtracted = true;
-                   }
-               }
-            } else if (info.url) {
-               medias.push({
-                   type: info.ext === 'mp3' || info.ext === 'm4a' ? 'audio' : 'video',
-                   url: info.url,
-                   thumbnail: info.thumbnail,
-                   title: info.title || 'Media',
-                   ext: info.ext,
-                   size: info.filesize || info.filesize_approx || 0
-               });
-               isExtracted = true;
+            if (cobaltRes.ok) {
+                const data = await cobaltRes.json();
+                
+                if (data.status === 'stream' || data.status === 'redirect' || data.url) {
+                    medias.push({
+                        type: 'video',
+                        url: data.url,
+                        title: 'Video',
+                        ext: 'mp4',
+                        quality: 'Auto',
+                        size: 0
+                    });
+                    isExtracted = true;
+                } else if (data.status === 'picker' && data.picker) {
+                    data.picker.forEach((item: any, idx: number) => {
+                        medias.push({
+                            type: item.type === 'video' ? 'video' : 'image',
+                            url: item.url,
+                            title: `Mídia ${idx + 1}`,
+                            ext: item.type === 'video' ? 'mp4' : 'jpg',
+                            size: 0
+                        });
+                    });
+                    isExtracted = true;
+                }
+            } else {
+                console.warn(`Cobalt API retornou status ${cobaltRes.status}`);
             }
-          }
-        } catch (ytError: any) {
-          console.error("youtube-dl-exec falhou. Detalhes:", ytError.message || ytError);
-          return NextResponse.json({ error: `YTDL Error: ${ytError.message}` }, { status: 500 });
+        } catch (error: any) {
+            console.error("Cobalt API falhou. Detalhes:", error.message || error);
         }
     }
 
