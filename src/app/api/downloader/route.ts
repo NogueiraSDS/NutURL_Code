@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server';
 import { load } from 'cheerio';
 import { create } from 'youtube-dl-exec';
 import path from 'path';
+import fs from 'fs';
 
 // Workaround para o Next.js achar o binário em produção
-const isWin = process.platform === 'win32';
-const binName = isWin ? 'yt-dlp.exe' : 'yt-dlp';
+let binName = 'yt-dlp';
+const exePath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', 'yt-dlp.exe');
+if (fs.existsSync(exePath)) {
+  binName = 'yt-dlp.exe';
+}
+
 const binPath = path.join(process.cwd(), 'node_modules', 'youtube-dl-exec', 'bin', binName);
 const youtubedl = create(binPath);
 
