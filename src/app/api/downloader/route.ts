@@ -223,8 +223,57 @@ export async function POST(req: Request) {
                     isExtracted = true;
                 }
             }
-        } catch (err) {
+        } catch(err) {
             console.warn("Falha ao usar tikwm, caindo para youtube-dl-exec...");
+        }
+    }
+
+    // 1.7 Interceptar Reddit via feed RSS (bypassa o Cloudflare/Auth block da Vercel)
+    if (!isExtracted && url.includes('reddit.com')) {
+        try {
+            // Converter a URL para a versão .rss (ex: /user/nome/submitted -> /user/nome/submitted.rss)
+            let rssUrl = url.split('?')[0];
+            if (rssUrl.endsWith('/')) rssUrl = rssUrl.slice(0, -1);
+            if (!rssUrl.endsWith('.rss')) rssUrl += '.rss';
+            
+            const response = await fetch(rssUrl);
+            const xml = await response.text();
+            
+            // Buscar imagens (preview.redd.it ou i.redd.it) e gifs no XML
+            const regex = /(https:\/\/(?:preview|i)\.redd\.it\/[a-zA-Z0-9.\-_]+(jpg|png|gif|jpeg|mp4))/ig;
+            const matches = [...xml.matchAll(regex)].map(m => m[1]);
+            
+            const uniqueUrls = [...new Set(matches)];
+            
+            uniqueUrls.forEach((mediaUrl, idx) => {
+                // Converter preview.redd.it para i.redd.it para pegar a resolução original máxima e sem compressão
+                let originalUrl = mediaUrl.replace('preview.redd.it', 'i.redd.it');
+                let type = 'image';
+                let ext = 'jpg';
+                
+                if (originalUrl.includes('.gif')) {
+                    ext = 'gif';
+                } else if (originalUrl.includes('.png')) {
+                    ext = 'png';
+                } else if (originalUrl.includes('.mp4')) {
+                    ext = 'mp4';
+                    type = 'video';
+                }
+                
+                medias.push({
+                    type: type as any,
+                    url: originalUrl,
+                    title: `Reddit Media ${idx + 1}`,
+                    ext,
+                    size: 0
+                });
+            });
+            
+            if (medias.length > 0) {
+                isExtracted = true;
+            }
+        } catch(err) {
+            console.warn("Falha ao usar interceptador Reddit RSS", err);
         }
     }
 

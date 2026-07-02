@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 interface MediaInfo {
   type: 'image' | 'video' | 'audio';
@@ -128,6 +128,20 @@ export default function DownloaderPage() {
   // Controls
   const [sortType, setSortType] = useState<'size' | 'default'>('size');
   const [typeFilter, setTypeFilter] = useState<'all' | 'image' | 'video' | 'audio'>('all');
+  
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const executeFetch = async (targetUrl: string) => {
     if (!targetUrl) return;
@@ -369,6 +383,37 @@ export default function DownloaderPage() {
           </div>
         )}
       </div>
+
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '2rem',
+            width: '3.5rem',
+            height: '3.5rem',
+            borderRadius: '50%',
+            backgroundColor: '#3b82f6',
+            color: '#ffffff',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 50,
+            transition: 'all 0.2s',
+          }}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-3px)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+          aria-label="Voltar para o topo"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
