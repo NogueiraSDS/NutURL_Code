@@ -171,9 +171,12 @@ export async function POST(req: Request) {
                     }
                 }
             } else if (url.includes('instagram.com')) {
+                // Limpar parâmetros de rastreamento (utm_source, igsh, etc) pois quebram a extração de carrossel
+                const cleanIgUrl = url.split('?')[0];
+                
                 // Tentar usar o instagram do btch
                 const { igdl } = require('btch-downloader');
-                const igData = await igdl(url);
+                const igData = await igdl(cleanIgUrl);
                 if (igData && igData.length > 0) {
                     igData.forEach((item: any, idx: number) => {
                         medias.push({
