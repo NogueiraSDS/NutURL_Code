@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server';
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const url = searchParams.get('url');
-  let filename = searchParams.get('filename') || 'download';
+  let rawFilename = searchParams.get('filename') || 'download';
+  // Sanitize filename: allow only letters, numbers, spaces, dots, dashes, and underscores.
+  // This removes emojis, special characters, and invalid filesystem characters.
+  let filename = rawFilename.replace(/[^a-zA-Z0-9 .\-_]/g, '').trim() || 'download';
 
   if (!url) {
     return NextResponse.json({ error: 'URL is required' }, { status: 400 });
@@ -38,7 +41,8 @@ export async function GET(req: Request) {
     }
 
     const headers = new Headers();
-    headers.set('Content-Disposition', `attachment; filename="${filename}"`);
+    // Encode filename to avoid ByteString conversion errors with emojis/special characters
+    headers.set('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
     if (contentType) {
         headers.set('Content-Type', contentType);
     }
