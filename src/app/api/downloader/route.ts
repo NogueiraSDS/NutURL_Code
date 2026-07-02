@@ -135,52 +135,60 @@ export async function POST(req: Request) {
         }
     }
 
-    // 2. Tentar usar a API do Cobalt (funciona no Vercel sem precisar de Python)
+    // 2. Tentar usar o btch-downloader (Zero binários, nativo do Node.js)
     if (!isExtracted) {
         try {
-            const cobaltRes = await fetch('https://api.cobalt.tools/api/json', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-                },
-                body: JSON.stringify({
-                    url: url,
-                    isAudioOnly: false
-                })
-            });
-
-            if (cobaltRes.ok) {
-                const data = await cobaltRes.json();
+            // Se for YouTube
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                const { youtube } = require('btch-downloader');
+                const ytData = await youtube(url);
                 
-                if (data.status === 'stream' || data.status === 'redirect' || data.url) {
-                    medias.push({
-                        type: 'video',
-                        url: data.url,
-                        title: 'Video',
-                        ext: 'mp4',
-                        quality: 'Auto',
-                        size: 0
-                    });
-                    isExtracted = true;
-                } else if (data.status === 'picker' && data.picker) {
-                    data.picker.forEach((item: any, idx: number) => {
+                if (ytData && ytData.status) {
+                    if (ytData.mp4) {
                         medias.push({
-                            type: item.type === 'video' ? 'video' : 'image',
+                            type: 'video',
+                            url: ytData.mp4,
+                            thumbnail: ytData.thumbnail,
+                            title: ytData.title || 'Video',
+                            ext: 'mp4',
+                            quality: 'Vídeo (Com Áudio)',
+                            size: 0
+                        });
+                    }
+                    if (ytData.mp3) {
+                        medias.push({
+                            type: 'audio',
+                            url: ytData.mp3,
+                            thumbnail: ytData.thumbnail,
+                            title: ytData.title || 'Audio',
+                            ext: 'mp3',
+                            quality: 'Somente Áudio',
+                            size: 0
+                        });
+                    }
+                    if (ytData.mp4 || ytData.mp3) {
+                        isExtracted = true;
+                    }
+                }
+            } else if (url.includes('instagram.com')) {
+                // Tentar usar o instagram do btch
+                const { igdl } = require('btch-downloader');
+                const igData = await igdl(url);
+                if (igData && igData.length > 0) {
+                    igData.forEach((item: any, idx: number) => {
+                        medias.push({
+                            type: item.url.includes('.mp4') ? 'video' : 'image',
                             url: item.url,
-                            title: `Mídia ${idx + 1}`,
-                            ext: item.type === 'video' ? 'mp4' : 'jpg',
+                            title: `Instagram Mídia ${idx + 1}`,
+                            ext: item.url.includes('.mp4') ? 'mp4' : 'jpg',
                             size: 0
                         });
                     });
                     isExtracted = true;
                 }
-            } else {
-                console.warn(`Cobalt API retornou status ${cobaltRes.status}`);
             }
         } catch (error: any) {
-            console.error("Cobalt API falhou. Detalhes:", error.message || error);
+            console.error("btch-downloader falhou. Detalhes:", error.message || error);
         }
     }
 
