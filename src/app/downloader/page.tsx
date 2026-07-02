@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 interface MediaInfo {
   type: 'image' | 'video' | 'audio';
@@ -17,6 +17,106 @@ const formatSize = (bytes?: number) => {
     const mb = bytes / 1024 / 1024;
     return mb > 1 ? `${mb.toFixed(2)} MB` : `${(bytes / 1024).toFixed(0)} KB`;
 };
+
+function MediaGroupCard({ group, handleDownload }: { group: MediaInfo[], handleDownload: (url: string, title: string, ext: string) => void }) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const media = group[selectedIndex];
+  
+  if (!media) return null;
+
+  return (
+    <div className="glass" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
+      {/* Thumbnail Area */}
+      <div style={{ position: 'relative', height: '180px', backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {media.type === 'video' ? (
+          <video 
+            src={media.url} 
+            poster={media.thumbnail} 
+            controls 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          />
+        ) : media.type === 'audio' ? (
+          <audio 
+            src={media.url} 
+            controls 
+            style={{ width: '90%' }} 
+          />
+        ) : media.type === 'image' ? (
+          <img src={media.url} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+        ) : media.thumbnail ? (
+          <img src={media.thumbnail} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+        ) : (
+          <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '2rem' }}>
+            🎥
+          </div>
+        )}
+      </div>
+
+      {/* Info Area */}
+      <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+        <div style={{ marginBottom: '1rem' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={media.title}>
+            {media.title || 'Mídia'}
+          </h3>
+          
+          {group.length > 1 ? (
+            <select 
+              className="input" 
+              style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem', fontSize: '0.875rem' }}
+              value={selectedIndex}
+              onChange={(e) => setSelectedIndex(Number(e.target.value))}
+            >
+              {group.map((m, idx) => (
+                <option key={idx} value={idx}>
+                  {m.quality || 'Auto'} - {m.ext?.toUpperCase() || 'Arquivo'} {m.size ? `(${formatSize(m.size)})` : ''}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <>
+              <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', textTransform: 'capitalize' }}>
+                {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} 
+                {media.quality && ` • ${media.quality}`} 
+              </p>
+              <p style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: 'rgba(167, 139, 250, 0.9)', fontWeight: 'bold' }}>
+                Tamanho: {media.size ? formatSize(media.size) : 'Desconhecido'}
+              </p>
+            </>
+          )}
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <button
+              onClick={() => handleDownload(media.url, media.title || 'media', media.ext || 'bin')}
+              className="btn"
+              style={{ width: '100%', padding: '0.5rem', fontSize: '0.875rem' }}
+            >
+              Baixar
+            </button>
+            <a 
+              href={media.url} 
+              target="_blank" 
+              rel="noreferrer"
+              style={{ 
+                width: '100%', 
+                textAlign: 'center',
+                padding: '0.5rem', 
+                fontSize: '0.875rem',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '8px',
+                color: '#fff',
+                transition: 'background 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            >
+              Link Direto
+            </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function DownloaderPage() {
   const [url, setUrl] = useState('');
@@ -105,13 +205,32 @@ export default function DownloaderPage() {
   };
 
   const displayedMedias = [...medias]
-    .filter(m => typeFilter === 'all' ? true : m.type === typeFilter)
+    .filter(m => typeFilter === 'all' || m.type === typeFilter)
     .sort((a, b) => {
-        if (sortType === 'size') {
-            return (b.size || 0) - (a.size || 0);
-        }
-        return 0; // Mantém ordem original (Padrão/Data)
+      if (sortType === 'size') {
+        return (b.size || 0) - (a.size || 0);
+      }
+      return 0; // default order
     });
+
+  const groupedMedias = useMemo(() => {
+    const groups: { [title: string]: MediaInfo[] } = {};
+    const standalone: MediaInfo[][] = [];
+
+    displayedMedias.forEach(media => {
+      if (media.title && media.type === 'video') {
+        if (!groups[media.title]) groups[media.title] = [];
+        groups[media.title].push(media);
+      } else {
+        standalone.push([media]);
+      }
+    });
+
+    return [
+      ...Object.values(groups),
+      ...standalone
+    ];
+  }, [displayedMedias]);
 
   return (
     <div 
@@ -243,80 +362,8 @@ export default function DownloaderPage() {
               gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
               gap: '1.5rem' 
             }}>
-              {displayedMedias.map((media, idx) => (
-                <div key={idx} className="glass" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }}>
-                  
-                  {/* Thumbnail Area */}
-                  <div style={{ position: 'relative', height: '180px', backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {media.type === 'video' ? (
-                      <video 
-                        src={media.url} 
-                        poster={media.thumbnail} 
-                        controls 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                      />
-                    ) : media.type === 'audio' ? (
-                      <audio 
-                        src={media.url} 
-                        controls 
-                        style={{ width: '90%' }} 
-                      />
-                    ) : media.type === 'image' ? (
-                      <img src={media.url} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-                    ) : media.thumbnail ? (
-                      <img src={media.thumbnail} alt={media.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-                    ) : (
-                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '2rem' }}>
-                        🎥
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info Area */}
-                  <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
-                    <div style={{ marginBottom: '1rem' }}>
-                      <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={media.title}>
-                        {media.title || 'Mídia'}
-                      </h3>
-                      <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: 'rgba(255,255,255,0.6)', textTransform: 'capitalize' }}>
-                        {media.type} • {media.ext?.toUpperCase() || 'Arquivo'} 
-                        {media.quality && ` • ${media.quality}`} 
-                      </p>
-                      <p style={{ marginTop: '0.25rem', fontSize: '0.875rem', color: 'rgba(167, 139, 250, 0.9)', fontWeight: 'bold' }}>
-                        Tamanho: {media.size ? formatSize(media.size) : 'Desconhecido'}
-                      </p>
-                    </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <button
-                          onClick={() => handleDownload(media.url, media.title || 'media', media.ext || 'bin')}
-                          className="btn"
-                          style={{ width: '100%', padding: '0.5rem', fontSize: '0.875rem' }}
-                        >
-                          Baixar
-                        </button>
-                        <a 
-                          href={media.url} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          style={{ 
-                            width: '100%', 
-                            textAlign: 'center',
-                            padding: '0.5rem', 
-                            fontSize: '0.875rem',
-                            border: '1px solid rgba(255,255,255,0.2)',
-                            borderRadius: '8px',
-                            color: '#fff',
-                            transition: 'background 0.2s'
-                          }}
-                          onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-                          onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        >
-                          Link Direto
-                        </a>
-                    </div>
-                  </div>
-                </div>
+              {groupedMedias.map((group, idx) => (
+                <MediaGroupCard key={idx} group={group} handleDownload={handleDownload} />
               ))}
             </div>
           </div>
