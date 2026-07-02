@@ -68,7 +68,89 @@ export async function POST(req: Request) {
       }
     }
 
-    // 1.5 Interceptar TikTok para usar API tikwm (evita erro de python3/yt-dlp no Vercel e baixa sem marca d'água)
+    // 1.5 Interceptar TheFap.net para galerias e pegar as fotos originais
+    if (!isExtracted && url.includes('thefap.net')) {
+        try {
+            const response = await fetch(url);
+            const html = await response.text();
+            
+            let postLinks: string[] = [];
+            
+            // Regex simples para pegar os hrefs, já que o Cheerio às vezes falha na Vercel se não tiver o pacote instalado nativamente na rota
+            const matches = [...html.matchAll(/<a[^>]*href="([^"]+)"[^>]*>/g)];
+            for (const m of matches) {
+                const href = m[1];
+                // Identifica se o link termina com /i1, /v1, etc (padrão de post do thefap)
+                if (href && (href.match(/\/i\d+$/) || href.match(/\/v\d+$/))) {
+                    const fullLink = href.startsWith('http') ? href : `https://oneprotests.thefap.net${href}`;
+                    if (!postLinks.includes(fullLink)) {
+                        postLinks.push(fullLink);
+                    }
+                }
+            }
+            
+            // Se não encontrou links na página, mas a URL atual for de um post único
+            if (postLinks.length === 0 && (url.match(/\/i\d+$/) || url.match(/\/v\d+$/))) {
+                postLinks.push(url);
+            }
+
+            if (postLinks.length > 0) {
+                // Função para buscar a mídia original de cada post (em paralelo)
+                const fetchPost = async (postUrl: string, idx: number) => {
+                    try {
+                        const postRes = await fetch(postUrl);
+                        const postHtml = await postRes.text();
+                        
+                        let mediaUrl = '';
+                        let type = 'image';
+                        let ext = 'jpg';
+                        
+                        // Verificar se tem vídeo
+                        const videoMatch = postHtml.match(/<video[^>]*>\s*<source[^>]*src="([^"]+)"/i);
+                        if (videoMatch && videoMatch[1]) {
+                            mediaUrl = videoMatch[1];
+                            type = 'video';
+                            ext = 'mp4';
+                        } else {
+                            // Buscar a imagem do twitter (geralmente contém pbs.twimg.com/media)
+                            const imgMatch = postHtml.match(/src="([^"]+pbs\.twimg\.com\/media[^"]+)"/i);
+                            if (imgMatch && imgMatch[1]) {
+                                // Trocar :small ou :medium por :orig para pegar a qualidade original máxima
+                                mediaUrl = imgMatch[1].replace(/:small$/, ':orig').replace(/:medium$/, ':orig');
+                            }
+                        }
+                        
+                        if (mediaUrl) {
+                            return {
+                                type,
+                                url: mediaUrl,
+                                title: `TheFap Media ${idx + 1}`,
+                                ext,
+                                size: 0
+                            };
+                        }
+                    } catch(e) {}
+                    return null;
+                };
+
+                // Limitar processamento a 50 itens para evitar timeout na Vercel (10 segundos limite)
+                const promises = postLinks.slice(0, 50).map((link, i) => fetchPost(link, i));
+                const results = await Promise.all(promises);
+                
+                results.forEach((res: any) => {
+                    if (res) medias.push(res);
+                });
+                
+                if (medias.length > 0) {
+                    isExtracted = true;
+                }
+            }
+        } catch(err) {
+            console.warn("Falha ao usar interceptador thefap", err);
+        }
+    }
+
+    // 1.6 Interceptar TikTok para usar API tikwm (evita erro de python3/yt-dlp no Vercel e baixa sem marca d'água)
     if (!isExtracted && url.includes('tiktok.com')) {
         try {
             const tkUrl = `https://www.tikwm.com/api/?url=${url}`;
