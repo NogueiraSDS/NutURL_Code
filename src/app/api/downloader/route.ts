@@ -105,13 +105,24 @@ export async function POST(req: Request) {
                         let type = 'image';
                         let ext = 'jpg';
                         
-                        // Verificar se tem vídeo
+                        // Verificar se tem vídeo no thefap
                         const videoMatch = postHtml.match(/<video[^>]*>\s*<source[^>]*src="([^"]+)"/i);
+                        const fileMatch = postHtml.match(/file=([A-Za-z0-9+/=]+)/);
+                        
                         if (videoMatch && videoMatch[1]) {
                             mediaUrl = videoMatch[1];
                             type = 'video';
                             ext = 'mp4';
-                        } else {
+                        } else if (fileMatch && fileMatch[1]) {
+                            // thefap embute vídeos em iframes com o link em base64 no parâmetro file=
+                            try {
+                                mediaUrl = Buffer.from(fileMatch[1], 'base64').toString('utf8');
+                                type = 'video';
+                                ext = 'mp4';
+                            } catch(e) {}
+                        }
+                        
+                        if (!mediaUrl) {
                             // Buscar a imagem do twitter (geralmente contém pbs.twimg.com/media)
                             const imgMatch = postHtml.match(/src="([^"]+pbs\.twimg\.com\/media[^"]+)"/i);
                             if (imgMatch && imgMatch[1]) {
