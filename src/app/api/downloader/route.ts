@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { load } from 'cheerio';
+import ytdl from '@distube/ytdl-core';
 
 
 interface MediaInfo {
@@ -140,8 +141,6 @@ export async function POST(req: Request) {
         try {
             // Se for YouTube
             if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                const ytdl = require('@distube/ytdl-core');
-                
                 // Obter info completa do vídeo
                 const info = await ytdl.getInfo(url);
                 
@@ -205,7 +204,11 @@ export async function POST(req: Request) {
                 }
             }
         } catch (error: any) {
-            console.error("btch-downloader falhou. Detalhes:", error.message || error);
+            console.error("Downloader secundário falhou. Detalhes:", error.message || error);
+            // Se for youtube e falhou aqui, não devemos deixar o Cheerio pegar o iframe
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                return NextResponse.json({ error: `YouTube extraction failed: ${error.message}` }, { status: 500 });
+            }
         }
     }
 
