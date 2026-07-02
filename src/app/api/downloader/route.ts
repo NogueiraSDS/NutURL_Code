@@ -196,6 +196,10 @@ export async function POST(req: Request) {
         }
     }
 
+    if (isExtracted && medias.length > 0) {
+        return NextResponse.json({ medias });
+    }
+
     // 3. Fallback / Complemento: Fazer fetch simples e usar Cheerio
     try {
       const response = await fetch(url, {
