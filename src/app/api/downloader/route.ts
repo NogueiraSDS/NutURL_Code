@@ -140,33 +140,50 @@ export async function POST(req: Request) {
         try {
             // Se for YouTube
             if (url.includes('youtube.com') || url.includes('youtu.be')) {
-                const { youtube } = require('btch-downloader');
-                const ytData = await youtube(url);
+                const ytdl = require('@distube/ytdl-core');
                 
-                if (ytData && ytData.status) {
-                    if (ytData.mp4) {
-                        medias.push({
-                            type: 'video',
-                            url: ytData.mp4,
-                            thumbnail: ytData.thumbnail,
-                            title: ytData.title || 'Video',
-                            ext: 'mp4',
-                            quality: 'Vídeo (Com Áudio)',
-                            size: 0
-                        });
+                // Obter info completa do vídeo
+                const info = await ytdl.getInfo(url);
+                
+                if (info && info.formats && info.formats.length > 0) {
+                    const title = info.videoDetails?.title || 'YouTube Video';
+                    const thumbnail = info.videoDetails?.thumbnails?.[0]?.url;
+                    
+                    // Separar formatos que possuem vídeo e áudio juntos (para evitar vídeos mudos)
+                    const playableFormats = ytdl.filterFormats(info.formats, 'videoandaudio');
+                    
+                    playableFormats.forEach((f: any) => {
+                        if (f.url) {
+                            medias.push({
+                                type: 'video',
+                                url: f.url,
+                                thumbnail: thumbnail,
+                                title: title,
+                                ext: f.container || 'mp4',
+                                quality: f.qualityLabel || 'Auto',
+                                size: f.contentLength ? parseInt(f.contentLength) : 0
+                            });
+                        }
+                    });
+
+                    // Adicionar uma opção focada 100% em áudio de alta qualidade
+                    const audioFormats = ytdl.filterFormats(info.formats, 'audioonly');
+                    if (audioFormats.length > 0) {
+                        const bestAudio = ytdl.chooseFormat(audioFormats, { quality: 'highestaudio' });
+                        if (bestAudio && bestAudio.url) {
+                            medias.push({
+                                type: 'audio',
+                                url: bestAudio.url,
+                                thumbnail: thumbnail,
+                                title: title,
+                                ext: bestAudio.container || 'm4a',
+                                quality: 'Áudio (Alta Qualidade)',
+                                size: bestAudio.contentLength ? parseInt(bestAudio.contentLength) : 0
+                            });
+                        }
                     }
-                    if (ytData.mp3) {
-                        medias.push({
-                            type: 'audio',
-                            url: ytData.mp3,
-                            thumbnail: ytData.thumbnail,
-                            title: ytData.title || 'Audio',
-                            ext: 'mp3',
-                            quality: 'Somente Áudio',
-                            size: 0
-                        });
-                    }
-                    if (ytData.mp4 || ytData.mp3) {
+
+                    if (medias.length > 0) {
                         isExtracted = true;
                     }
                 }
