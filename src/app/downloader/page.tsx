@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 
 interface MediaInfo {
   type: 'image' | 'video' | 'audio';
@@ -274,6 +275,35 @@ export default function DownloaderPage() {
 
         {/* Header Section */}
         <div style={{ textAlign: 'center' }} className="animate-fade-in">
+          <Link 
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '1rem',
+              color: 'rgba(255,255,255,0.7)',
+              textDecoration: 'none',
+              fontSize: '1rem',
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(255,255,255,0.05)',
+              transition: 'all 0.2s',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+              e.currentTarget.style.color = '#fff';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+              e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Voltar para a Home
+          </Link>
           <h1 className="text-gradient" style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
             Downloader de Mídia
           </h1>
