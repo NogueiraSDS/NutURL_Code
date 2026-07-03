@@ -81,7 +81,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ slug: link.slug });
+    return NextResponse.json({ slug: link.slug, link });
   } catch (error) {
     console.error('Error shortening url:', error);
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
