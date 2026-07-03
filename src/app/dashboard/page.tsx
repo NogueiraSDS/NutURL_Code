@@ -14,7 +14,9 @@ export default function Dashboard() {
   const [popularBioLinks, setPopularBioLinks] = useState<any[]>([]);
   const [visitsByHour, setVisitsByHour] = useState<any[]>([]);
   const [visitsByDayOfWeek, setVisitsByDayOfWeek] = useState<any[]>([]);
+  const [top20Links, setTop20Links] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'links' | 'profile'>('links');
+  const [period, setPeriod] = useState('7d');
   const [fetching, setFetching] = useState(true);
   const [tier, setTier] = useState('free');
   const { t } = useI18n();
@@ -27,14 +29,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user) {
+      setFetching(true);
       Promise.all([
-        fetch(`/api/analytics?userId=${user.uid}`).then(res => res.json()),
+        fetch(`/api/analytics?userId=${user.uid}&period=${period}`).then(res => res.json()),
         fetch(`/api/me?userId=${user.uid}&email=${encodeURIComponent(user.email || '')}`).then(res => res.json())
       ])
         .then(([analyticsData, userData]) => {
           setChartData(analyticsData.chartData || []);
           setProfileChartData(analyticsData.profileChartData || []);
           setPopularBioLinks(analyticsData.popularBioLinks || []);
+          setTop20Links(analyticsData.top20Links || []);
           setVisitsByHour(analyticsData.visitsByHour || []);
           setVisitsByDayOfWeek(analyticsData.visitsByDayOfWeek || []);
           let currentTier = userData.tier || 'free';
@@ -46,8 +50,9 @@ export default function Dashboard() {
           console.error(err);
           setFetching(false);
         });
+        });
     }
-  }, [user]);
+  }, [user, period]);
 
   if (loading || !user) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>Carregando...</div>;
 
@@ -92,6 +97,28 @@ export default function Dashboard() {
               👤 {t('dashboard.tabProfile') || 'Visitas da Página (@)'}
             </button>
           </div>
+
+          <div style={{ marginLeft: 'auto' }}>
+            <select 
+              value={period} 
+              onChange={(e) => setPeriod(e.target.value)}
+              style={{
+                background: 'rgba(0,0,0,0.2)',
+                color: 'white',
+                border: '1px solid var(--card-border)',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="24h">Últimas 24h</option>
+              <option value="7d">Últimos 7 dias</option>
+              <option value="15d">Últimos 15 dias</option>
+              <option value="30d">Último Mês</option>
+              <option value="6m">Últimos 6 meses</option>
+            </select>
+          </div>
         </div>
 
         <div style={{ height: '300px', width: '100%' }}>
@@ -126,6 +153,51 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {activeTab === 'links' && !fetching && (
+        <div className="glass" style={{ padding: '2rem', marginBottom: '2rem', overflowX: 'auto' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            🏆 Top {top20Links.length > 0 ? top20Links.length : ''} Links (no período selecionado)
+          </h3>
+          
+          {top20Links.length > 0 ? (
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '600px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <th style={{ padding: '1rem', color: '#94a3b8', fontWeight: 'normal' }}>URL Original</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8', fontWeight: 'normal' }}>URL Encurtada</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8', fontWeight: 'normal', textAlign: 'center' }}>Cliques</th>
+                  <th style={{ padding: '1rem', color: '#94a3b8', fontWeight: 'normal', textAlign: 'right' }}>Criado em</th>
+                </tr>
+              </thead>
+              <tbody>
+                {top20Links.map((link, idx) => (
+                  <tr key={link.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <td style={{ padding: '1rem', maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <a href={link.url} target="_blank" rel="noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+                        {link.url}
+                      </a>
+                    </td>
+                    <td style={{ padding: '1rem', color: 'var(--primary)', fontWeight: 'bold' }}>
+                      <a href={`https://wnut.me/${link.slug}`} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+                        wnut.me/{link.slug}
+                      </a>
+                    </td>
+                    <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>
+                      {link.count}
+                    </td>
+                    <td style={{ padding: '1rem', color: '#94a3b8', textAlign: 'right', fontSize: '0.9rem' }}>
+                      {new Date(link.createdAt).toLocaleDateString('pt-BR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p style={{ color: '#94a3b8' }}>Nenhum clique registrado neste período.</p>
+          )}
+        </div>
+      )}
 
       {activeTab === 'profile' && !fetching && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
