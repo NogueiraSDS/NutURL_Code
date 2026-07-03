@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings, DownloadCloud } from 'lucide-react';
 import { useI18n } from '@/context/I18nContext';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -145,8 +145,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="md:hidden" style={{ fontWeight: 'bold' }}>Dashboard</span>
           </div>
 
-          <div className="user-dropdown-container" style={{ position: 'relative' }}>
-            <button 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Link 
+              href="/downloader" 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'rgba(255,255,255,0.05)',
+                color: 'white',
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: 500,
+                fontSize: '0.9rem',
+                transition: 'all 0.2s',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+            >
+              <DownloadCloud size={18} />
+              <span className="hidden sm:block">Downloader</span>
+            </Link>
+
+            <div className="user-dropdown-container" style={{ position: 'relative' }}>
+              <button 
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               style={{ 
                 display: 'flex', 
@@ -241,6 +265,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </button>
               </div>
             )}
+          </div>
           </div>
         </header>
 

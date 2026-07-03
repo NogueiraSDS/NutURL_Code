@@ -50,7 +50,6 @@ export default function Dashboard() {
           console.error(err);
           setFetching(false);
         });
-        });
     }
   }, [user, period]);
 
