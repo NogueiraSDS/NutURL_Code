@@ -11,7 +11,6 @@ interface AuthContextType {
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUserPassword: (password: string) => Promise<void>;
   linkGoogleAccount: () => Promise<void>;
@@ -24,7 +23,6 @@ const AuthContext = createContext<AuthContextType>({
   signInWithGoogle: async () => {},
   signInWithEmail: async () => {},
   registerWithEmail: async () => {},
-  resetPassword: async () => {},
   resetPassword: async () => {},
   logout: async () => {},
   updateUserPassword: async () => {},
