@@ -357,19 +357,19 @@ export default function ProfileDashboard() {
           <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             
             {/* Imagens */}
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-              <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+              <div style={{ minWidth: 0 }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Avatar / Foto de Perfil</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: avatarUrl ? `url(${avatarUrl}) center/cover` : 'var(--card-bg)', border: '2px solid var(--primary)' }} />
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'avatar')} disabled={isUploading} style={{ color: '#cbd5e1' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ width: '64px', height: '64px', flexShrink: 0, borderRadius: '50%', background: avatarUrl ? `url(${avatarUrl}) center/cover` : 'var(--card-bg)', border: '2px solid var(--primary)' }} />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'avatar')} disabled={isUploading} style={{ color: '#cbd5e1', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }} />
                 </div>
               </div>
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Banner de Capa (Opcional)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '120px', height: '40px', borderRadius: '4px', background: coverUrl ? `url(${coverUrl}) center/cover` : 'var(--card-bg)', border: '1px solid #334155' }} />
-                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'cover')} disabled={isUploading} style={{ color: '#cbd5e1' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ width: '120px', height: '40px', flexShrink: 0, borderRadius: '4px', background: coverUrl ? `url(${coverUrl}) center/cover` : 'var(--card-bg)', border: '1px solid #334155' }} />
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'cover')} disabled={isUploading} style={{ color: '#cbd5e1', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }} />
                 </div>
               </div>
             </div>

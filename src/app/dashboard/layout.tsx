@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings } from 'lucide-react';
 import { useI18n } from '@/context/I18nContext';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +13,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { t } = useI18n();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen && !(event.target as Element).closest('.user-dropdown-container')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -47,20 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Sidebar */}
-      <aside style={{
-        position: 'fixed',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        zIndex: 50,
-        width: '260px',
-        backgroundColor: '#1e293b',
-        borderRight: '1px solid rgba(255,255,255,0.05)',
-        transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
-        transition: 'transform 0.3s ease',
-        display: 'flex',
-        flexDirection: 'column'
-      }} className="md:translate-x-0 md:static md:block">
+      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         
         <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -119,59 +118,117 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
-
-        <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <button 
-            onClick={() => {
-              logout();
-              router.push('/');
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem 1rem',
-              width: '100%',
-              borderRadius: '8px',
-              color: '#f87171',
-              backgroundColor: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              textAlign: 'left',
-              transition: 'all 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-          >
-            <LogOut size={20} />
-            {t('dashboard.logout') || 'Sair'}
-          </button>
-        </div>
       </aside>
 
       {/* Main Content */}
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflow: 'hidden' }}>
         
-        {/* Mobile Header */}
-        <header className="md:hidden" style={{ 
-          padding: '1rem 1.5rem', 
+        {/* Top Header */}
+        <header style={{ 
+          padding: '1rem 2rem', 
           borderBottom: '1px solid rgba(255,255,255,0.05)',
           display: 'flex',
           alignItems: 'center',
-          gap: '1rem',
-          backgroundColor: '#0f172a'
+          justifyContent: 'space-between',
+          backgroundColor: '#0f172a',
+          zIndex: 30
         }}>
-          <button 
-            onClick={() => setIsSidebarOpen(true)}
-            style={{ background: 'none', border: 'none', color: '#f8fafc', cursor: 'pointer' }}
-          >
-            <Menu size={24} />
-          </button>
-          <span style={{ fontWeight: 'bold' }}>Dashboard</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button 
+              className="md:hidden"
+              onClick={() => setIsSidebarOpen(true)}
+              style={{ background: 'none', border: 'none', color: '#f8fafc', cursor: 'pointer', padding: 0 }}
+            >
+              <Menu size={24} />
+            </button>
+            <span className="md:hidden" style={{ fontWeight: 'bold' }}>Dashboard</span>
+          </div>
+
+          <div className="user-dropdown-container" style={{ position: 'relative' }}>
+            <button 
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.75rem', 
+                background: 'rgba(255,255,255,0.03)', 
+                border: '1px solid rgba(255,255,255,0.05)', 
+                padding: '0.5rem 1rem', 
+                borderRadius: '30px',
+                color: '#f8fafc',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+            >
+              <div style={{ 
+                width: '32px', 
+                height: '32px', 
+                borderRadius: '50%', 
+                background: 'var(--primary)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                fontWeight: 'bold',
+                overflow: 'hidden'
+              }}>
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  (user?.displayName || user?.email || 'U')[0].toUpperCase()
+                )}
+              </div>
+              <span className="hidden sm:block" style={{ fontSize: '0.9rem', fontWeight: 500 }}>
+                {user?.displayName || user?.email?.split('@')[0]}
+              </span>
+              <ChevronDown size={16} color="#94a3b8" />
+            </button>
+
+            {isDropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 0.5rem)',
+                right: 0,
+                width: '220px',
+                background: '#1e293b',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.5)',
+                padding: '0.5rem',
+                zIndex: 100
+              }}>
+                <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: '0.5rem' }}>
+                  <p style={{ fontWeight: 'bold', fontSize: '0.9rem', margin: 0 }}>{user?.displayName || 'Usuário'}</p>
+                  <p style={{ color: '#94a3b8', fontSize: '0.75rem', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.email}</p>
+                </div>
+                
+                <button 
+                  onClick={() => { setIsDropdownOpen(false); router.push('/dashboard/profile'); }}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', color: '#e2e8f0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <Settings size={18} />
+                  Meu Perfil
+                </button>
+
+                <button 
+                  onClick={() => { setIsDropdownOpen(false); logout(); router.push('/'); }}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', color: '#f87171', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', marginTop: '0.25rem'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <LogOut size={18} />
+                  Sair
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
@@ -182,11 +239,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       <style jsx global>{`
+        /* Sidebar Base Styles */
+        .dashboard-sidebar {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          z-index: 50;
+          width: 260px;
+          background-color: #1e293b;
+          border-right: 1px solid rgba(255,255,255,0.05);
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .dashboard-sidebar.open {
+          transform: translateX(0);
+        }
+
+        /* Desktop specific */
         @media (min-width: 768px) {
-          .md\\:translate-x-0 { transform: translateX(0) !important; }
-          .md\\:static { position: static !important; }
-          .md\\:block { display: flex !important; }
+          .dashboard-sidebar {
+            position: static;
+            transform: translateX(0);
+            flex-shrink: 0;
+          }
+          
           .md\\:hidden { display: none !important; }
+          .hidden.sm\\:block { display: block !important; }
+        }
+
+        @media (max-width: 767px) {
+          .hidden.sm\\:block { display: none !important; }
         }
       `}</style>
     </div>

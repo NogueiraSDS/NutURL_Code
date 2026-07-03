@@ -41,3 +41,28 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const linkId = searchParams.get('linkId');
+
+    if (!linkId) {
+      return NextResponse.json({ error: 'ID do link é obrigatório' }, { status: 400 });
+    }
+
+    // Deletar as visitas associadas primeiro para evitar erro de Foreign Key
+    await prisma.visit.deleteMany({
+      where: { linkId }
+    });
+
+    await prisma.link.delete({
+      where: { id: linkId }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting link:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor ao deletar' }, { status: 500 });
+  }
+}
