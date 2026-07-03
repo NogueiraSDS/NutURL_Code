@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { User, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification } from 'firebase/auth';
+import { User, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updatePassword, linkWithPopup, deleteUser } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 
 interface AuthContextType {
@@ -11,7 +11,11 @@ interface AuthContextType {
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   registerWithEmail: (email: string, pass: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUserPassword: (password: string) => Promise<void>;
+  linkGoogleAccount: () => Promise<void>;
+  deleteAuthUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,7 +25,11 @@ const AuthContext = createContext<AuthContextType>({
   signInWithEmail: async () => {},
   registerWithEmail: async () => {},
   resetPassword: async () => {},
+  resetPassword: async () => {},
   logout: async () => {},
+  updateUserPassword: async () => {},
+  linkGoogleAccount: async () => {},
+  deleteAuthUser: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -70,8 +78,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await signOut(auth);
   };
 
+  const updateUserPassword = async (password: string) => {
+    if (auth.currentUser) {
+      await updatePassword(auth.currentUser, password);
+    } else {
+      throw new Error("Usuário não autenticado.");
+    }
+  };
+
+  const linkGoogleAccount = async () => {
+    if (auth.currentUser) {
+      const provider = new GoogleAuthProvider();
+      await linkWithPopup(auth.currentUser, provider);
+    } else {
+      throw new Error("Usuário não autenticado.");
+    }
+  };
+
+  const deleteAuthUser = async () => {
+    if (auth.currentUser) {
+      await deleteUser(auth.currentUser);
+    } else {
+      throw new Error("Usuário não autenticado.");
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, registerWithEmail, resetPassword, logout }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, registerWithEmail, resetPassword, logout, updateUserPassword, linkGoogleAccount, deleteAuthUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -45,6 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t('dashboard.myLinks') || 'Meus Links', href: '/dashboard/links', icon: LinkIcon },
     { name: 'Minha Página', href: '/dashboard/profile', icon: User },
     { name: 'Meu Plano', href: '/dashboard/plan', icon: CreditCard },
+    { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (
@@ -211,14 +212,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
                   onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
-                  <Settings size={18} />
+                  <User size={18} />
                   Meu Perfil
+                </button>
+
+                <button 
+                  onClick={() => { setIsDropdownOpen(false); router.push('/dashboard/settings'); }}
+                  style={{
+                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', color: '#e2e8f0', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', marginTop: '0.25rem'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <Settings size={18} />
+                  Configurações
                 </button>
 
                 <button 
                   onClick={() => { setIsDropdownOpen(false); logout(); router.push('/'); }}
                   style={{
-                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', color: '#f87171', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', marginTop: '0.25rem'
+                    display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem', borderRadius: '8px', color: '#f87171', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', marginTop: '0.25rem', borderTop: '1px solid rgba(255,255,255,0.05)'
                   }}
                   onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}
                   onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}

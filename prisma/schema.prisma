@@ -39,6 +39,7 @@ model User {
   stripeCustomerId   String?  @unique
   email              String?
   tier               String   @default("free") // "free", "pro" ou "premium"
+  isActive           Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   profile            Profile?

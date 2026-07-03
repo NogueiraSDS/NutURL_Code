@@ -32,3 +32,23 @@ export async function GET(request: Request) {
     return NextResponse.json({ tier: 'free' });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const { userId, isActive } = await request.json();
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { firebaseUid: userId },
+      data: { isActive }
+    });
+
+    return NextResponse.json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
+  }
+}
