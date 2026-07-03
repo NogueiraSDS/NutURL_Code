@@ -344,12 +344,9 @@ export default function ProfileDashboard() {
   if (loading || fetching) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>Carregando...</div>;
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1300px', margin: '0 auto', width: '100%', flex: 1 }}>
+    <div style={{ width: '100%', flex: 1 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800 }}>Sua <span className="text-gradient">Página</span></h1>
-        <button onClick={() => router.push('/dashboard')} className="btn" style={{ background: 'transparent', border: '1px solid #94a3b8' }}>
-          Voltar ao Dashboard
-        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem', alignItems: 'start' }}>

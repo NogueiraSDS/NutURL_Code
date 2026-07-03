@@ -682,53 +682,6 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
         </div>
       )}
 
-      {/* Sticky Bottom Ad Bar */}
-      {hasAds && (
-        <div style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: profile.theme === 'minimal' ? '#ffffff' : 'rgba(15, 23, 42, 0.95)',
-          backdropFilter: 'blur(8px)',
-          borderTop: profile.theme === 'minimal' ? '1px solid #e1e1e1' : '1px solid rgba(255, 255, 255, 0.1)',
-          padding: '0.75rem 1.5rem',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999,
-          color: profile.theme === 'minimal' ? '#333333' : '#cbd5e1',
-          fontSize: '0.85rem',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.25)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center', textAlign: 'center' }}>
-            <span style={{ 
-              background: '#f59e0b', 
-              color: '#000', 
-              padding: '2px 6px', 
-              borderRadius: '4px', 
-              fontWeight: 'bold', 
-              fontSize: '0.75rem',
-              textTransform: 'uppercase' 
-            }}>
-              Ads
-            </span>
-            <span>{t('profile.adText') || 'Quer divulgar sua marca com estilo? Encurte links e crie sua própria página totalmente personalizável!'}</span>
-            <a 
-              href="/" 
-              style={{ 
-                color: 'var(--primary)', 
-                fontWeight: 'bold', 
-                textDecoration: 'underline', 
-                marginLeft: '0.5rem' 
-              }}
-            >
-              {t('profile.createFree') || 'Começar Grátis'}
-            </a>
-          </div>
-        </div>
-      )}
-
       {/* Age Restriction Modal */}
       {showAgeModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999, padding: '1rem' }}>
