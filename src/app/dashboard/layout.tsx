@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings, DownloadCloud } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings, DownloadCloud, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useI18n } from '@/context/I18nContext';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -14,6 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { t } = useI18n();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -60,14 +61,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Sidebar */}
-      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`} style={{ width: isDesktopCollapsed ? '80px' : '260px' }}>
         
         <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: isDesktopCollapsed ? 'center' : 'flex-start', width: '100%' }}>
+            <div style={{ width: '32px', height: '32px', flexShrink: 0, background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>
               N
             </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>NutURL</span>
+            {!isDesktopCollapsed && <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>NutURL</span>}
           </div>
           <button 
             className="md:hidden"
@@ -91,7 +92,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.75rem',
+                  justifyContent: isDesktopCollapsed ? 'center' : 'flex-start',
+                  gap: isDesktopCollapsed ? '0' : '0.75rem',
                   padding: '0.75rem 1rem',
                   borderRadius: '8px',
                   color: isActive ? '#ffffff' : '#94a3b8',
@@ -114,11 +116,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 }}
               >
                 <Icon size={20} color={isActive ? '#3b82f6' : 'currentColor'} />
-                {item.name}
+                {!isDesktopCollapsed && item.name}
               </Link>
             );
           })}
         </nav>
+
+        {/* Desktop Collapse Toggle */}
+        <div className="hidden sm:block" style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <button
+            onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isDesktopCollapsed ? 'center' : 'flex-start',
+              gap: '0.75rem',
+              width: '100%',
+              background: 'transparent',
+              border: 'none',
+              color: '#94a3b8',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              borderRadius: '8px',
+              transition: 'all 0.2s'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#e2e8f0'; }}
+            onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#94a3b8'; }}
+          >
+            {isDesktopCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            {!isDesktopCollapsed && <span>Recolher</span>}
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -284,7 +312,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           bottom: 0;
           left: 0;
           z-index: 50;
-          width: 260px;
           background-color: #1e293b;
           border-right: 1px solid rgba(255,255,255,0.05);
           transform: translateX(-100%);
