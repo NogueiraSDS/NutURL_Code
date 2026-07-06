@@ -164,12 +164,24 @@ export async function POST(req: Request) {
     // 1.6 Interceptar TikTok para usar API tikwm (evita erro de python3/yt-dlp no Vercel e baixa sem marca d'água)
     if (!isExtracted && url.includes('tiktok.com')) {
         try {
-            const tkUrl = `https://www.tikwm.com/api/?url=${url}`;
+            const tkUrl = `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}&hd=1`;
             const tkRes = await fetch(tkUrl);
             const tkJson = await tkRes.json();
             
             if (tkJson?.data) {
                 const data = tkJson.data;
+                // Vídeo Sem Marca d'Água (HD)
+                if (data.hdplay) {
+                    medias.push({
+                        type: 'video',
+                        url: data.hdplay,
+                        thumbnail: data.cover,
+                        title: data.title || 'TikTok Video',
+                        ext: 'mp4',
+                        quality: 'Sem Marca d\'Água (HD)',
+                        size: data.hd_size || 0
+                    });
+                }
                 // Vídeo Sem Marca d'Água
                 if (data.play) {
                     medias.push({
@@ -324,11 +336,13 @@ export async function POST(req: Request) {
                 const igData = await igdl(cleanIgUrl);
                 if (igData && igData.length > 0) {
                     igData.forEach((item: any, idx: number) => {
+                        const isVideo = (item.filename && item.filename.includes('.mp4')) || item.url.includes('.mp4');
                         medias.push({
-                            type: item.url.includes('.mp4') ? 'video' : 'image',
+                            type: isVideo ? 'video' : 'image',
                             url: item.url,
+                            thumbnail: item.thumbnail || undefined,
                             title: `Instagram Mídia ${idx + 1}`,
-                            ext: item.url.includes('.mp4') ? 'mp4' : 'jpg',
+                            ext: isVideo ? 'mp4' : 'jpg',
                             size: 0
                         });
                     });
