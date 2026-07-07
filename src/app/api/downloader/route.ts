@@ -459,21 +459,44 @@ export async function POST(req: Request) {
           }
       });
 
-      // Fallback para video direto na tag video
-      $('video').each((_, el) => {
-        const src = resolveUrl($(el).attr('src'));
-        if (src) {
-            if (!medias.some(m => m.url === src)) {
-                medias.push({
-                    type: 'video',
-                    url: src,
-                    title: 'HTML5 Video',
-                    ext: src.split('.').pop()?.split('?')[0] || 'mp4',
-                    size: 0
-                });
-            }
+      // Varredura geral no HTML para encontrar URLs de mídia perdidas em scripts/JSON/texto (Fallback Geral)
+      const mediaRegex = /(?:https?:)?\/\/[^\s"'`<>]+?\.(mp4|webm|mkv|avi|mov|m4v|flv|mp3|ogg|wav|m4a|flac|aac)(?:\?[^\s"'`<>]*)?/gi;
+      let match;
+      while ((match = mediaRegex.exec(html)) !== null) {
+        let matchedUrl = match[0];
+        if (matchedUrl.startsWith('//')) {
+          matchedUrl = `${baseUrl.protocol}${matchedUrl}`;
         }
-      });
+        const resolvedUrl = resolveUrl(matchedUrl);
+        if (resolvedUrl && !medias.some(m => m.url === resolvedUrl)) {
+          const ext = resolvedUrl.split('.').pop()?.split('?')[0]?.toLowerCase() || 'mp4';
+          const isAudio = ['mp3', 'ogg', 'wav', 'm4a', 'flac', 'aac'].includes(ext);
+          medias.push({
+            type: isAudio ? 'audio' : 'video',
+            url: resolvedUrl,
+            title: isAudio ? 'Audio Extraído' : 'Video Extraído',
+            ext,
+            size: 0
+          });
+        }
+      }
+
+      // Buscar caminhos relativos de mídia dentro de aspas (ex: "/video/sample.mp4")
+      const relativeMediaRegex = /["'`](\/[^\s"'`<>]+?\.(mp4|webm|mkv|avi|mov|m4v|flv|mp3|ogg|wav|m4a|flac|aac)(?:\?[^\s"'`<>]*)?)["'`]/gi;
+      while ((match = relativeMediaRegex.exec(html)) !== null) {
+        const resolvedUrl = resolveUrl(match[1]);
+        if (resolvedUrl && !medias.some(m => m.url === resolvedUrl)) {
+          const ext = resolvedUrl.split('.').pop()?.split('?')[0]?.toLowerCase() || 'mp4';
+          const isAudio = ['mp3', 'ogg', 'wav', 'm4a', 'flac', 'aac'].includes(ext);
+          medias.push({
+            type: isAudio ? 'audio' : 'video',
+            url: resolvedUrl,
+            title: isAudio ? 'Audio Extraído' : 'Video Extraído',
+            ext,
+            size: 0
+          });
+        }
+      }
 
     } catch (cheerioError) {
        console.error("Cheerio fetch falhou:", cheerioError);
