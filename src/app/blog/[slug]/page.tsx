@@ -1,90 +1,50 @@
-'use client';
-
-import { useParams, useRouter } from 'next/navigation';
-import { useI18n } from '@/context/I18nContext';
+import { Metadata } from 'next';
 import { blogArticles } from '@/data/blogArticles';
-import styles from './article.module.css';
+import ArticleClient from './ArticleClient';
 
-export default function BlogArticleReader() {
-  const params = useParams();
-  const router = useRouter();
-  const { locale, setLocale, t } = useI18n();
+type Props = {
+  params: Promise<{ slug: string }>;
+};
 
-  const slug = params?.slug as string;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
   const article = blogArticles.find((a) => a.slug === slug);
 
-  const handleBack = () => {
-    router.push('/blog');
-  };
-
   if (!article) {
-    return (
-      <div className={styles.container}>
-        <div className={`glass ${styles.card}`} style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <h1 style={{ fontSize: '2rem', color: '#ef4444', marginBottom: '1rem' }}>
-            {locale === 'pt' ? 'Artigo Não Encontrado' : 'Article Not Found'}
-          </h1>
-          <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>
-            {locale === 'pt'
-              ? 'Desculpe, o artigo que você está procurando não existe ou foi removido.'
-              : 'Sorry, the article you are looking for does not exist or has been removed.'}
-          </p>
-          <button onClick={handleBack} className="btn">
-            {locale === 'pt' ? 'Voltar para o Blog' : 'Back to Blog'}
-          </button>
-        </div>
-      </div>
-    );
+    return {
+      title: 'Artigo não encontrado | NutURL Blog',
+      description: 'O artigo que você está procurando não existe ou foi removido.',
+    };
   }
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US', options);
+  // We are generating SEO in Portuguese as the primary language for indexing
+  const keywords = article.subtitle.pt
+    .toLowerCase()
+    .replace(/[.,:;!?()]/g, '')
+    .split(' ')
+    .filter((word) => word.length > 2); // Palavras com mais de 2 letras
+
+  return {
+    title: `${article.title.pt} | NutURL Blog`,
+    description: article.subtitle.pt,
+    keywords,
+    openGraph: {
+      title: article.title.pt,
+      description: article.subtitle.pt,
+      type: 'article',
+      publishedTime: article.date,
+      authors: ['NutURL'],
+      url: `https://nuturl.com/blog/${slug}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title.pt,
+      description: article.subtitle.pt,
+    },
   };
+}
 
-  return (
-    <div className={styles.container}>
-      {/* Top Navigation */}
-      <div className={styles.topNav}>
-        <button onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')} className={styles.navBtn}>
-          {locale === 'pt' ? '🇺🇸 English' : '🇧🇷 Português'}
-        </button>
-        <button onClick={handleBack} className={styles.navBtn}>
-          {t('blog.back') || '← Voltar para o Blog'}
-        </button>
-      </div>
-
-      <article className={`glass ${styles.card}`}>
-        {/* Category & Info */}
-        <div className={styles.metaHeader}>
-          <span className={styles.categoryBadge}>{article.category[locale]}</span>
-          <div className={styles.metaStats}>
-            <span>{formatDate(article.date)}</span>
-            <span className={styles.bullet}>•</span>
-            <span>{t('blog.readTime').replace('{time}', String(article.readTime)) || `${article.readTime} min read`}</span>
-          </div>
-        </div>
-
-        {/* Title & Subtitle */}
-        <h1 className={styles.title}>{article.title[locale]}</h1>
-        <p className={styles.subtitle}>{article.subtitle[locale]}</p>
-
-        {/* Divider */}
-        <div className={styles.divider}></div>
-
-        {/* Article Body */}
-        <div
-          className={styles.articleBody}
-          dangerouslySetInnerHTML={{ __html: article.content[locale] }}
-        />
-
-        {/* Article Footer */}
-        <div className={styles.articleFooter}>
-          <button onClick={handleBack} className={styles.backBtn}>
-            {t('blog.back') || '← Voltar para o Blog'}
-          </button>
-        </div>
-      </article>
-    </div>
-  );
+export default async function Page() {
+  return <ArticleClient />;
 }
