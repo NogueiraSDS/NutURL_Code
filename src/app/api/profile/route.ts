@@ -49,7 +49,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId, username, title, bio, avatarUrl, coverUrl, backgroundColor, theme, hideWatermark, email } = body;
+    const { userId, username, title, bio, avatarUrl, coverUrl, backgroundColor, theme, titleFont, bioFont, hideWatermark, email } = body;
 
     if (!userId || !username) {
       return NextResponse.json({ error: 'Missing userId or username' }, { status: 400 });
@@ -90,6 +90,8 @@ export async function POST(request: Request) {
         ...(coverUrl !== undefined && { coverUrl }),
         ...(backgroundColor !== undefined && { backgroundColor }),
         ...(theme !== undefined && { theme }),
+        ...(titleFont !== undefined && { titleFont }),
+        ...(bioFont !== undefined && { bioFont }),
         ...(hideWatermark !== undefined && { hideWatermark }),
       },
       create: {
@@ -101,6 +103,8 @@ export async function POST(request: Request) {
         coverUrl,
         backgroundColor: backgroundColor || '#0f172a',
         theme: theme || 'solid',
+        titleFont: titleFont || 'Inter',
+        bioFont: bioFont || 'Inter',
         hideWatermark: hideWatermark || false,
       },
       include: {

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutURL Downloader</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h2>NutURL Downloader</h2>
+    </header>
+    
+    <div class="section">
+      <div class="section-header">
+        <h3>Vídeos na Página (DOM)</h3>
+        <button id="btn-scan-dom" class="btn-sm secondary">Atualizar</button>
+      </div>
+      <ul id="dom-list">
+        <li class="empty-state">Nenhum vídeo carregado na página.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h3>Requisições de Rede (HLS/MP4)</h3>
+      <ul id="media-list">
+        <li class="empty-state">Nenhuma requisição de vídeo detectada.</li>
+      </ul>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

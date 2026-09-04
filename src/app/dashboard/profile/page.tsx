@@ -26,6 +26,8 @@ export default function ProfileDashboard() {
   const [coverUrl, setCoverUrl] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('#0f172a');
   const [theme, setTheme] = useState('solid');
+  const [titleFont, setTitleFont] = useState('Inter');
+  const [bioFont, setBioFont] = useState('Inter');
   const [hideWatermark, setHideWatermark] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -93,6 +95,8 @@ export default function ProfileDashboard() {
             setCoverUrl(data.profile.coverUrl || '');
             setBackgroundColor(data.profile.backgroundColor || '#0f172a');
             setTheme(data.profile.theme || 'solid');
+            setTitleFont(data.profile.titleFont || 'Inter');
+            setBioFont(data.profile.bioFont || 'Inter');
             setHideWatermark(data.profile.hideWatermark || false);
             setLinks(data.profile.links || []);
           }
@@ -131,6 +135,7 @@ export default function ProfileDashboard() {
     else if (urlLower.includes('t.me') || urlLower.includes('telegram.org')) setNewLinkIcon('telegram');
     else if (urlLower.includes('whatsapp.com') || urlLower.includes('wa.me')) setNewLinkIcon('whatsapp');
     else if (urlLower.includes('github.com')) setNewLinkIcon('github');
+    else if (urlLower.includes('shopee') || urlLower.includes('aliexpress') || urlLower.includes('amazon') || urlLower.includes('mercadolivre') || urlLower.includes('magazineluiza') || urlLower.includes('loja')) setNewLinkIcon('store');
   }, [newLinkUrl]);
 
   // Dynamic username check
@@ -169,7 +174,7 @@ export default function ProfileDashboard() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, hideWatermark, email: user.email })
+        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, titleFont, bioFont, hideWatermark, email: user.email })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar perfil');
@@ -323,6 +328,7 @@ export default function ProfileDashboard() {
     { value: 'telegram', label: '✈️ Telegram' },
     { value: 'whatsapp', label: '💬 WhatsApp' },
     { value: 'github', label: '🐙 GitHub' },
+    { value: 'store', label: '🛍️ Loja' },
     { value: 'spotify', label: '🎵 Spotify' },
     { value: 'deezer', label: '🎵 Deezer' },
     { value: 'applemusic', label: '🎵 Apple Music' },
@@ -440,6 +446,35 @@ export default function ProfileDashboard() {
                 className="input"
                 style={{ resize: 'vertical', minHeight: '80px' }}
               />
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Fonte do Título</label>
+                <select value={titleFont} onChange={(e) => setTitleFont(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
+                  <option value="Inter">Inter (Padrão)</option>
+                  <option value="Outfit">Outfit</option>
+                  <option value="Space Grotesk">Space Grotesk</option>
+                  <option value="Playfair Display">Playfair Display (Serif)</option>
+                  <option value="Quicksand">Quicksand (Rounded)</option>
+                  <option value="Roboto">Roboto</option>
+                  <option value="Montserrat">Montserrat</option>
+                  <option value="Poppins">Poppins</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Fonte da Descrição (Bio)</label>
+                <select value={bioFont} onChange={(e) => setBioFont(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
+                  <option value="Inter">Inter (Padrão)</option>
+                  <option value="Outfit">Outfit</option>
+                  <option value="Space Grotesk">Space Grotesk</option>
+                  <option value="Playfair Display">Playfair Display (Serif)</option>
+                  <option value="Quicksand">Quicksand (Rounded)</option>
+                  <option value="Roboto">Roboto</option>
+                  <option value="Montserrat">Montserrat</option>
+                  <option value="Poppins">Poppins</option>
+                </select>
+              </div>
             </div>
 
             {/* Premium Section */}
@@ -683,6 +718,8 @@ export default function ProfileDashboard() {
                   coverUrl,
                   backgroundColor,
                   theme,
+                  titleFont,
+                  bioFont,
                   hideWatermark,
                   tier,
                   links: links.map(l => ({ ...l, isActive: true }))

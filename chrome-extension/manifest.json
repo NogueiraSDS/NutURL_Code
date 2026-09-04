@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "NutURL Blob Video Downloader",
+  "version": "1.0",
+  "description": "Download any blob/HLS video or record protected video streams.",
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "downloads",
+    "scripting",
+    "storage",
+    "tabCapture",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "NutURL Video Downloader"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ]
+}

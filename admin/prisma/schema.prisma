@@ -37,6 +37,7 @@ model User {
   stripeCustomerId   String?  @unique
   email              String?
   tier               String   @default("free") // "free", "pro" ou "premium"
+  isActive           Boolean  @default(true)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   profile            Profile?
@@ -51,6 +52,8 @@ model Profile {
   coverUrl        String?
   backgroundColor String?       @default("#0f172a") // Cor de fundo do perfil
   theme           String?       @default("solid") // Temas premium: solid, gradient_1, gradient_2, matrix
+  titleFont       String?       @default("Inter")
+  bioFont         String?       @default("Inter")
   hideWatermark   Boolean       @default(false)
   userId          String        @unique // Ligação com o User existente
   user            User          @relation(fields: [userId], references: [id])
