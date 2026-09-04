@@ -27,7 +27,9 @@ export default function ProfileDashboard() {
   const [backgroundColor, setBackgroundColor] = useState('#0f172a');
   const [theme, setTheme] = useState('solid');
   const [titleFont, setTitleFont] = useState('Inter');
+  const [titleColor, setTitleColor] = useState('');
   const [bioFont, setBioFont] = useState('Inter');
+  const [bioColor, setBioColor] = useState('');
   const [hideWatermark, setHideWatermark] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
@@ -96,7 +98,9 @@ export default function ProfileDashboard() {
             setBackgroundColor(data.profile.backgroundColor || '#0f172a');
             setTheme(data.profile.theme || 'solid');
             setTitleFont(data.profile.titleFont || 'Inter');
+            setTitleColor(data.profile.titleColor || '');
             setBioFont(data.profile.bioFont || 'Inter');
+            setBioColor(data.profile.bioColor || '');
             setHideWatermark(data.profile.hideWatermark || false);
             setLinks(data.profile.links || []);
           }
@@ -174,7 +178,7 @@ export default function ProfileDashboard() {
       const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, titleFont, bioFont, hideWatermark, email: user.email })
+        body: JSON.stringify({ userId: user.uid, username: cleanUsername, title, bio, avatarUrl, coverUrl, backgroundColor, theme, titleFont, titleColor, bioFont, bioColor, hideWatermark, email: user.email })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao salvar perfil');
@@ -451,29 +455,49 @@ export default function ProfileDashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Fonte do Título</label>
-                <select value={titleFont} onChange={(e) => setTitleFont(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
-                  <option value="Inter">Inter (Padrão)</option>
-                  <option value="Outfit">Outfit</option>
-                  <option value="Space Grotesk">Space Grotesk</option>
-                  <option value="Playfair Display">Playfair Display (Serif)</option>
-                  <option value="Quicksand">Quicksand (Rounded)</option>
-                  <option value="Roboto">Roboto</option>
-                  <option value="Montserrat">Montserrat</option>
-                  <option value="Poppins">Poppins</option>
-                </select>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select value={titleFont} onChange={(e) => setTitleFont(e.target.value)} className="input" style={{ flex: 1, appearance: 'auto' }}>
+                    <option value="Inter">Inter (Padrão)</option>
+                    <option value="Outfit">Outfit</option>
+                    <option value="Space Grotesk">Space Grotesk</option>
+                    <option value="Playfair Display">Playfair Display (Serif)</option>
+                    <option value="Quicksand">Quicksand (Rounded)</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Montserrat">Montserrat</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Dancing Script">Dancing Script (Cursiva)</option>
+                    <option value="Pacifico">Pacifico (Cursiva)</option>
+                    <option value="Caveat">Caveat (Cursiva)</option>
+                    <option value="Great Vibes">Great Vibes (Cursiva)</option>
+                  </select>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }} title="Cor do Título">
+                    <input type="color" value={titleColor || '#ffffff'} onChange={(e) => setTitleColor(e.target.value)} style={{ width: '40px', height: '40px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }} />
+                    <button type="button" onClick={() => setTitleColor('')} style={{ position: 'absolute', right: '-10px', top: '-10px', background: 'var(--error)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '10px', cursor: 'pointer', display: titleColor ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                  </div>
+                </div>
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Fonte da Descrição (Bio)</label>
-                <select value={bioFont} onChange={(e) => setBioFont(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
-                  <option value="Inter">Inter (Padrão)</option>
-                  <option value="Outfit">Outfit</option>
-                  <option value="Space Grotesk">Space Grotesk</option>
-                  <option value="Playfair Display">Playfair Display (Serif)</option>
-                  <option value="Quicksand">Quicksand (Rounded)</option>
-                  <option value="Roboto">Roboto</option>
-                  <option value="Montserrat">Montserrat</option>
-                  <option value="Poppins">Poppins</option>
-                </select>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select value={bioFont} onChange={(e) => setBioFont(e.target.value)} className="input" style={{ flex: 1, appearance: 'auto' }}>
+                    <option value="Inter">Inter (Padrão)</option>
+                    <option value="Outfit">Outfit</option>
+                    <option value="Space Grotesk">Space Grotesk</option>
+                    <option value="Playfair Display">Playfair Display (Serif)</option>
+                    <option value="Quicksand">Quicksand (Rounded)</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Montserrat">Montserrat</option>
+                    <option value="Poppins">Poppins</option>
+                    <option value="Dancing Script">Dancing Script (Cursiva)</option>
+                    <option value="Pacifico">Pacifico (Cursiva)</option>
+                    <option value="Caveat">Caveat (Cursiva)</option>
+                    <option value="Great Vibes">Great Vibes (Cursiva)</option>
+                  </select>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }} title="Cor da Descrição">
+                    <input type="color" value={bioColor || '#cbd5e1'} onChange={(e) => setBioColor(e.target.value)} style={{ width: '40px', height: '40px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }} />
+                    <button type="button" onClick={() => setBioColor('')} style={{ position: 'absolute', right: '-10px', top: '-10px', background: 'var(--error)', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '10px', cursor: 'pointer', display: bioColor ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -719,7 +743,9 @@ export default function ProfileDashboard() {
                   backgroundColor,
                   theme,
                   titleFont,
+                  titleColor,
                   bioFont,
+                  bioColor,
                   hideWatermark,
                   tier,
                   links: links.map(l => ({ ...l, isActive: true }))

@@ -422,10 +422,10 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
 
       {/* Custom Fonts for Title and Bio */}
       {profile.titleFont && profile.titleFont !== 'Inter' && (
-        <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${profile.titleFont.replace(/ /g, '+')}:wght@400;600;700;800&display=swap`} />
+        <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${profile.titleFont.replace(/ /g, '+')}${['Dancing Script', 'Pacifico', 'Caveat', 'Great Vibes'].includes(profile.titleFont) ? '' : ':wght@400;600;700;800'}&display=swap`} />
       )}
       {profile.bioFont && profile.bioFont !== 'Inter' && profile.bioFont !== profile.titleFont && (
-        <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${profile.bioFont.replace(/ /g, '+')}:wght@400;600;700;800&display=swap`} />
+        <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${profile.bioFont.replace(/ /g, '+')}${['Dancing Script', 'Pacifico', 'Caveat', 'Great Vibes'].includes(profile.bioFont) ? '' : ':wght@400;600;700;800'}&display=swap`} />
       )}
 
       {/* CSS Animado */}
@@ -508,8 +508,8 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
             profile.title ? profile.title.charAt(0).toUpperCase() : '@'
           )}
         </div>
-        <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', ...themeConfig.title, ...(profile.titleFont ? { fontFamily: `'${profile.titleFont}', sans-serif` } : {}) }}>{profile.title || `@${profile.username}`}</h1>
-        {profile.bio && <p style={{ fontSize: '1.1rem', whiteSpace: 'pre-wrap', ...themeConfig.bio, ...(profile.bioFont ? { fontFamily: `'${profile.bioFont}', sans-serif` } : {}) }}>{profile.bio}</p>}
+        <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', ...themeConfig.title, ...(profile.titleFont ? { fontFamily: `'${profile.titleFont}', sans-serif` } : {}), ...(profile.titleColor ? { color: profile.titleColor } : {}) }}>{profile.title || `@${profile.username}`}</h1>
+        {profile.bio && <p style={{ fontSize: '1.1rem', whiteSpace: 'pre-wrap', ...themeConfig.bio, ...(profile.bioFont ? { fontFamily: `'${profile.bioFont}', sans-serif` } : {}), ...(profile.bioColor ? { color: profile.bioColor } : {}) }}>{profile.bio}</p>}
         
         {/* Social Icons Row (Premium Only) */}
         {socialIcons.length > 0 && (
