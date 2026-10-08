@@ -264,7 +264,7 @@ export default function ProfileDashboard() {
             url: newLinkUrl, 
             icon: newLinkIcon, 
             isAgeRestricted: finalAgeRestricted,
-            isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
+            isSocialIcon: newLinkIsSocialIcon,
             animation: tier !== 'free' ? newLinkAnimation : 'none',
             groupName: newLinkGroup.trim() || null
           })
@@ -285,7 +285,7 @@ export default function ProfileDashboard() {
             url: newLinkUrl, 
             icon: newLinkIcon, 
             isAgeRestricted: finalAgeRestricted,
-            isSocialIcon: tier === 'premium' ? newLinkIsSocialIcon : false,
+            isSocialIcon: newLinkIsSocialIcon,
             animation: tier !== 'free' ? newLinkAnimation : 'none',
             groupName: newLinkGroup.trim() || null
           })
@@ -613,14 +613,13 @@ export default function ProfileDashboard() {
               )}
             </label>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.9rem', cursor: tier !== 'premium' ? 'not-allowed' : 'pointer', opacity: tier !== 'premium' ? 0.6 : 1 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#94a3b8', fontSize: '0.9rem', cursor: 'pointer' }}>
               <input 
                 type="checkbox" 
-                checked={tier === 'premium' && newLinkIsSocialIcon} 
+                checked={newLinkIsSocialIcon} 
                 onChange={(e) => setNewLinkIsSocialIcon(e.target.checked)} 
-                disabled={tier !== 'premium'}
               />
-              Exibir apenas como ícone no topo da página (Premium)
+              Exibir apenas como ícone no topo da página
             </label>
 
             <select value={newLinkAnimation} onChange={(e) => setNewLinkAnimation(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto', opacity: tier === 'free' ? 0.5 : 1 }} disabled={tier === 'free'}>

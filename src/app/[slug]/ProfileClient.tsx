@@ -245,12 +245,27 @@ const themeStyles: Record<string, {
   }
 };
 
+const isColorDark = (colorStr: string) => {
+  if (!colorStr) return true;
+  let hex = colorStr.replace('#', '').trim();
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+  if (hex.length !== 6) return true;
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return true;
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 128;
+};
+
 const getThemeConfiguration = (themeName: string, customBg: string) => {
   const preset = themeStyles[themeName];
   if (preset) return preset;
 
   // Defaults for legacy/custom solid backgrounds
-  const isDark = !customBg || ['#000', '#0f172a', '#1e293b'].some(c => customBg.toLowerCase().includes(c));
+  const isDark = isColorDark(customBg);
   
   let containerBg: React.CSSProperties = { background: customBg || '#0f172a' };
   if (themeName === 'gradient_1') {
@@ -268,14 +283,14 @@ const getThemeConfiguration = (themeName: string, customBg: string) => {
       color: themeName === 'matrix' ? '#0f0' : (isDark ? '#ffffff' : '#0f172a'),
     },
     button: {
-      background: themeName === 'matrix' ? '#000' : 'rgba(255, 255, 255, 0.05)',
-      border: themeName === 'matrix' ? '1px solid #0f0' : '1px solid rgba(255, 255, 255, 0.1)',
+      background: themeName === 'matrix' ? '#000' : (isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'),
+      border: themeName === 'matrix' ? '1px solid #0f0' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.15)'),
       borderRadius: '12px',
-      color: themeName === 'matrix' ? '#0f0' : '#ffffff',
+      color: themeName === 'matrix' ? '#0f0' : (isDark ? '#ffffff' : '#0f172a'),
       transition: 'all 0.2s'
     },
-    title: { color: themeName === 'matrix' ? '#0f0' : '#ffffff', fontWeight: 800 },
-    bio: { color: themeName === 'matrix' ? '#0f0' : '#94a3b8' }
+    title: { color: themeName === 'matrix' ? '#0f0' : (isDark ? '#ffffff' : '#0f172a'), fontWeight: 800 },
+    bio: { color: themeName === 'matrix' ? '#0f0' : (isDark ? '#94a3b8' : '#475569') }
   };
 };
 
@@ -341,12 +356,10 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
   const isPremium = profile.user ? profile.user.tier === 'premium' : (profile.tier ? profile.tier === 'premium' : false);
   const isPaid = profile.user ? profile.user.tier !== 'free' : (profile.tier ? profile.tier !== 'free' : false);
 
-  const socialIcons = isPremium
-    ? (profile.links || []).filter((link: any) => link.isActive && link.isSocialIcon)
-    : [];
+  const socialIcons = (profile.links || []).filter((link: any) => link.isActive && link.isSocialIcon);
 
   const standardLinks = (profile.links || []).filter(
-    (link: any) => link.isActive && (!isPremium || !link.isSocialIcon)
+    (link: any) => link.isActive && !link.isSocialIcon
   );
 
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
