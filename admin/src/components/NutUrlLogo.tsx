@@ -18,25 +18,33 @@ export const NutUrlLogo: React.FC<LogoProps> = ({
       width={size}
       height={size}
       viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid meet"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}
+      style={{
+        display: 'inline-block',
+        flexShrink: 0,
+        verticalAlign: 'middle',
+        width: `${size}px`,
+        height: `${size}px`,
+        ...style
+      }}
     >
-      {showBg && <rect width="100" height="100" rx="24" fill="#f0f4f8" />}
+      {showBg && <rect width="100" height="100" rx="24" fill="#f0f5f8" />}
       <path
-        d="M 28 70 V 42 C 28 29 37 21 49 21 C 56 21 61 27 63 44"
+        d="M 27 70 V 42 C 27 27 38 19 50 19 C 58 19 63 24 63 43"
         fill="none"
         stroke="#0a3443"
-        strokeWidth="12"
+        strokeWidth="13"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M 37 56 C 45 64 54 78 64 78 C 72 78 72 68 72 30"
+        d="M 37 57 C 37 76 42 81 50 81 C 62 81 73 73 73 58 V 30"
         fill="none"
-        stroke="#196377"
-        strokeWidth="12"
+        stroke="#176075"
+        strokeWidth="13"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
