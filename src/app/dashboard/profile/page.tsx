@@ -387,30 +387,92 @@ export default function ProfileDashboard() {
             {isUploading && <p style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>Comprimindo e fazendo upload... Aguarde.</p>}
 
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Cor de Fundo da Página</label>
-              <div style={{ position: 'relative' }}>
-                <div 
-                  onClick={() => setShowColorPicker(!showColorPicker)}
-                  style={{ 
-                    width: '100%', height: '48px', borderRadius: '8px', 
-                    background: backgroundColor, border: '1px solid var(--card-border)',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '0 1rem',
-                    color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.8)'
-                  }}
-                >
-                  Clique para alterar: {backgroundColor}
-                </div>
-                {showColorPicker && (
-                  <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 50, marginTop: '0.5rem', background: 'var(--card-bg)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--card-border)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
-                      <span style={{ fontWeight: 'bold' }}>Selecione a Cor</span>
-                      <button type="button" onClick={() => setShowColorPicker(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>✕</button>
-                    </div>
-                    <HexColorPicker color={backgroundColor} onChange={setBackgroundColor} />
-                  </div>
-                )}
-              </div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Tema de Fundo da Página</label>
+              <select 
+                value={theme} 
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (tier === 'free' && val !== 'solid') {
+                    alert('Os temas visuais com efeitos avançados são exclusivos para planos Premium.');
+                    return;
+                  }
+                  setTheme(val);
+                }} 
+                className="input" 
+                style={{ width: '100%', appearance: 'auto' }}
+              >
+                <option value="solid">🎨 Cor Sólida Personalizada (Todos os Planos)</option>
+                <option value="gradient_1" disabled={tier === 'free'}>✨ Gradiente Aurora (Premium)</option>
+                <option value="gradient_2" disabled={tier === 'free'}>✨ Gradiente Neon (Premium)</option>
+                <option value="matrix" disabled={tier === 'free'}>✨ Matrix Hacker (Premium)</option>
+                <option value="glassmorphism" disabled={tier === 'free'}>✨ Glassmorphism Mesh (Premium)</option>
+                <option value="aurora" disabled={tier === 'free'}>✨ Aurora Glow (Premium)</option>
+                <option value="cyberpunk" disabled={tier === 'free'}>✨ Cyberpunk Neon (Premium)</option>
+                <option value="minimal" disabled={tier === 'free'}>✨ Minimalista Stark (Premium)</option>
+                <option value="claymorphism" disabled={tier === 'free'}>✨ Claymorphism Soft (Premium)</option>
+              </select>
             </div>
+
+            {theme === 'solid' && (
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Cor de Fundo da Página</label>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+                    <div 
+                      onClick={() => setShowColorPicker(!showColorPicker)}
+                      style={{ 
+                        width: '100%', height: '48px', borderRadius: '8px', 
+                        background: backgroundColor, border: '1px solid var(--card-border)',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem',
+                        color: '#fff', textShadow: '0 1px 3px rgba(0,0,0,0.8)', fontWeight: 'bold'
+                      }}
+                    >
+                      <span>Cor: {backgroundColor}</span>
+                      <span>🎨</span>
+                    </div>
+                    {showColorPicker && (
+                      <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 50, marginTop: '0.5rem', background: 'var(--card-bg)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--card-border)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                          <span style={{ fontWeight: 'bold' }}>Selecione a Cor</span>
+                          <button type="button" onClick={() => setShowColorPicker(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}>✕</button>
+                        </div>
+                        <HexColorPicker color={backgroundColor} onChange={setBackgroundColor} />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} title="Escolher com seletor de cores nativo">
+                    <input 
+                      type="color" 
+                      value={backgroundColor || '#0f172a'} 
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      style={{ width: '48px', height: '48px', padding: '2px', border: '1px solid var(--card-border)', borderRadius: '8px', cursor: 'pointer', background: 'transparent' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Paleta rápida:</span>
+                  {['#0f172a', '#000000', '#1e1b4b', '#064e3b', '#450a0a', '#4c0519', '#1e293b', '#3b82f6', '#8b5cf6', '#ffffff'].map(c => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setBackgroundColor(c)}
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        borderRadius: '50%',
+                        background: c,
+                        border: backgroundColor === c ? '2px solid var(--primary)' : '1px solid rgba(255,255,255,0.2)',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                      title={c}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', color: '#94a3b8' }}>Seu Username único</label>
@@ -508,21 +570,6 @@ export default function ProfileDashboard() {
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', opacity: tier === 'free' ? 0.5 : 1, pointerEvents: tier === 'free' ? 'none' : 'auto' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1' }}>Tema de Fundo</label>
-                  <select value={theme} onChange={(e) => setTheme(e.target.value)} className="input" style={{ width: '100%', appearance: 'auto' }}>
-                    <option value="solid">Cor Sólida (Padrão)</option>
-                    <option value="gradient_1">Gradiente Aurora (Legado)</option>
-                    <option value="gradient_2">Gradiente Neon (Legado)</option>
-                    <option value="matrix">Matrix (Hacker Legado)</option>
-                    <option value="glassmorphism">✨ Glassmorphism Mesh (Premium)</option>
-                    <option value="aurora">✨ Aurora Glow (Premium)</option>
-                    <option value="cyberpunk">✨ Cyberpunk Neon (Premium)</option>
-                    <option value="minimal">✨ Minimalista Stark (Premium)</option>
-                    <option value="claymorphism">✨ Claymorphism Soft (Premium)</option>
-                  </select>
-                </div>
-
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', cursor: 'pointer' }}>
                   <input type="checkbox" checked={hideWatermark} onChange={(e) => setHideWatermark(e.target.checked)} />
                   Ocultar marca d'água "nuturl" no final da página
@@ -530,7 +577,7 @@ export default function ProfileDashboard() {
               </div>
               
               {tier === 'free' && (
-                <p style={{ color: '#f59e0b', fontSize: '0.85rem', marginTop: '1rem' }}>Faça upgrade para acessar estas opções.</p>
+                <p style={{ color: '#f59e0b', fontSize: '0.85rem', marginTop: '1rem' }}>Faça upgrade para acessar a opção de ocultar marca d'água e temas especiais.</p>
               )}
             </div>
 

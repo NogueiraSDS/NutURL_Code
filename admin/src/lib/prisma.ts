@@ -12,9 +12,10 @@ const cleanedUrl = databaseUrl
   .replace(/[?&]$/, '');
 
 const isProd = process.env.NODE_ENV === 'production';
+const isSupabase = cleanedUrl.includes('supabase.co') || cleanedUrl.includes('supabase.com');
 const pool = new pg.Pool({ 
   connectionString: cleanedUrl,
-  ...(isProd && { ssl: { rejectUnauthorized: false } })
+  ...((isProd || isSupabase) && { ssl: { rejectUnauthorized: false } })
 });
 const adapter = new PrismaPg(pool);
 
