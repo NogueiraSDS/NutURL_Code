@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import NutUrlLogo from '@/components/NutUrlLogo';
 
 interface MetricData {
   totalUsers: number;
@@ -69,9 +70,7 @@ export default function AdminDashboard() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 text-xl font-black text-blue-500">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
+              <NutUrlLogo size={32} />
               <span>nuturl</span>
               <span className="rounded bg-blue-500/10 px-2 py-0.5 text-xs font-bold text-blue-400">Admin</span>
             </div>

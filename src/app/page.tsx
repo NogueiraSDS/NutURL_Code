@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useI18n } from '@/context/I18nContext';
 import Link from 'next/link';
 import { blogArticles } from '@/data/blogArticles';
+import NutUrlLogo from '@/components/NutUrlLogo';
 
 // Simple Vector SVG Icons for Features
 const FeatureIcons = {
@@ -262,14 +263,9 @@ export default function Home() {
       <div className={styles.topNav}>
         <div 
           onClick={() => router.push('/')} 
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem' }}
         >
-          {/* Simple Abstract Nut Logo SVG */}
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-            <path d="M2 17l10 5 10-5"></path>
-            <path d="M2 12l10 5 10-5"></path>
-          </svg>
+          <NutUrlLogo size={32} />
           <span style={{ fontWeight: 800, fontSize: '1.4rem', letterSpacing: '-0.03em', color: '#f8fafc' }}>
             Nut<span style={{ color: 'var(--primary)' }}>URL</span>
           </span>
@@ -731,9 +727,7 @@ export default function Home() {
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerBrand}>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--primary)' }}>
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
+            <NutUrlLogo size={24} />
             <span>nuturl</span>
           </div>
 

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings, DownloadCloud, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useI18n } from '@/context/I18nContext';
+import NutUrlLogo from '@/components/NutUrlLogo';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, logout } = useAuth();
@@ -65,9 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         
         <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: isDesktopCollapsed ? 'center' : 'flex-start', width: '100%' }}>
-            <div style={{ width: '32px', height: '32px', flexShrink: 0, background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem' }}>
-              N
-            </div>
+            <NutUrlLogo size={32} />
             {!isDesktopCollapsed && <span style={{ fontSize: '1.25rem', fontWeight: 'bold' }}>NutURL</span>}
           </div>
           <button 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import NutUrlLogo from '@/components/NutUrlLogo';
 
 export default function AdminLogin() {
   const { user, signInWithEmail, loading } = useAuth();
@@ -43,9 +44,7 @@ export default function AdminLogin() {
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/40 p-8 shadow-2xl backdrop-blur-xl">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2 text-2xl font-black text-blue-500">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-            </svg>
+            <NutUrlLogo size={36} />
             <span>nuturl</span>
             <span className="rounded bg-blue-500/10 px-2 py-0.5 text-xs font-bold text-blue-400">Admin</span>
           </div>

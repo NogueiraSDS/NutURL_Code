@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useI18n } from '@/context/I18nContext';
+import NutUrlLogo from '@/components/NutUrlLogo';
 
 // Vector SVG Social Icon Component
 const SocialIcon = ({ name, size = 18 }: { name: string; size?: number }) => {
@@ -687,7 +688,7 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
           textAlign: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Zap size={16} />
+            <NutUrlLogo size={18} />
             <a href="/" style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'bold' }}>
               Powered by nuturl
             </a>
