@@ -1,5 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-  <rect width="100" height="100" rx="24" fill="#f0f5f8"/>
-  <path d="M 27 70 V 42 C 27 27 38 19 50 19 C 58 19 63 24 63 43" fill="none" stroke="#0a3443" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M 37 57 C 37 76 42 81 50 81 C 62 81 73 73 73 58 V 30" fill="none" stroke="#176075" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="adminGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="adminGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+    <linearGradient id="adminBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background App Card -->
+  <rect width="100" height="100" rx="24" fill="url(#adminBg)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+
+  <!-- Left 'N' Arch Ribbon -->
+  <path d="M 28 72 V 42 C 28 29 37 20 50 20 C 60 20 66 26 66 38" fill="none" stroke="url(#adminGrad1)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Right 'N' Arch Ribbon -->
+  <path d="M 34 62 C 34 74 40 80 50 80 C 63 80 72 71 72 58 V 28" fill="none" stroke="url(#adminGrad2)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Center Connection Link Dot -->
+  <circle cx="50" cy="50" r="3.5" fill="#ffffff" />
 </svg>
