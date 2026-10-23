@@ -116,12 +116,18 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
     }
   }
 
+  // Inspeção de Link Seguro (Modo Preview com '+')
+  if (slug.endsWith('+') || slug.endsWith('%2B')) {
+    const cleanCode = slug.replace(/(\+|%2B)$/, '');
+    redirect(`/preview/${cleanCode}`);
+  }
+
   const link = await prisma.link.findUnique({
     where: { slug },
   });
 
   if (!link) {
-    notFound();
+    redirect('/link-nao-encontrado');
   }
 
   if (link.expiresAt && link.expiresAt < new Date()) {

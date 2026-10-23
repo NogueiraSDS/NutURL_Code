@@ -12,25 +12,38 @@ import CookieConsent from "@/components/CookieConsent";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://nuturl.com"),
-  title: "NutURL - Premium Link-in-Bio & URL Shortener",
-  description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real e redirecionamentos inteligentes.",
-  keywords: ["encurtador de url", "link tree", "link na bio", "linktree gratis", "nuturl", "analytics links", "monetizacao de links"],
+  title: "NutURL — Link na Bio, Encurtador de URL (wnet.me) e Downloader de Vídeos",
+  description: "A plataforma completa para criadores e afiliados: crie sua página de Link na Bio grátis, encurte links com o domínio exclusivo wnet.me e baixe vídeos sem anúncios.",
+  keywords: [
+    "link na bio",
+    "alternativa ao linktree",
+    "encurtador de url",
+    "encurtador de link whatsapp",
+    "wnet.me",
+    "wnut.me",
+    "nuturl",
+    "baixar videos",
+    "downloader de midia",
+    "agrupador de links",
+    "download tiktok",
+    "download reels"
+  ],
   authors: [{ name: "NutURL Team" }],
   alternates: {
-    canonical: "/",
+    canonical: "https://nuturl.com/",
   },
   openGraph: {
-    title: "NutURL - Premium Link-in-Bio & URL Shortener",
-    description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real.",
-    url: "https://nuturl.com",
+    title: "NutURL — Bio Link, Encurtador (wnet.me) e Downloader em 1 só lugar",
+    description: "Crie sua página de links, encurte URLs com domínio ultra-curto (wnet.me) e baixe vídeos das redes sociais rapidamente.",
+    url: "https://nuturl.com/",
     siteName: "NutURL",
     type: "website",
     locale: "pt_BR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NutURL - Premium Link-in-Bio & URL Shortener",
-    description: "Crie páginas de links personalizadas e encurte URLs com métricas de acesso em tempo real.",
+    title: "NutURL — Bio Link, Encurtador (wnet.me) e Downloader",
+    description: "Substitua 3 ferramentas por 1. Link na Bio, encurtador wnet.me e download de vídeos sem anúncios.",
   },
 };
 

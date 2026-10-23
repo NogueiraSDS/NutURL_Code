@@ -140,6 +140,18 @@ export default function DownloaderPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Suporte a URL vinda via query param (ex: da home)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const queryUrl = params.get('url');
+      if (queryUrl) {
+        setUrl(queryUrl);
+        executeFetch(queryUrl);
+      }
+    }
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -409,6 +421,42 @@ export default function DownloaderPage() {
               {groupedMedias.map((group, idx) => (
                 <MediaGroupCard key={idx} group={group} handleDownload={handleDownload} />
               ))}
+            </div>
+
+            {/* Banner de Conversão para Criadores de Conteúdo (PLG) */}
+            <div className="glass" style={{
+              marginTop: '3rem',
+              padding: '2rem',
+              borderRadius: '16px',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: '1rem'
+            }}>
+              <span style={{ fontSize: '2rem' }}>🚀</span>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff', margin: 0 }}>
+                Criador de conteúdo? Crie sua página de bio grátis no NutURL
+              </h3>
+              <p style={{ color: '#94a3b8', maxWidth: '600px', margin: 0, fontSize: '0.95rem' }}>
+                Reúna todos os seus links, redes sociais e produtos em um visual profissional com domínio ultra-curto (wnet.me) e métricas em tempo real.
+              </p>
+              <Link 
+                href="/login" 
+                className="btn" 
+                style={{ 
+                  background: 'linear-gradient(135deg, #3b82f6, #6366f1)', 
+                  color: '#fff', 
+                  fontWeight: 700, 
+                  padding: '10px 24px', 
+                  borderRadius: '10px',
+                  textDecoration: 'none'
+                }}
+              >
+                Criar Minha Bio Agora
+              </Link>
             </div>
           </div>
         )}

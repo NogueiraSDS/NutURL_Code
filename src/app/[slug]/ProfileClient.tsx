@@ -688,9 +688,28 @@ export default function ProfileClient({ profile, isPreview = false }: { profile:
           textAlign: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <NutUrlLogo size={18} />
-            <a href="/" style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'bold' }}>
-              Powered by nuturl
+            <a 
+              href="https://nuturl.com/?utm_source=bio_footer&utm_campaign=viral_loop" 
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ 
+                color: 'inherit', 
+                textDecoration: 'none', 
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                padding: '6px 14px',
+                borderRadius: '9999px',
+                transition: 'all 0.2s ease',
+                backdropFilter: 'blur(6px)'
+              }}
+            >
+              <NutUrlLogo size={16} />
+              <span>⚡ Criado com NutURL — Crie o seu grátis</span>
             </a>
           </div>
           <div style={{ 

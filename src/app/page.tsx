@@ -186,11 +186,25 @@ export default function Home() {
   const [customAlias, setCustomAlias] = useState('');
   const [tier, setTier] = useState('free');
 
+  // Quick-Action Hero Tabs: 'shortener' | 'downloader' | 'bio'
+  const [heroTab, setHeroTab] = useState<'shortener' | 'downloader' | 'bio'>('shortener');
+  const [bioUsername, setBioUsername] = useState('');
+  const [downloaderInput, setDownloaderInput] = useState('');
+
   // Interactive Carousel State
   const [activeTheme, setActiveTheme] = useState('glassmorphism');
 
-  // FAQ Accordion State
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  // Suporte a redirecionamento do wnet.me raiz (?utm_source=wnet_root)
+  const [showWnetWelcome, setShowWnetWelcome] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('utm_source') === 'wnet_root') {
+        setShowWnetWelcome(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -238,7 +252,7 @@ export default function Home() {
         throw new Error(data.error || 'Erro ao encurtar a URL');
       }
 
-      setShortUrl(`https://wnut.me/${data.slug}`);
+      setShortUrl(`https://wnet.me/${data.slug}`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -251,14 +265,68 @@ export default function Home() {
     alert(t('home.copied') || 'Link copiado!');
   };
 
+  // FAQ Accordion State
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index);
+  };
+
+  const scrollToTools = () => {
+    const el = document.getElementById('interactive-tools');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleClaimBio = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = bioUsername.trim().replace(/^@/, '');
+    if (clean) {
+      router.push(`/login?username=${encodeURIComponent(clean)}`);
+    } else {
+      router.push('/login');
+    }
+  };
+
+  const handleGoDownloader = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (downloaderInput.trim()) {
+      router.push(`/downloader?url=${encodeURIComponent(downloaderInput.trim())}`);
+    } else {
+      router.push('/downloader');
+    }
   };
 
   const currentMock = mockThemes[activeTheme];
 
   return (
     <div className={styles.container}>
+      {/* Toast amigável para visitantes vindos do wnet.me */}
+      {showWnetWelcome && (
+        <div style={{
+          backgroundColor: 'rgba(59, 130, 246, 0.15)',
+          borderBottom: '1px solid rgba(59, 130, 246, 0.3)',
+          padding: '10px 1rem',
+          textAlign: 'center',
+          fontSize: '0.9rem',
+          color: '#cbd5e1',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem'
+        }}>
+          <span>👋 <strong>Você veio pelo wnet.me!</strong> Este é o encurtador oficial do NutURL. Crie seus próprios links curtos gratuitamente abaixo.</span>
+          <button 
+            onClick={() => setShowWnetWelcome(false)}
+            style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }}
+            title="Fechar aviso"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Top Navbar Buttons */}
       <div className={styles.topNav}>
         <div 
@@ -292,9 +360,13 @@ export default function Home() {
           {/* Left Column (2/3) */}
           <div className={styles.heroLeft}>
             <div className={`${styles.hero} animate-fade-in`}>
+              <div className={styles.heroBadge}>
+                {t('home.badge') || '🚀 3 Ferramentas Essenciais em 1 Só Plataforma'}
+              </div>
               <h1 className={styles.title}>
                 {(() => {
-                  const parts = t('home.shortenShare').split('.').map(x => x.trim()).filter(Boolean);
+                  const parts = (t('home.shortenShare') || '').split('.').map(x => x.trim()).filter(Boolean);
+                  if (parts.length <= 1) return t('home.shortenShare');
                   return (
                     <>
                       {parts.slice(0, -1).map((part, idx) => (
@@ -310,67 +382,143 @@ export default function Home() {
               <p className={styles.subtitle}>
                 {t('home.subtitle')}
               </p>
+
+              {/* CTAs Principais */}
+              <div className={styles.heroCtas}>
+                <button onClick={() => router.push(user ? '/dashboard' : '/login')} className={styles.heroBtnPrimary}>
+                  {t('home.ctaPrimary') || 'Criar Minha Conta Grátis'}
+                </button>
+                <button onClick={scrollToTools} className={styles.heroBtnSecondary}>
+                  {t('home.ctaSecondary') || 'Testar Ferramentas Agora'} ↓
+                </button>
+              </div>
             </div>
 
-            {/* URL Shortener Widget */}
-            <div className={`glass ${styles.shortenerBox} animate-fade-in`} style={{ animationDelay: '0.2s' }}>
-              <form onSubmit={handleShorten} className={styles.inputGroup}>
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder={t('home.placeholder')}
-                  className="input"
-                  required
-                />
-                <button type="submit" className="btn" disabled={isLoading}>
-                  {isLoading ? t('home.btnShortening') : t('home.btnShorten')}
+            {/* Quick-Action Tabs Widget */}
+            <div id="interactive-tools" className={`glass ${styles.shortenerBox} animate-fade-in`} style={{ animationDelay: '0.2s' }}>
+              <div className={styles.tabsNav}>
+                <button 
+                  type="button" 
+                  onClick={() => setHeroTab('shortener')} 
+                  className={`${styles.tabBtn} ${heroTab === 'shortener' ? styles.tabBtnActive : ''}`}
+                >
+                  {t('home.tabShortener') || '🔗 Encurtar URL (wnet.me)'}
                 </button>
-              </form>
-
-              {tier === 'premium' && (
-                <div style={{ marginTop: '0.5rem', width: '100%' }}>
-                  <input 
-                    type="text" 
-                    value={customAlias} 
-                    onChange={(e) => setCustomAlias(e.target.value)} 
-                    placeholder={t('home.aliasPlaceholder')}
-                    className="input" 
-                    style={{ width: '100%' }} 
-                  />
-                </div>
-              )}
-
-              <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-start' }}>
-                <label className="switch-container" style={{ opacity: tier === 'free' ? 0.5 : 1, cursor: tier === 'free' ? 'not-allowed' : 'pointer' }}>
-                  <span className="switch">
-                    <input 
-                      type="checkbox" 
-                      checked={hasAd} 
-                      onChange={(e) => setHasAd(e.target.checked)} 
-                      disabled={tier === 'free'}
-                    />
-                    <span className="slider"></span>
-                  </span>
-                  <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
-                    {hasAd ? t('home.adWaitPage') : t('home.directRedirect')}
-                    {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{t('home.requiresPro')}</span>}
-                  </span>
-                </label>
+                <button 
+                  type="button" 
+                  onClick={() => setHeroTab('downloader')} 
+                  className={`${styles.tabBtn} ${heroTab === 'downloader' ? styles.tabBtnActive : ''}`}
+                >
+                  {t('home.tabDownloader') || '📥 Baixar Vídeo'}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setHeroTab('bio')} 
+                  className={`${styles.tabBtn} ${heroTab === 'bio' ? styles.tabBtnActive : ''}`}
+                >
+                  {t('home.tabBio') || '📱 Criar Bio'}
+                </button>
               </div>
 
-              {error && <p style={{ color: 'var(--error)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}
+              {/* TAB 1: Encurtador wnet.me */}
+              {heroTab === 'shortener' && (
+                <>
+                  <form onSubmit={handleShorten} className={styles.inputGroup}>
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder={t('home.placeholder')}
+                      className="input"
+                      required
+                    />
+                    <button type="submit" className="btn" disabled={isLoading}>
+                      {isLoading ? t('home.btnShortening') : t('home.btnShorten')}
+                    </button>
+                  </form>
 
-              {shortUrl && (
-                <div className={styles.resultBox}>
-                  <p style={{ fontWeight: '600' }}>{t('home.ready')}</p>
-                  <a href={shortUrl} target="_blank" rel="noopener noreferrer" className={styles.shortLink}>
-                    {shortUrl}
-                  </a>
-                  <button onClick={copyToClipboard} className="btn" style={{ background: '#475569', fontSize: '0.9rem', padding: '8px 16px' }}>
-                    {t('home.copyLink')}
+                  {tier === 'premium' && (
+                    <div style={{ marginTop: '0.5rem', width: '100%' }}>
+                      <input 
+                        type="text" 
+                        value={customAlias} 
+                        onChange={(e) => setCustomAlias(e.target.value)} 
+                        placeholder={t('home.aliasPlaceholder')}
+                        className="input" 
+                        style={{ width: '100%' }} 
+                      />
+                    </div>
+                  )}
+
+                  <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-start' }}>
+                    <label className="switch-container" style={{ opacity: tier === 'free' ? 0.5 : 1, cursor: tier === 'free' ? 'not-allowed' : 'pointer' }}>
+                      <span className="switch">
+                        <input 
+                          type="checkbox" 
+                          checked={hasAd} 
+                          onChange={(e) => setHasAd(e.target.checked)} 
+                          disabled={tier === 'free'}
+                        />
+                        <span className="slider"></span>
+                      </span>
+                      <span style={{ fontSize: '0.9rem', color: '#94a3b8' }}>
+                        {hasAd ? t('home.adWaitPage') : t('home.directRedirect')}
+                        {tier === 'free' && <span style={{ marginLeft: '10px', fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>{t('home.requiresPro')}</span>}
+                      </span>
+                    </label>
+                  </div>
+
+                  {error && <p style={{ color: 'var(--error)', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}
+
+                  {shortUrl && (
+                    <div className={styles.resultBox}>
+                      <p style={{ fontWeight: '600' }}>{t('home.ready')}</p>
+                      <a href={shortUrl} target="_blank" rel="noopener noreferrer" className={styles.shortLink}>
+                        {shortUrl}
+                      </a>
+                      <button onClick={copyToClipboard} className="btn" style={{ background: '#475569', fontSize: '0.9rem', padding: '8px 16px' }}>
+                        {t('home.copyLink')}
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* TAB 2: Downloader de Mídias */}
+              {heroTab === 'downloader' && (
+                <form onSubmit={handleGoDownloader} className={styles.inputGroup}>
+                  <input
+                    type="url"
+                    value={downloaderInput}
+                    onChange={(e) => setDownloaderInput(e.target.value)}
+                    placeholder={t('home.placeholderDownloader') || 'Cole o link do TikTok, Reels, Shorts ou YouTube...'}
+                    className="input"
+                    required
+                  />
+                  <button type="submit" className="btn" style={{ background: '#3b82f6', color: '#fff', fontWeight: 'bold' }}>
+                    {t('home.btnDownload') || 'Baixar Mídia'}
                   </button>
-                </div>
+                </form>
+              )}
+
+              {/* TAB 3: Criar Bio */}
+              {heroTab === 'bio' && (
+                <form onSubmit={handleClaimBio} className={styles.inputGroup}>
+                  <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '0 0.75rem', flex: 1 }}>
+                    <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 600 }}>nuturl.com/@</span>
+                    <input
+                      type="text"
+                      value={bioUsername}
+                      onChange={(e) => setBioUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                      placeholder="seu-nome"
+                      style={{ background: 'transparent', border: 'none', color: '#fff', padding: '0.75rem 0.5rem', outline: 'none', width: '100%', fontSize: '1rem' }}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn" style={{ background: '#10b981', color: '#fff', fontWeight: 'bold' }}>
+                    {t('home.btnClaimBio') || 'Reivindicar Link'}
+                  </button>
+                </form>
               )}
             </div>
           </div>
@@ -394,39 +542,89 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Features Grid Section */}
+      {/* Features Grid Section - Os 3 Pilares */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>{t('home.featSection') || 'Recursos Incríveis'}</h2>
+        <h2 className={styles.sectionTitle}>{t('home.featSection') || 'A Tríade Essencial para Criadores e Negócios'}</h2>
         <p className={styles.sectionSubtitle}>
-          {locale === 'pt' ? 'Tudo o que você precisa para alavancar a presença digital do seu negócio.' : 'Everything you need to power your digital presence.'}
+          {t('home.featSubtitle') || 'Centralize links, impulsione campanhas e salve referências sem complicação.'}
         </p>
 
         <div className={styles.featuresGrid}>
-          {/* Card 1: Link in Bio */}
+          {/* Pilar 1: Link in Bio */}
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>
               {FeatureIcons.bio}
             </div>
-            <h3>{t('home.featTitle1') || 'Páginas de Link na Bio'}</h3>
-            <p>{t('home.featDesc1') || 'Crie links na bio altamente customizáveis com temas modernos, fontes elegantes e ícones sociais vetorizados.'}</p>
+            <h3>{t('home.featTitle1') || 'Uma Bio que realmente converte'}</h3>
+            <p>{t('home.featDesc1') || 'Centralize seus links importantes, redes sociais e produtos em uma página rápida e personalizável (nuturl.com/@voce). Sem marcas d\'água intrusivas e com carregamento instantâneo.'}</p>
           </div>
 
-          {/* Card 2: Analytics */}
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              {FeatureIcons.analytics}
-            </div>
-            <h3>{t('home.featTitle2') || 'Estatísticas em Tempo Real'}</h3>
-            <p>{t('home.featDesc2') || 'Acompanhe visualizações de páginas, cliques e referenciadores de forma clara pelo seu dashboard.'}</p>
-          </div>
-
-          {/* Card 3: Shortener */}
+          {/* Pilar 2: Encurtador wnet.me */}
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>
               {FeatureIcons.shortener}
             </div>
-            <h3>{t('home.featTitle3') || 'Encurtador Inteligente'}</h3>
-            <p>{t('home.featDesc3') || 'Personalize aliases de link e decida entre redirecionamentos imediatos ou com monetização de anúncios.'}</p>
+            <h3>{t('home.featTitle2') || 'Links ultra-curtos com domínio dedicado (wnet.me)'}</h3>
+            <p>{t('home.featDesc2') || 'Aumente sua taxa de cliques (CTR) no WhatsApp, SMS e campanhas de tráfego pago com links curtos, limpos e confiáveis usando nosso domínio exclusivo wnet.me com rastreamento de cliques em tempo real.'}</p>
+          </div>
+
+          {/* Pilar 3: Downloader de Mídias */}
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              {FeatureIcons.analytics}
+            </div>
+            <h3>{t('home.featTitle3') || 'Baixe vídeos e referências em segundos'}</h3>
+            <p>{t('home.featDesc3') || 'Salve vídeos, áudios e conteúdos das principais plataformas em alta qualidade. Uma ferramenta limpa, rápida e livre daqueles pop-ups irritantes para agilizar a rotina de criadores de conteúdo.'}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Comparação: Por que escolher o NutURL? */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>{t('home.compareTitle') || 'Por que escolher o NutURL?'}</h2>
+        <p className={styles.sectionSubtitle}>{t('home.compareSubtitle') || 'Economize tempo e dinheiro substituindo ferramentas fragmentadas.'}</p>
+
+        <div className={styles.comparisonGrid}>
+          {/* Abordagem Tradicional */}
+          <div className={styles.compareCard}>
+            <div className={styles.compareHeader}>
+              <h3>⚠️ {t('home.compareTraditional') || 'Abordagem Tradicional'}</h3>
+            </div>
+            <ul className={styles.compareList}>
+              <li className={styles.compareItem}>
+                <span className={styles.compareItemCross}>✕</span>
+                <span>{t('home.compareItem1Trad') || 'Pagar em dólar por ferramentas isoladas (ex: Linktree Pro)'}</span>
+              </li>
+              <li className={styles.compareItem}>
+                <span className={styles.compareItemCross}>✕</span>
+                <span>{t('home.compareItem2Trad') || 'Encurtadores cheios de limites e domínios longos/suspeitos'}</span>
+              </li>
+              <li className={styles.compareItem}>
+                <span className={styles.compareItemCross}>✕</span>
+                <span>{t('home.compareItem3Trad') || 'Sites duvidosos de download cheios de vírus e pop-ups irritantes'}</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Com o NutURL */}
+          <div className={`${styles.compareCard} ${styles.compareCardHighlighted}`}>
+            <div className={styles.compareHeader}>
+              <h3 style={{ color: '#60a5fa' }}>✨ {t('home.compareNuturl') || 'Com o NutURL'}</h3>
+            </div>
+            <ul className={styles.compareList}>
+              <li className={styles.compareItem}>
+                <span className={styles.compareItemCheck}>✓</span>
+                <span style={{ color: '#f8fafc', fontWeight: 500 }}>{t('home.compareItem1Nut') || 'Bio personalizada, ilimitada e com carregamento ultrarrápido'}</span>
+              </li>
+              <li className={styles.compareItem}>
+                <span className={styles.compareItemCheck}>✓</span>
+                <span style={{ color: '#f8fafc', fontWeight: 500 }}>{t('home.compareItem2Nut') || 'Domínio ultra-curto dedicado (wnet.me) com analytics em tempo real'}</span>
+              </li>
+              <li className={styles.compareItem}>
+                <span className={styles.compareItemCheck}>✓</span>
+                <span style={{ color: '#f8fafc', fontWeight: 500 }}>{t('home.compareItem3Nut') || 'Downloader integrado, limpo, seguro e com alta velocidade'}</span>
+              </li>
+            </ul>
           </div>
         </div>
       </section>
@@ -746,22 +944,64 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* JSON-LD Structured Data Schema Markup */}
+      {/* JSON-LD Structured Data Schema Markup (SoftwareApplication + FAQPage) */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            "name": "NutURL",
-            "operatingSystem": "All",
-            "applicationCategory": "BusinessApplication",
-            "offers": {
-              "@type": "AggregateOffer",
-              "lowPrice": "0",
-              "highPrice": "5",
-              "priceCurrency": "USD"
-            }
+            "@graph": [
+              {
+                "@type": "SoftwareApplication",
+                "name": "NutURL",
+                "url": "https://nuturl.com",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "Web",
+                "description": "Plataforma unificada de Agrupador de Links (Link na Bio), Encurtador de URLs (via domínio wnet.me) e Downloader de mídias sociais.",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0.00",
+                  "priceCurrency": "BRL"
+                }
+              },
+              {
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "O que é o NutURL?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "O NutURL é uma plataforma tudo-em-um que reúne criador de Link na Bio, encurtador de URLs com domínio exclusivo (wnet.me) e downloader de mídias sociais."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "O domínio wnet.me é seguro? Quem é o dono?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Sim, o wnet.me é o encurtador oficial operado exclusivamente pela plataforma NutURL (nuturl.com), projetado para oferecer links ultra-curtos e seguros."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "O NutURL é gratuito?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Sim! Você pode criar sua página de bio, encurtar links com wnet.me e utilizar o downloader gratuitamente."
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Como verificar para onde um link wnet.me aponta antes de clicar?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Basta adicionar um sinal de + ao final do link curto (wnet.me/codigo+) para visualizar o destino final com total segurança."
+                    }
+                  }
+                ]
+              }
+            ]
           })
         }}
       />
