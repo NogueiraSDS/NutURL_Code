@@ -30,8 +30,30 @@ export const I18nProvider = ({ children }: { children: React.ReactNode }) => {
     if (saved && (saved === 'pt' || saved === 'en')) {
       setLocaleState(saved);
     } else {
-      const browserLang = navigator.language.startsWith('en') ? 'en' : 'pt';
-      setLocaleState(browserLang);
+      // Checa idioma e fuso horário para garantir detecção do Brasil
+      const userLang = (navigator.language || '').toLowerCase();
+      const userLangs = (navigator.languages || []).map(l => l.toLowerCase());
+      const timeZone = Intl?.DateTimeFormat?.().resolvedOptions()?.timeZone || '';
+      
+      const isBrazilTimeZone = timeZone.includes('Sao_Paulo') || 
+                               timeZone.includes('Fortaleza') || 
+                               timeZone.includes('Belem') || 
+                               timeZone.includes('Manaus') || 
+                               timeZone.includes('Cuiaba') || 
+                               timeZone.includes('Recife') || 
+                               timeZone.includes('Maceio') || 
+                               timeZone.includes('Noronha') || 
+                               timeZone.includes('Porto_Velho') || 
+                               timeZone.includes('Boa_Vista') || 
+                               timeZone.includes('Rio_Branco');
+
+      const isPortuguese = userLang.startsWith('pt') || userLangs.some(l => l.startsWith('pt'));
+
+      if (isBrazilTimeZone || isPortuguese) {
+        setLocaleState('pt');
+      } else {
+        setLocaleState(userLang.startsWith('en') ? 'en' : 'pt');
+      }
     }
     setMounted(true);
   }, []);

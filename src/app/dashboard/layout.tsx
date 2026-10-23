@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDesktopCollapsed, setIsDesktopCollapsed] = useState(false);
@@ -195,6 +195,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <DownloadCloud size={18} />
               <span className="hidden sm:block">Downloader</span>
             </Link>
+
+            {/* Seletor de Idioma / Moeda */}
+            <button
+              onClick={() => setLocale(locale === 'pt' ? 'en' : 'pt')}
+              title={locale === 'pt' ? 'Mudar para Inglês (USD $)' : 'Mudar para Português (BRL R$)'}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: 'rgba(255,255,255,0.05)',
+                color: '#94a3b8',
+                padding: '0.45rem 0.8rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(255,255,255,0.1)',
+                cursor: 'pointer',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.color = '#fff';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.color = '#94a3b8';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+              }}
+            >
+              <span>{locale === 'pt' ? '🇧🇷 R$' : '🇺🇸 $'}</span>
+              <span>{locale.toUpperCase()}</span>
+            </button>
 
             <div className="user-dropdown-container" style={{ position: 'relative' }}>
               <button 
