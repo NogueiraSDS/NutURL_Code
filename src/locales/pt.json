@@ -147,7 +147,11 @@
       "selectPro": "Selecionar Plano Pro",
       "selectPremium": "Selecionar Premium",
       "proDesc": "Remova anúncios dos seus links e adicione páginas ilimitadas.",
-      "premiumDesc": "Tudo do Pro + Aliases personalizados premium e API."
+      "premiumDesc": "Tudo do Pro + Aliases personalizados premium e API.",
+      "cancelPlanBtn": "Cancelar Assinatura",
+      "cancelling": "Cancelando assinatura...",
+      "cancelConfirm": "Tem certeza que deseja cancelar sua assinatura? Você perderá o acesso aos recursos premium e seus links voltarão aos limites do plano gratuito.",
+      "cancelSuccess": "Sua assinatura foi cancelada com sucesso no Stripe e sua conta retornou ao plano gratuito."
     }
   },
   "redirect": {

@@ -42,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     // Criar a Sessão de Checkout
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [
@@ -51,10 +51,18 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/plan?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing`,
-      client_reference_id: userId, // Passa o ID do firebase para o webhook identificar quem comprou
-    });
+      client_reference_id: userId,
+    };
+
+    if (user.stripeCustomerId) {
+      sessionParams.customer = user.stripeCustomerId;
+    } else if (user.email) {
+      sessionParams.customer_email = user.email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (error: any) {

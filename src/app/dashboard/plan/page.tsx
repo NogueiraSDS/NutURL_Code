@@ -11,8 +11,36 @@ export default function PlanPage() {
   const router = useRouter();
   const [tier, setTier] = useState('free');
   const [fetching, setFetching] = useState(true);
+  const [cancelling, setCancelling] = useState(false);
   const { t, locale } = useI18n();
   const isBrl = locale === 'pt';
+
+  const handleCancelPlan = async () => {
+    if (!user) return;
+    const confirmMsg = t('pricing.myPlan.cancelConfirm') || 'Tem certeza que deseja cancelar sua assinatura?';
+    if (!window.confirm(confirmMsg)) return;
+
+    setCancelling(true);
+    try {
+      const res = await fetch('/api/cancel-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(t('pricing.myPlan.cancelSuccess') || 'Assinatura cancelada com sucesso!');
+        setTier('free');
+      } else {
+        alert(data.error || 'Erro ao cancelar plano');
+      }
+    } catch (err: any) {
+      console.error(err);
+      alert('Erro de conexão ao cancelar plano.');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -78,6 +106,39 @@ export default function PlanPage() {
                 <span style={{ fontWeight: 'bold' }}>{tier === 'free' ? t('pricing.myPlan.analyticsBasic') : t('pricing.myPlan.analyticsAdvanced')}</span>
               </div>
             </div>
+
+            {/* Botão de Cancelamento de Assinatura */}
+            {tier !== 'free' && (
+              <div style={{ marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1.25rem' }}>
+                <button
+                  type="button"
+                  onClick={handleCancelPlan}
+                  disabled={cancelling}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#f87171',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    width: '100%',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    e.currentTarget.style.borderColor = '#ef4444';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                  }}
+                >
+                  {cancelling ? (t('pricing.myPlan.cancelling') || 'Cancelando...') : (t('pricing.myPlan.cancelPlanBtn') || 'Cancelar Assinatura')}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Upgrade Options */}

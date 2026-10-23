@@ -147,7 +147,11 @@
       "selectPro": "Select Pro Plan",
       "selectPremium": "Select Premium",
       "proDesc": "Remove ads from your links and add unlimited pages.",
-      "premiumDesc": "Everything in Pro + premium custom aliases and API."
+      "premiumDesc": "Everything in Pro + premium custom aliases and API.",
+      "cancelPlanBtn": "Cancel Subscription",
+      "cancelling": "Cancelling subscription...",
+      "cancelConfirm": "Are you sure you want to cancel your subscription? You will lose access to premium features and your account will return to the free plan limits.",
+      "cancelSuccess": "Your subscription was successfully cancelled on Stripe and your account has returned to the free plan."
     }
   },
   "redirect": {
