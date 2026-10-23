@@ -39,7 +39,12 @@ export async function POST(request: Request) {
         const priceId = lineItems.data[0]?.price?.id;
         
         let newTier = 'pro';
-        if (priceId === process.env.STRIPE_PRICE_ID_PREMIUM) {
+        const isPremiumPrice = 
+          priceId === process.env.STRIPE_PRICE_ID_BRL_PREMIUM ||
+          priceId === process.env.STRIPE_PRICE_ID_USD_PREMIUM ||
+          priceId === process.env.STRIPE_PRICE_ID_PREMIUM;
+
+        if (isPremiumPrice) {
           newTier = 'premium';
         }
 

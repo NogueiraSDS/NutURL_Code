@@ -108,6 +108,26 @@
       "allPro": "Todos os recursos PRO",
       "customAlias": "Link Customizado (Alias)",
       "customEx": "Ex: nuturl.com/sua-marca"
+    },
+    "myPlan": {
+      "title": "Meu Plano",
+      "subtitle": "Gerencie sua assinatura e limites da conta.",
+      "loading": "Carregando informações do plano...",
+      "currentBadge": "PLANO ATUAL",
+      "freeDesc": "Você está utilizando o plano gratuito com limites básicos.",
+      "paidDesc": "Obrigado por apoiar nosso projeto! Aproveite seus recursos.",
+      "shortLinks": "Links Curtos",
+      "unlimited": "Ilimitados",
+      "bioPage": "Página de Link-in-Bio",
+      "bioPageActive": "1 Ativa",
+      "clickAnalytics": "Análise de Cliques",
+      "analyticsBasic": "Básico (7 dias)",
+      "analyticsAdvanced": "Avançado",
+      "upgradeTitle": "Faça um Upgrade",
+      "selectPro": "Selecionar Plano Pro",
+      "selectPremium": "Selecionar Premium",
+      "proDesc": "Remova anúncios dos seus links e adicione páginas ilimitadas.",
+      "premiumDesc": "Tudo do Pro + Aliases personalizados premium e API."
     }
   },
   "redirect": {

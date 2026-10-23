@@ -108,6 +108,26 @@
       "allPro": "All PRO features",
       "customAlias": "Custom Link (Alias)",
       "customEx": "Ex: nuturl.com/your-brand"
+    },
+    "myPlan": {
+      "title": "My Plan",
+      "subtitle": "Manage your subscription and account limits.",
+      "loading": "Loading plan information...",
+      "currentBadge": "CURRENT PLAN",
+      "freeDesc": "You are on the free plan with basic limits.",
+      "paidDesc": "Thank you for supporting our project! Enjoy your features.",
+      "shortLinks": "Short Links",
+      "unlimited": "Unlimited",
+      "bioPage": "Link-in-Bio Page",
+      "bioPageActive": "1 Active",
+      "clickAnalytics": "Click Analytics",
+      "analyticsBasic": "Basic (7 days)",
+      "analyticsAdvanced": "Advanced",
+      "upgradeTitle": "Upgrade Your Plan",
+      "selectPro": "Select Pro Plan",
+      "selectPremium": "Select Premium",
+      "proDesc": "Remove ads from your links and add unlimited pages.",
+      "premiumDesc": "Everything in Pro + premium custom aliases and API."
     }
   },
   "redirect": {

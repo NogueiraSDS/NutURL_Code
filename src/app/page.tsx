@@ -587,7 +587,7 @@ export default function Home() {
           <div className={styles.pricingCard}>
             <span className={styles.planName}>{t('pricing.basicPlan') || 'Plano Básico'}</span>
             <div className={styles.planPrice}>
-              $0<span className={styles.planPeriod}>{t('pricing.month')}</span>
+              {locale === 'pt' ? 'R$ 0' : '$0'}<span className={styles.planPeriod}>{t('pricing.month')}</span>
             </div>
             <p className={styles.planDesc}>
               {locale === 'pt' ? 'Ideal para testar a plataforma e encurtar links rápidos.' : 'Great to test out the platform and shorten quick links.'}
@@ -622,7 +622,7 @@ export default function Home() {
             <span className={styles.popularBadge}>{t('pricing.mostPopular') || 'MAIS POPULAR'}</span>
             <span className={styles.planName}>PRO</span>
             <div className={styles.planPrice}>
-              $1<span className={styles.planPeriod}>{t('pricing.month')}</span>
+              {locale === 'pt' ? 'R$ 4,90' : '$1'}<span className={styles.planPeriod}>{t('pricing.month')}</span>
             </div>
             <p className={styles.planDesc}>
               {locale === 'pt' ? 'Ideal para profissionais que querem estatísticas completas e links diretos.' : 'Best for professionals wanting full analytics and direct redirects.'}
@@ -656,7 +656,7 @@ export default function Home() {
           <div className={styles.pricingCard}>
             <span className={styles.planName}>PREMIUM</span>
             <div className={styles.planPrice}>
-              $5<span className={styles.planPeriod}>{t('pricing.month')}</span>
+              {locale === 'pt' ? 'R$ 27,90' : '$5'}<span className={styles.planPeriod}>{t('pricing.month')}</span>
             </div>
             <p className={styles.planDesc}>
               {locale === 'pt' ? 'Acesso ilimitado e completo para branding da sua marca pessoal ou negócio.' : 'Unrestricted access for full personal branding or business pages.'}

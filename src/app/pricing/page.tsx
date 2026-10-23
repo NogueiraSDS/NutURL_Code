@@ -10,7 +10,7 @@ export default function PricingPage() {
   const router = useRouter();
   const [tier, setTier] = useState('free');
   const [loading, setLoading] = useState(false);
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   useEffect(() => {
     if (user) {
@@ -25,6 +25,8 @@ export default function PricingPage() {
     }
   }, [user]);
 
+  const isBrl = locale === 'pt';
+
   const handleCheckout = async (planTier: string) => {
     if (!user) {
       router.push('/login');
@@ -35,7 +37,7 @@ export default function PricingPage() {
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.uid, tier: planTier })
+        body: JSON.stringify({ userId: user.uid, tier: planTier, currency: isBrl ? 'brl' : 'usd' })
       });
       const data = await res.json();
       if (data.url) {
@@ -64,7 +66,7 @@ export default function PricingPage() {
         {/* Plano FREE */}
         <div className="glass" style={{ padding: '2rem', borderRadius: '16px', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#94a3b8' }}>Free</h2>
-          <div style={{ fontSize: '3rem', fontWeight: 800, margin: '1rem 0' }}>$0<span style={{ fontSize: '1rem', color: '#94a3b8' }}>{t('pricing.month')}</span></div>
+          <div style={{ fontSize: '3rem', fontWeight: 800, margin: '1rem 0' }}>{isBrl ? 'R$ 0' : '$0'}<span style={{ fontSize: '1rem', color: '#94a3b8' }}>{t('pricing.month')}</span></div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', flex: 1 }}>
             <li style={{ marginBottom: '1rem' }}>✅ {t('pricing.freeFeatures.dashboard')}</li>
             <li style={{ marginBottom: '1rem' }}>✅ {t('pricing.freeFeatures.multipleLinks')}</li>
@@ -83,7 +85,7 @@ export default function PricingPage() {
             {t('pricing.mostPopular')}
           </div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--primary)' }}>Pro</h2>
-          <div style={{ fontSize: '3rem', fontWeight: 800, margin: '1rem 0' }}>$1<span style={{ fontSize: '1rem', color: '#94a3b8' }}>{t('pricing.month')}</span></div>
+          <div style={{ fontSize: '3rem', fontWeight: 800, margin: '1rem 0' }}>{isBrl ? 'R$ 4,90' : '$1'}<span style={{ fontSize: '1rem', color: '#94a3b8' }}>{t('pricing.month')}</span></div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', flex: 1 }}>
             <li style={{ marginBottom: '1rem' }}>✅ {t('pricing.proFeatures.allFree')}</li>
             <li style={{ marginBottom: '1rem' }}>⚡ {t('pricing.proFeatures.direct')}</li>
@@ -102,7 +104,7 @@ export default function PricingPage() {
         {/* Plano PREMIUM */}
         <div className="glass" style={{ padding: '2rem', borderRadius: '16px', textAlign: 'left', display: 'flex', flexDirection: 'column' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: '#f59e0b' }}>Premium</h2>
-          <div style={{ fontSize: '3rem', fontWeight: 800, margin: '1rem 0' }}>$5<span style={{ fontSize: '1rem', color: '#94a3b8' }}>{t('pricing.month')}</span></div>
+          <div style={{ fontSize: '3rem', fontWeight: 800, margin: '1rem 0' }}>{isBrl ? 'R$ 27,90' : '$5'}<span style={{ fontSize: '1rem', color: '#94a3b8' }}>{t('pricing.month')}</span></div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 2rem 0', flex: 1 }}>
             <li style={{ marginBottom: '1rem' }}>✅ {t('pricing.premiumFeatures.allPro')}</li>
             <li style={{ marginBottom: '1rem' }}>🚀 {t('pricing.premiumFeatures.customAlias')}</li>

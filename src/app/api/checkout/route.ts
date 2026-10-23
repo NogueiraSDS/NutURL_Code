@@ -8,7 +8,7 @@ const stripe = new Stripe(stripeKey, { apiVersion: '2026-05-27.dahlia' });
 
 export async function POST(request: Request) {
   try {
-    const { userId, tier } = await request.json();
+    const { userId, tier, currency } = await request.json();
 
     if (!stripeKey) {
       return NextResponse.json({ error: 'Stripe não configurado no servidor (.env.local)' }, { status: 500 });
@@ -24,13 +24,19 @@ export async function POST(request: Request) {
       user = await prisma.user.create({ data: { firebaseUid: userId, tier: 'free' } });
     }
 
-    // Definir o Price ID com base no plano escolhido
-    // IMPORTANTE: O usuário precisará trocar esses IDs pelos gerados no painel do Stripe dele.
+    // Identifica se a moeda solicitada é BRL ou USD (padrão BRL se currency === 'brl' ou 'pt')
+    const isBrl = currency === 'brl' || currency === 'pt';
+
+    // Definir o Price ID com base no plano escolhido e na moeda
     let priceId = '';
     if (tier === 'pro') {
-      priceId = process.env.STRIPE_PRICE_ID_PRO || 'price_123_PRO';
+      priceId = isBrl 
+        ? (process.env.STRIPE_PRICE_ID_BRL_PRO || process.env.STRIPE_PRICE_ID_PRO || 'price_123_PRO')
+        : (process.env.STRIPE_PRICE_ID_USD_PRO || process.env.STRIPE_PRICE_ID_PRO || 'price_123_PRO');
     } else if (tier === 'premium') {
-      priceId = process.env.STRIPE_PRICE_ID_PREMIUM || 'price_123_PREMIUM';
+      priceId = isBrl
+        ? (process.env.STRIPE_PRICE_ID_BRL_PREMIUM || process.env.STRIPE_PRICE_ID_PREMIUM || 'price_123_PREMIUM')
+        : (process.env.STRIPE_PRICE_ID_USD_PREMIUM || process.env.STRIPE_PRICE_ID_PREMIUM || 'price_123_PREMIUM');
     } else {
       return NextResponse.json({ error: 'Plano inválido' }, { status: 400 });
     }
