@@ -280,10 +280,10 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
         </div>
 
         {/* Content Section */}
-        <div style={{ padding: '0 1.5rem 1.5rem' }}>
+        <div style={{ padding: '0 1.5rem 1.5rem', position: 'relative', zIndex: 5 }}>
           
           {/* Avatar and Verification Badge */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '-45px', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '-45px', marginBottom: '1rem', position: 'relative', zIndex: 10 }}>
             <div style={{
               width: '90px',
               height: '90px',
@@ -291,10 +291,12 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
               overflow: 'hidden',
               background: '#1e293b',
               border: '3px solid #0f172a',
-              boxShadow: '0 10px 20px rgba(0,0,0,0.4)',
+              boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 20
             }}>
               {card.avatarUrl ? (
                 <img src={card.avatarUrl} alt={card.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
