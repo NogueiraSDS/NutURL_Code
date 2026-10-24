@@ -43,6 +43,7 @@ model User {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   profile            Profile?
+  businessCard       BusinessCard?
 }
 
 model Profile {
@@ -94,4 +95,24 @@ model ProfileVisit {
   referer   String?
   createdAt DateTime @default(now())
 }
-
+model BusinessCard {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug        String   @unique // URL amigavel do cartao (ex: nuturl.com/card/:slug)
+  fullName    String
+  role        String?  // Cargo / Funcao
+  company     String?  // Empresa ou organizacao
+  phone       String?  // Telefone celular ou fixo
+  whatsapp    String?  // Numero WhatsApp (DDI + DDD + Numero)
+  email       String?
+  website     String?
+  address     String?  // Endereço / Localização física
+  city        String?
+  state       String?
+  notes       String?  // Pequena bio ou mensagem no cartão
+  avatarUrl   String?  // Foto de perfil
+  theme       String?  @default("dark") // dark, elegant, modern, gradient
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

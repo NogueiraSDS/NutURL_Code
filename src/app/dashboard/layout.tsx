@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings, DownloadCloud, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Link as LinkIcon, User, CreditCard, LogOut, Menu, X, ChevronDown, Settings, DownloadCloud, ChevronLeft, ChevronRight, Contact } from 'lucide-react';
 import { useI18n } from '@/context/I18nContext';
 import NutUrlLogo from '@/components/NutUrlLogo';
 
@@ -46,6 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t('dashboard.overview') || 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: t('dashboard.myLinks') || 'Meus Links', href: '/dashboard/links', icon: LinkIcon },
     { name: 'Minha Página', href: '/dashboard/profile', icon: User },
+    { name: 'Cartão de Visita', href: '/dashboard/card', icon: Contact },
     { name: 'Meu Plano', href: '/dashboard/plan', icon: CreditCard },
     { name: 'Configurações', href: '/dashboard/settings', icon: Settings },
   ];
