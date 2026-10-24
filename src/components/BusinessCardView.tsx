@@ -53,28 +53,23 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
       ? `${window.location.origin}/card/${card.slug || ''}`
       : `https://nuturl.com/card/${card.slug || ''}`);
 
-  // Format clean WhatsApp link
   const cleanWhatsapp = (card.whatsapp || '').replace(/\D/g, '');
   const whatsappUrl = cleanWhatsapp ? `https://wa.me/${cleanWhatsapp}` : '';
 
-  // Format clean phone link
   const cleanPhone = (card.phone || '').replace(/[^\d+]/g, '');
   const phoneUrl = cleanPhone ? `tel:${cleanPhone}` : '';
 
-  // Format website link
   const websiteUrl = card.website
     ? card.website.startsWith('http://') || card.website.startsWith('https://')
       ? card.website
       : `https://${card.website}`
     : '';
 
-  // Google Maps link
   const fullAddress = [card.address, card.city, card.state].filter(Boolean).join(', ');
   const mapsUrl = fullAddress
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
     : '';
 
-  // Handle QR code modal open
   const handleOpenQrModal = async () => {
     try {
       const url = await QRCode.toDataURL(targetUrl, {
@@ -92,7 +87,6 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
     }
   };
 
-  // Download QR Code PNG
   const handleDownloadQrPng = () => {
     if (!qrDataUrl) return;
     const a = document.createElement('a');
@@ -103,7 +97,6 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
     document.body.removeChild(a);
   };
 
-  // Handle Share / Copy Link
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -113,9 +106,7 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
           url: targetUrl,
         });
         return;
-      } catch (err) {
-        // user cancelled or share failed, fallback to copy
-      }
+      } catch (err) {}
     }
 
     if (navigator.clipboard) {
@@ -125,7 +116,6 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
     }
   };
 
-  // Handle Save vCard contact
   const handleSaveContact = () => {
     downloadVCard({
       fullName: card.fullName,
@@ -150,122 +140,219 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   };
 
-  // Themes configuration
+  // Theme styles configured with inline CSS guarantees
   const themeStyles = {
     dark: {
-      cardBg: 'bg-slate-900/95 border-slate-700/60',
-      banner: 'bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800',
-      glow: 'from-blue-600 via-indigo-600 to-emerald-500',
-      primaryBtn: 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-600/30',
-      textAccent: 'text-indigo-400',
-      badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      badgeDot: 'bg-emerald-400',
+      cardBg: 'rgba(15, 23, 42, 0.95)',
+      cardBorder: '1px solid rgba(255, 255, 255, 0.1)',
+      banner: 'linear-gradient(135deg, #1d4ed8 0%, #4338ca 50%, #6b21a8 100%)',
+      glow: 'rgba(59, 130, 246, 0.25)',
+      primaryBtn: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+      btnTextColor: '#ffffff',
+      textAccent: '#818cf8',
+      badgeBg: 'rgba(16, 185, 129, 0.15)',
+      badgeBorder: '1px solid rgba(16, 185, 129, 0.3)',
+      badgeText: '#34d399',
+      badgeDot: '#34d399',
     },
     elegant: {
-      cardBg: 'bg-zinc-950/95 border-amber-500/30',
-      banner: 'bg-gradient-to-r from-zinc-900 via-neutral-900 to-amber-950',
-      glow: 'from-amber-600 via-yellow-600 to-zinc-800',
-      primaryBtn: 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-zinc-950 font-bold shadow-amber-500/20',
-      textAccent: 'text-amber-400',
-      badge: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-      badgeDot: 'bg-amber-400',
+      cardBg: 'rgba(10, 10, 10, 0.95)',
+      cardBorder: '1px solid rgba(217, 119, 6, 0.3)',
+      banner: 'linear-gradient(135deg, #1c1917 0%, #292524 50%, #451a03 100%)',
+      glow: 'rgba(217, 119, 6, 0.25)',
+      primaryBtn: 'linear-gradient(135deg, #d97706, #b45309)',
+      btnTextColor: '#ffffff',
+      textAccent: '#fbbf24',
+      badgeBg: 'rgba(245, 158, 11, 0.15)',
+      badgeBorder: '1px solid rgba(245, 158, 11, 0.3)',
+      badgeText: '#fcd34d',
+      badgeDot: '#fbbf24',
     },
     modern: {
-      cardBg: 'bg-slate-900/80 border-cyan-500/30 backdrop-blur-2xl',
-      banner: 'bg-gradient-to-r from-cyan-600 via-teal-600 to-blue-700',
-      glow: 'from-cyan-500 via-teal-500 to-blue-600',
-      primaryBtn: 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-cyan-500/25',
-      textAccent: 'text-cyan-400',
-      badge: 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
-      badgeDot: 'bg-cyan-400',
+      cardBg: 'rgba(15, 23, 42, 0.85)',
+      cardBorder: '1px solid rgba(6, 182, 212, 0.3)',
+      banner: 'linear-gradient(135deg, #0891b2 0%, #0d9488 50%, #1d4ed8 100%)',
+      glow: 'rgba(6, 182, 212, 0.25)',
+      primaryBtn: 'linear-gradient(135deg, #06b6d4, #2563eb)',
+      btnTextColor: '#ffffff',
+      textAccent: '#22d3ee',
+      badgeBg: 'rgba(6, 182, 212, 0.15)',
+      badgeBorder: '1px solid rgba(6, 182, 212, 0.3)',
+      badgeText: '#67e8f9',
+      badgeDot: '#22d3ee',
     },
     gradient: {
-      cardBg: 'bg-slate-900/90 border-fuchsia-500/30',
-      banner: 'bg-gradient-to-r from-fuchsia-600 via-pink-600 to-indigo-700',
-      glow: 'from-pink-600 via-purple-600 to-indigo-600',
-      primaryBtn: 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white shadow-pink-600/30',
-      textAccent: 'text-fuchsia-400',
-      badge: 'bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/20',
-      badgeDot: 'bg-fuchsia-400',
+      cardBg: 'rgba(15, 23, 42, 0.92)',
+      cardBorder: '1px solid rgba(217, 70, 239, 0.3)',
+      banner: 'linear-gradient(135deg, #c026d3 0%, #db2777 50%, #4338ca 100%)',
+      glow: 'rgba(217, 70, 239, 0.25)',
+      primaryBtn: 'linear-gradient(135deg, #db2777, #9333ea)',
+      btnTextColor: '#ffffff',
+      textAccent: '#f472b6',
+      badgeBg: 'rgba(236, 72, 153, 0.15)',
+      badgeBorder: '1px solid rgba(236, 72, 153, 0.3)',
+      badgeText: '#f472b6',
+      badgeDot: '#ec4899',
     },
   };
 
   const selectedTheme = themeStyles[(card.theme as keyof typeof themeStyles) || 'dark'] || themeStyles.dark;
 
   return (
-    <div className="w-full max-w-md mx-auto relative select-none">
-      {/* Background Ambient Glow */}
-      <div className={`absolute -inset-1 bg-gradient-to-r ${selectedTheme.glow} rounded-3xl blur-xl opacity-30 pointer-events-none transition-all duration-500`} />
+    <div style={{ width: '100%', maxWidth: '420px', margin: '0 auto', position: 'relative', userSelect: 'none' }}>
+      
+      {/* Outer ambient glow */}
+      <div style={{
+        position: 'absolute',
+        inset: '-4px',
+        borderRadius: '28px',
+        background: selectedTheme.glow,
+        filter: 'blur(20px)',
+        pointerEvents: 'none',
+        zIndex: 0
+      }} />
 
       {/* Main Card Container */}
-      <div className={`relative rounded-3xl ${selectedTheme.cardBg} backdrop-blur-xl border shadow-2xl overflow-hidden transition-all duration-300`}>
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        borderRadius: '24px',
+        background: selectedTheme.cardBg,
+        border: selectedTheme.cardBorder,
+        boxShadow: '0 20px 40px -15px rgba(0,0,0,0.7)',
+        overflow: 'hidden',
+        backdropFilter: 'blur(16px)',
+      }}>
         
         {/* Top Header Banner */}
-        <div className={`h-32 ${selectedTheme.banner} relative flex items-center justify-end px-4 transition-all duration-500`}>
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/15 to-transparent pointer-events-none" />
-          
-          <div className="flex items-center gap-2 relative z-10">
+        <div style={{
+          height: '110px',
+          background: selectedTheme.banner,
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          padding: '0 1rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative', zIndex: 2 }}>
             <button
               onClick={handleOpenQrModal}
               title="Ver QR Code"
-              className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition-transform active:scale-95 border border-white/10"
+              type="button"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'white',
+                cursor: 'pointer'
+              }}
             >
-              <QrCode className="w-4 h-4" />
+              <QrCode size={16} />
             </button>
             <button
               onClick={handleShare}
               title="Compartilhar Cartão"
-              className="p-2.5 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-md transition-transform active:scale-95 border border-white/10 flex items-center gap-1.5 text-xs font-medium"
+              type="button"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0 0.75rem',
+                height: '36px',
+                borderRadius: '20px',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '0.75rem',
+                fontWeight: 600
+              }}
             >
-              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-              {copied && <span className="text-emerald-300 pr-1">Copiado</span>}
+              {copied ? <Check size={14} color="#34d399" /> : <Share2 size={14} />}
+              <span>{copied ? 'Copiado!' : 'Compartilhar'}</span>
             </button>
           </div>
         </div>
 
-        {/* Avatar Section */}
-        <div className="relative px-6 pt-0 pb-4">
-          <div className="-mt-16 mb-4 flex justify-between items-end">
-            <div className="relative w-28 h-28 rounded-2xl overflow-hidden ring-4 ring-slate-900 bg-slate-800 shadow-xl flex items-center justify-center">
+        {/* Content Section */}
+        <div style={{ padding: '0 1.5rem 1.5rem' }}>
+          
+          {/* Avatar and Verification Badge */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '-45px', marginBottom: '1rem' }}>
+            <div style={{
+              width: '90px',
+              height: '90px',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              background: '#1e293b',
+              border: '3px solid #0f172a',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
               {card.avatarUrl ? (
-                <img
-                  src={card.avatarUrl}
-                  alt={card.fullName}
-                  className="w-full h-full object-cover"
-                />
+                <img src={card.avatarUrl} alt={card.fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl">
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(135deg, #6366f1, #a855f7)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '1.75rem'
+                }}>
                   {getInitials(card.fullName)}
                 </div>
               )}
             </div>
 
-            <div className="flex flex-col items-end pb-1">
-              <span className={`inline-flex items-center gap-1 text-[11px] font-semibold tracking-wider uppercase px-2.5 py-1 rounded-full ${selectedTheme.badge}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${selectedTheme.badgeDot} animate-pulse`} />
-                Cartão Verificado
-              </span>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              padding: '0.3rem 0.65rem',
+              borderRadius: '20px',
+              background: selectedTheme.badgeBg,
+              border: selectedTheme.badgeBorder,
+              color: selectedTheme.badgeText,
+              marginBottom: '0.25rem'
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: selectedTheme.badgeDot }} />
+              Verificado
             </div>
           </div>
 
-          {/* Name & Headline */}
-          <div className="space-y-1 mb-5">
-            <h1 className="text-2xl font-bold text-white tracking-tight leading-snug">
+          {/* Name & Titles */}
+          <div style={{ marginBottom: '1.25rem' }}>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#ffffff', margin: '0 0 0.35rem 0', lineHeight: 1.2 }}>
               {card.fullName || 'Seu Nome'}
             </h1>
-            
+
             {(card.role || card.company) && (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-300">
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem' }}>
                 {card.role && (
-                  <span className={`flex items-center gap-1.5 ${selectedTheme.textAccent} font-medium`}>
-                    <Briefcase className="w-3.5 h-3.5" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', color: selectedTheme.textAccent, fontWeight: 600 }}>
+                    <Briefcase size={14} />
                     {card.role}
                   </span>
                 )}
-                {card.role && card.company && <span className="text-slate-600">•</span>}
+                {card.role && card.company && <span style={{ color: '#475569' }}>•</span>}
                 {card.company && (
-                  <span className="flex items-center gap-1.5 text-slate-300">
-                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', color: '#cbd5e1' }}>
+                    <Building2 size={14} color="#94a3b8" />
                     {card.company}
                   </span>
                 )}
@@ -273,36 +360,72 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
             )}
 
             {card.notes && (
-              <p className="text-xs text-slate-400 pt-2 leading-relaxed whitespace-pre-line border-t border-slate-800/80 mt-2">
+              <p style={{
+                fontSize: '0.8rem',
+                color: '#94a3b8',
+                margin: '0.75rem 0 0 0',
+                paddingTop: '0.65rem',
+                borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                lineHeight: 1.45,
+                whiteSpace: 'pre-line'
+              }}>
                 {card.notes}
               </p>
             )}
           </div>
 
-          {/* Primary Action Button: Salvar nos Contatos (vCard) */}
+          {/* Primary Action Button: Salvar vCard */}
           <button
             onClick={handleSaveContact}
-            className={`w-full py-3.5 px-4 rounded-xl ${selectedTheme.primaryBtn} font-semibold text-sm shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all cursor-pointer mb-5`}
+            type="button"
+            style={{
+              width: '100%',
+              padding: '0.85rem 1rem',
+              borderRadius: '12px',
+              background: selectedTheme.primaryBtn,
+              color: selectedTheme.btnTextColor,
+              border: 'none',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              cursor: 'pointer',
+              marginBottom: '1rem',
+              boxShadow: '0 6px 20px -5px rgba(0,0,0,0.4)',
+              transition: 'transform 0.15s ease'
+            }}
           >
-            <Download className="w-4 h-4" />
+            <Download size={18} />
             Salvar nos Contatos (.vcf)
           </button>
 
-          {/* Quick Contact Action Badges */}
-          <div className="grid grid-cols-2 gap-2.5 mb-5">
+          {/* Contact Badges Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1rem' }}>
             {whatsappUrl && (
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-950/40 border border-emerald-800/40 hover:bg-emerald-900/50 text-emerald-300 transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem',
+                  borderRadius: '10px',
+                  background: 'rgba(6, 78, 59, 0.4)',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  color: '#6ee7b7',
+                  textDecoration: 'none'
+                }}
               >
-                <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
-                  <MessageCircle className="w-4 h-4" />
+                <div style={{ padding: '0.4rem', borderRadius: '8px', background: 'rgba(16, 185, 129, 0.2)', display: 'flex' }}>
+                  <MessageCircle size={16} color="#34d399" />
                 </div>
-                <div className="min-w-0 text-left">
-                  <div className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold">WhatsApp</div>
-                  <div className="text-xs font-semibold truncate text-white">Chamar no zap</div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#34d399' }}>WhatsApp</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Conversar</div>
                 </div>
               </a>
             )}
@@ -310,14 +433,24 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
             {phoneUrl && (
               <a
                 href={phoneUrl}
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:bg-slate-800 text-slate-200 transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem',
+                  borderRadius: '10px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#e2e8f0',
+                  textDecoration: 'none'
+                }}
               >
-                <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
-                  <Phone className="w-4 h-4" />
+                <div style={{ padding: '0.4rem', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.2)', display: 'flex' }}>
+                  <Phone size={16} color="#60a5fa" />
                 </div>
-                <div className="min-w-0 text-left">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Ligar</div>
-                  <div className="text-xs font-semibold truncate text-white">{card.phone}</div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8' }}>Ligar</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{card.phone}</div>
                 </div>
               </a>
             )}
@@ -325,14 +458,24 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
             {card.email && (
               <a
                 href={`mailto:${card.email}`}
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:bg-slate-800 text-slate-200 transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem',
+                  borderRadius: '10px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#e2e8f0',
+                  textDecoration: 'none'
+                }}
               >
-                <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
-                  <Mail className="w-4 h-4" />
+                <div style={{ padding: '0.4rem', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.2)', display: 'flex' }}>
+                  <Mail size={16} color="#fbbf24" />
                 </div>
-                <div className="min-w-0 text-left">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">E-mail</div>
-                  <div className="text-xs font-semibold truncate text-white">{card.email}</div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8' }}>E-mail</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{card.email}</div>
                 </div>
               </a>
             )}
@@ -342,36 +485,63 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
                 href={websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-800/60 border border-slate-700/60 hover:bg-slate-800 text-slate-200 transition-colors"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.65rem',
+                  borderRadius: '10px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#e2e8f0',
+                  textDecoration: 'none'
+                }}
               >
-                <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400">
-                  <Globe className="w-4 h-4" />
+                <div style={{ padding: '0.4rem', borderRadius: '8px', background: 'rgba(168, 85, 247, 0.2)', display: 'flex' }}>
+                  <Globe size={16} color="#c084fc" />
                 </div>
-                <div className="min-w-0 text-left">
-                  <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Website</div>
-                  <div className="text-xs font-semibold truncate text-white">Acessar site</div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8' }}>Site</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Acessar</div>
                 </div>
               </a>
             )}
           </div>
 
-          {/* Address Item */}
+          {/* Endereço */}
           {fullAddress && (
-            <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/40 mb-4 flex items-start gap-3">
-              <MapPin className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
-              <div className="flex-1 min-w-0 text-left">
-                <span className="text-[10px] uppercase tracking-wider font-bold text-slate-400 block mb-0.5">
-                  Endereço / Localização
+            <div style={{
+              padding: '0.75rem',
+              borderRadius: '10px',
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '0.5rem'
+            }}>
+              <MapPin size={16} color="#f43f5e" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div>
+                <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 800, color: '#94a3b8', display: 'block' }}>
+                  Localização
                 </span>
-                <p className="text-xs text-slate-200 leading-snug">{fullAddress}</p>
+                <p style={{ fontSize: '0.75rem', color: '#e2e8f0', margin: '2px 0 0 0', lineHeight: 1.3 }}>{fullAddress}</p>
                 {mapsUrl && (
                   <a
                     href={mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-400 hover:text-blue-300 mt-1.5"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.25rem',
+                      fontSize: '0.75rem',
+                      color: '#60a5fa',
+                      textDecoration: 'none',
+                      marginTop: '0.35rem'
+                    }}
                   >
-                    Ver no Google Maps <ExternalLink className="w-3 h-3" />
+                    Ver no Google Maps <ExternalLink size={12} />
                   </a>
                 )}
               </div>
@@ -379,15 +549,22 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
           )}
 
           {/* Footer Branding */}
-          <div className="pt-3 pb-2 text-center border-t border-slate-800/60">
+          <div style={{ textAlign: 'center', paddingTop: '0.75rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
             <a
               href="https://nuturl.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-400 transition-colors"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.75rem',
+                color: '#64748b',
+                textDecoration: 'none'
+              }}
             >
-              <Sparkles className="w-3 h-3 text-indigo-400" />
-              Criado com <strong>NutURL</strong> • Cartão Digital
+              <Sparkles size={12} color="#818cf8" />
+              Criado com <strong>NutURL</strong>
             </a>
           </div>
         </div>
@@ -395,31 +572,77 @@ export default function BusinessCardView({ card, cardUrl, isPreview = false }: B
 
       {/* QR Code Modal */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-700 p-6 text-center shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-1">QR Code do Cartão</h3>
-            <p className="text-xs text-slate-400 mb-4">
-              Aponte a câmera do celular para abrir o cartão de visita digital ou salvar os contatos.
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem',
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(6px)'
+        }}>
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '340px',
+            borderRadius: '20px',
+            background: '#0f172a',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            padding: '1.5rem',
+            textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+          }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'white', margin: '0 0 0.25rem 0' }}>QR Code do Cartão</h3>
+            <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0 0 1rem 0' }}>
+              Aponte a câmera do celular para abrir ou salvar este contato direto na agenda.
             </p>
 
             {qrDataUrl && (
-              <div className="p-4 bg-white rounded-xl inline-block shadow-inner mb-4">
-                <img src={qrDataUrl} alt="QR Code Cartão de Visita" className="w-48 h-48 mx-auto" />
+              <div style={{
+                padding: '0.75rem',
+                background: 'white',
+                borderRadius: '12px',
+                display: 'inline-block',
+                marginBottom: '1.25rem'
+              }}>
+                <img src={qrDataUrl} alt="QR Code Cartão" style={{ width: '180px', height: '180px', display: 'block' }} />
               </div>
             )}
 
-            <div className="flex flex-col gap-2">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <button
                 onClick={handleDownloadQrPng}
-                className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                type="button"
+                className="btn"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.35rem',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer'
+                }}
               >
-                <Download className="w-4 h-4" />
+                <Download size={16} />
                 Baixar Imagem (PNG)
               </button>
 
               <button
                 onClick={() => setShowQrModal(false)}
-                className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs cursor-pointer transition-colors"
+                type="button"
+                style={{
+                  padding: '0.65rem 1rem',
+                  borderRadius: '8px',
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: 'none',
+                  color: '#94a3b8',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
               >
                 Fechar
               </button>

@@ -55,12 +55,44 @@ export default async function PublicBusinessCardPage({ params }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 sm:p-6 py-12 relative overflow-x-hidden">
+    <main style={{
+      minHeight: '100vh',
+      backgroundColor: '#090d16',
+      color: '#f8fafc',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem 1rem',
+      position: 'relative',
+      overflowX: 'hidden'
+    }}>
       {/* Decorative ambient gradients */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 translate-y-1/2 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+      <div style={{
+        position: 'absolute',
+        top: '25%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '380px',
+        height: '380px',
+        borderRadius: '50%',
+        background: 'rgba(59, 130, 246, 0.15)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none'
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '25%',
+        left: '50%',
+        transform: 'translate(-50%, 50%)',
+        width: '380px',
+        height: '380px',
+        borderRadius: '50%',
+        background: 'rgba(168, 85, 247, 0.15)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none'
+      }} />
 
-      <div className="relative z-10 w-full">
+      <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
         <BusinessCardView card={card} />
       </div>
     </main>

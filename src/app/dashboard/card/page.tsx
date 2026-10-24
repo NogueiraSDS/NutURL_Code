@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState } from 'react';
 import imageCompression from 'browser-image-compression';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '@/lib/firebase';
@@ -38,7 +38,6 @@ const THEMES = [
 export default function BusinessCardDashboard() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   const [fetching, setFetching] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -95,7 +94,6 @@ export default function BusinessCardDashboard() {
             setAvatarUrl(c.avatarUrl || '');
             setTheme(c.theme || 'dark');
           } else {
-            // Pre-fill with user info if available
             if (user.displayName) setFullName(user.displayName);
             if (user.email) setEmail(user.email);
             if (user.photoURL) setAvatarUrl(user.photoURL);
@@ -120,7 +118,6 @@ export default function BusinessCardDashboard() {
     }
   }, [user]);
 
-  // Handle avatar upload
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
@@ -234,52 +231,114 @@ export default function BusinessCardDashboard() {
 
   if (loading || fetching) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
-          <p className="text-slate-400">Carregando dados do seu Cartão de Visita...</p>
+      <div style={{ display: 'flex', minHeight: '60vh', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+          <RefreshCw className="animate-spin" size={32} color="#3b82f6" />
+          <p style={{ color: '#94a3b8' }}>Carregando dados do seu Cartão de Visita...</p>
         </div>
       </div>
     );
   }
 
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    color: '#94a3b8',
+    marginBottom: '0.375rem',
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    borderRadius: '10px',
+    backgroundColor: 'rgba(15, 23, 42, 0.7)',
+    border: '1px solid rgba(255, 255, 255, 0.12)',
+    padding: '0.65rem 0.85rem',
+    fontSize: '0.875rem',
+    color: '#f8fafc',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+  };
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', color: '#f8fafc' }}>
       {/* Top Header */}
-      <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <Contact className="h-5 w-5" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              background: 'rgba(59, 130, 246, 0.15)',
+              border: '1px solid rgba(59, 130, 246, 0.3)',
+              color: '#60a5fa'
+            }}>
+              <Contact size={20} />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>
               Cartão de Visita Digital
             </h1>
           </div>
-          <p className="mt-1 text-sm text-slate-400">
-            Crie seu vCard interativo profissional. Compartilhe com um toque via link, WhatsApp ou QR Code e permita que clientes salvem seu contato direto na agenda!
+          <p style={{ color: '#94a3b8', fontSize: '0.875rem', margin: 0 }}>
+            Crie seu vCard interativo profissional. Compartilhe via link ou QR Code e permita que clientes salvem seu contato direto na agenda.
           </p>
         </div>
 
-        {/* Public link action bar */}
         {slug && (
-          <div className="flex flex-wrap items-center gap-2 bg-slate-900/80 border border-slate-800 p-2 rounded-xl">
-            <span className="text-xs font-mono text-slate-400 truncate max-w-[200px] sm:max-w-[260px] pl-2">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            background: 'rgba(15, 23, 42, 0.8)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '0.5rem',
+            borderRadius: '12px'
+          }}>
+            <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#94a3b8', paddingLeft: '0.5rem' }}>
               /card/{slug}
             </span>
             <button
               onClick={handleCopyLink}
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: 'none',
+                color: '#e2e8f0',
+                cursor: 'pointer'
+              }}
             >
-              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+              {copied ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
               {copied ? 'Copiado!' : 'Copiar'}
             </button>
             <a
               href={publicCardUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                padding: '0.35rem 0.75rem',
+                borderRadius: '8px',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                background: 'var(--primary)',
+                color: 'white',
+                textDecoration: 'none'
+              }}
             >
               <ExternalLink size={14} />
               Visualizar
@@ -290,367 +349,400 @@ export default function BusinessCardDashboard() {
 
       {/* Alert Messages */}
       {successMessage && (
-        <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-400 flex items-center gap-2 animate-fadeIn">
-          <Check className="h-5 w-5 flex-shrink-0" />
+        <div style={{
+          marginBottom: '1.5rem',
+          padding: '0.85rem 1rem',
+          borderRadius: '10px',
+          background: 'rgba(16, 185, 129, 0.15)',
+          border: '1px solid rgba(16, 185, 129, 0.3)',
+          color: '#34d399',
+          fontSize: '0.875rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          <Check size={18} />
           <span>{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="mb-6 rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-400 animate-fadeIn">
+        <div style={{
+          marginBottom: '1.5rem',
+          padding: '0.85rem 1rem',
+          borderRadius: '10px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          color: '#f87171',
+          fontSize: '0.875rem'
+        }}>
           {errorMessage}
         </div>
       )}
 
-      {/* Tabs on mobile */}
-      <div className="mb-6 flex border-b border-slate-800 lg:hidden">
-        <button
-          onClick={() => setActiveTab('edit')}
-          className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'edit'
-              ? 'border-blue-500 text-blue-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Editar Cartão
-        </button>
-        <button
-          onClick={() => setActiveTab('preview')}
-          className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors flex items-center justify-center gap-2 ${
-            activeTab === 'preview'
-              ? 'border-blue-500 text-blue-400'
-              : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Eye size={16} />
-          Prévia em Tempo Real
-        </button>
-      </div>
+      {/* Main Grid: Form + Preview */}
+      <div className="card-editor-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.4fr) minmax(360px, 1fr)', gap: '2rem', alignItems: 'start' }}>
+        
+        {/* FORM */}
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Foto e Slug */}
+          <div className="glass" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <User size={18} color="#60a5fa" />
+              Identidade & Foto
+            </h2>
 
-      {/* Main Grid: Form + Live Preview */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
-        {/* FORM COLUMN */}
-        <div className={`lg:col-span-7 ${activeTab === 'preview' ? 'hidden lg:block' : 'block'}`}>
-          <form onSubmit={handleSave} className="space-y-6">
-            {/* Foto e Slug */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-xl">
-              <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <User size={18} className="text-blue-400" />
-                Identidade & Foto
-              </h2>
-
-              <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
-                <div className="relative group">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-slate-700 bg-slate-800 flex items-center justify-center shadow-lg">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                    ) : (
-                      <User size={36} className="text-slate-500" />
-                    )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <div style={{
+                position: 'relative',
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                background: '#1e293b',
+                border: '2px solid rgba(255, 255, 255, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0
+              }}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <User size={32} color="#64748b" />
+                )}
+                {isUploading && (
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <RefreshCw className="animate-spin" size={20} color="#60a5fa" />
                   </div>
-                  {isUploading && (
-                    <div className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
-                      <RefreshCw className="h-6 w-6 animate-spin text-blue-400" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex-1 text-center sm:text-left">
-                  <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 cursor-pointer border border-slate-700 transition-all">
-                    <Upload size={16} />
-                    <span>{isUploading ? 'Enviando...' : 'Carregar Foto'}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                      disabled={isUploading}
-                      className="hidden"
-                    />
-                  </label>
-                  <p className="text-xs text-slate-400 mt-2">
-                    Formatos JPG, PNG ou WebP. Compressão otimizada automática.
-                  </p>
-                </div>
+                )}
               </div>
 
-              {/* Slug / Link Amigável */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Link Personalizado (Slug do Cartão)
-                </label>
-                <div className="flex rounded-xl bg-slate-950 border border-slate-800 overflow-hidden focus-within:border-blue-500 transition-colors">
-                  <span className="inline-flex items-center px-3.5 text-xs text-slate-400 bg-slate-900 border-r border-slate-800">
-                    nuturl.com/card/
-                  </span>
+              <div>
+                <label style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: '#f8fafc',
+                  cursor: isUploading ? 'not-allowed' : 'pointer'
+                }}>
+                  <Upload size={16} />
+                  <span>{isUploading ? 'Enviando...' : 'Carregar Foto'}</span>
                   <input
-                    type="text"
-                    value={slug}
-                    onChange={(e) =>
-                      setSlug(
-                        e.target.value
-                          .toLowerCase()
-                          .replace(/[^a-z0-9_-]/g, '')
-                      )
-                    }
-                    placeholder="seu-nome"
-                    className="flex-1 bg-transparent px-3 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:outline-none"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    disabled={isUploading}
+                    style={{ display: 'none' }}
                   />
-                </div>
-                <p className="text-[11px] text-slate-400">
-                  Este será o endereço público para o seu cartão interativo.
+                </label>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.35rem', margin: 0 }}>
+                  Formatos JPG, PNG ou WebP com compressão automática.
                 </p>
               </div>
             </div>
 
-            {/* Dados Profissionais */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-xl space-y-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Briefcase size={18} className="text-blue-400" />
-                Dados Profissionais
-              </h2>
+            <div>
+              <label style={labelStyle}>Link Personalizado (Slug do Cartão)</label>
+              <div style={{
+                display: 'flex',
+                borderRadius: '10px',
+                background: 'rgba(15, 23, 42, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                overflow: 'hidden'
+              }}>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '0 0.85rem',
+                  fontSize: '0.8rem',
+                  color: '#94a3b8',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  borderRight: '1px solid rgba(255, 255, 255, 0.08)'
+                }}>
+                  nuturl.com/card/
+                </span>
+                <input
+                  type="text"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                  placeholder="seu-nome"
+                  style={{
+                    flex: 1,
+                    background: 'transparent',
+                    border: 'none',
+                    padding: '0.65rem 0.85rem',
+                    fontSize: '0.875rem',
+                    color: '#f8fafc',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.35rem' }}>
+                Endereço público do seu cartão online.
+              </p>
+            </div>
+          </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="sm:col-span-2 space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Nome Completo *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Ex: Dra. Juliana Silva"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
-                  />
-                </div>
+          {/* Dados Profissionais */}
+          <div className="glass" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Briefcase size={18} color="#60a5fa" />
+              Dados Profissionais
+            </h2>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Cargo / Especialidade
-                  </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={labelStyle}>Nome Completo *</label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Ex: Dra. Juliana Silva"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                <div>
+                  <label style={labelStyle}>Cargo / Especialidade</label>
                   <input
                     type="text"
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     placeholder="Ex: Arquiteta e Urbanista"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
+                    style={inputStyle}
                   />
                 </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Empresa / Marca
-                  </label>
+                <div>
+                  <label style={labelStyle}>Empresa / Marca</label>
                   <input
                     type="text"
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="Ex: Studio Arquitetura"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
+                    style={inputStyle}
                   />
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Contato Direto & Redes */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-xl space-y-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Phone size={18} className="text-blue-400" />
-                Canais de Contato
-              </h2>
+          {/* Canais de Contato */}
+          <div className="glass" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Phone size={18} color="#60a5fa" />
+              Canais de Contato
+            </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <MessageCircle size={14} className="text-emerald-400" />
-                    WhatsApp
-                  </label>
-                  <input
-                    type="text"
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    placeholder="Ex: 5511999998888"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
-                  />
-                  <p className="text-[11px] text-slate-400">Inclua DDI + DDD (Ex: 5511999998888)</p>
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              <div>
+                <label style={labelStyle}>WhatsApp (DDI + DDD + Número)</label>
+                <input
+                  type="text"
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="Ex: 5511999998888"
+                  style={inputStyle}
+                />
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Phone size={14} className="text-blue-400" />
-                    Telefone para Chamadas
-                  </label>
-                  <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ex: (11) 99999-8888"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
-                  />
-                </div>
+              <div>
+                <label style={labelStyle}>Telefone para Chamadas</label>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Ex: (11) 99999-8888"
+                  style={inputStyle}
+                />
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Mail size={14} className="text-sky-400" />
-                    E-mail Profissional
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="contato@empresa.com"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
-                  />
-                </div>
+              <div>
+                <label style={labelStyle}>E-mail Profissional</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="contato@empresa.com"
+                  style={inputStyle}
+                />
+              </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Globe size={14} className="text-purple-400" />
-                    Site / Portfolio
-                  </label>
-                  <input
-                    type="text"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="www.minhaempresa.com"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
-                  />
-                </div>
+              <div>
+                <label style={labelStyle}>Website / Portfolio</label>
+                <input
+                  type="text"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="www.minhaempresa.com"
+                  style={inputStyle}
+                />
               </div>
             </div>
+          </div>
 
-            {/* Localização & Apresentação */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-xl space-y-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <MapPin size={18} className="text-blue-400" />
-                Localização & Mensagem
-              </h2>
+          {/* Endereço & Mini-Bio */}
+          <div className="glass" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <MapPin size={18} color="#60a5fa" />
+              Localização & Mensagem
+            </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="sm:col-span-3 space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Endereço / Sala
-                  </label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Ex: Av. Brigadeiro Faria Lima, 1500 - Sala 42"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
-                  />
-                </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={labelStyle}>Endereço Comercial / Sala</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Ex: Av. Paulista, 1000 - Sala 42"
+                  style={inputStyle}
+                />
+              </div>
 
-                <div className="sm:col-span-2 space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Cidade
-                  </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={labelStyle}>Cidade</label>
                   <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Ex: São Paulo"
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
+                    style={inputStyle}
                   />
                 </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Estado (UF)
-                  </label>
+                <div>
+                  <label style={labelStyle}>UF</label>
                   <input
                     type="text"
                     value={state}
-                    onChange={(e) => setState(e.target.value.toUpperCase().slice(0, 2))}
-                    placeholder="Ex: SP"
                     maxLength={2}
-                    className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
+                    onChange={(e) => setState(e.target.value.toUpperCase().slice(0, 2))}
+                    placeholder="SP"
+                    style={inputStyle}
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5 pt-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Apresentação / Mini-bio (vCard Note)
-                </label>
+              <div>
+                <label style={labelStyle}>Apresentação / Mini-bio (vCard Note)</label>
                 <textarea
                   rows={3}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Ex: Especialista em arquitetura corporativa e design sustentável. Entre em contato para orçamentos e consultorias."
-                  className="w-full rounded-xl bg-slate-950 border border-slate-800 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Ex: Especialista em soluções corporativas. Entre em contato para orçamentos e consultorias."
+                  style={{ ...inputStyle, resize: 'vertical' }}
                 />
               </div>
             </div>
+          </div>
 
-            {/* Tema Visual */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 backdrop-blur-xl space-y-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Palette size={18} className="text-blue-400" />
-                Estilo & Tema
-              </h2>
+          {/* Estilo e Tema */}
+          <div className="glass" style={{ padding: '1.5rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Palette size={18} color="#60a5fa" />
+              Estilo & Tema Visual
+            </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {THEMES.map((t) => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+              {THEMES.map((t) => {
+                const isSelected = theme === t.id;
+                return (
                   <button
                     key={t.id}
                     type="button"
                     onClick={() => setTheme(t.id)}
-                    className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
-                      theme === t.id
-                        ? 'border-blue-500 bg-blue-500/10 shadow-lg shadow-blue-500/10'
-                        : 'border-slate-800 bg-slate-950/60 hover:border-slate-700'
-                    }`}
+                    style={{
+                      padding: '0.85rem 1rem',
+                      borderRadius: '10px',
+                      textAlign: 'left',
+                      background: isSelected ? 'rgba(59, 130, 246, 0.15)' : 'rgba(15, 23, 42, 0.6)',
+                      border: isSelected ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.1)',
+                      color: '#f8fafc',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
                   >
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <span className="font-semibold text-sm text-white">{t.label}</span>
-                      {theme === t.id && <Check size={16} className="text-blue-400" />}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                      <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{t.label}</span>
+                      {isSelected && <Check size={16} color="#3b82f6" />}
                     </div>
-                    <span className="text-xs text-slate-400">{t.desc}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{t.desc}</span>
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Submit Action Bar */}
-            <div className="sticky bottom-4 z-20">
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-xl shadow-blue-600/25 active:scale-[0.99] transition-all disabled:opacity-50"
-              >
-                {isSaving ? (
-                  <>
-                    <RefreshCw className="h-5 w-5 animate-spin" />
-                    <span>Salvando Alterações...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save size={18} />
-                    <span>Salvar Cartão de Visita</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="btn"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              padding: '0.85rem 1.5rem',
+              fontSize: '1rem',
+              width: '100%',
+              cursor: isSaving ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {isSaving ? (
+              <>
+                <RefreshCw className="animate-spin" size={18} />
+                <span>Salvando...</span>
+              </>
+            ) : (
+              <>
+                <Save size={18} />
+                <span>Salvar Cartão de Visita</span>
+              </>
+            )}
+          </button>
+        </form>
 
-        {/* LIVE PREVIEW COLUMN */}
-        <div className={`lg:col-span-5 ${activeTab === 'edit' ? 'hidden lg:block' : 'block'}`}>
-          <div className="sticky top-6">
-            <div className="flex items-center justify-between mb-3 px-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Sparkles size={14} className="text-amber-400" />
-                Pré-visualização Interativa
-              </span>
-              <span className="text-xs text-slate-400">Tempo real</span>
-            </div>
+        {/* PREVIEW */}
+        <div style={{ position: 'sticky', top: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <Sparkles size={14} color="#f59e0b" />
+              Pré-visualização
+            </span>
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Tempo real</span>
+          </div>
 
-            <div className="rounded-3xl border border-slate-800 bg-slate-950/80 p-3 sm:p-4 shadow-2xl backdrop-blur-xl">
-              <BusinessCardView card={previewCardData} cardUrl={publicCardUrl} isPreview={true} />
-            </div>
+          <div className="glass" style={{ padding: '1rem', borderRadius: '24px' }}>
+            <BusinessCardView card={previewCardData} cardUrl={publicCardUrl} isPreview={true} />
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 900px) {
+          .card-editor-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
